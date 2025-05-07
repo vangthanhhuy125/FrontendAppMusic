@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="6dp">
+
+    <FrameLayout
+        android:layout_width="180dp"
+        android:layout_height="120dp">
+
+        <!-- Ảnh nền -->
+        <ImageView
+            android:id="@+id/imgFeature"
+            android:layout_width="180dp"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:src="@drawable/exampleavatar"
+            android:background="@drawable/dialog_background"
+            android:clipToOutline="true"/>
+
+        <!-- Text nổi trên ảnh -->
+        <TextView
+            android:id="@+id/tvFeatureLabel"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="NEW ENGLISH SONGS"
+            android:textColor="@android:color/white"
+            android:textStyle="bold"
+            android:textAllCaps="true"
+            android:textSize="16sp"
+            android:shadowColor="#99000000"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="2" />
+    </FrameLayout>
+
+</LinearLayout>
