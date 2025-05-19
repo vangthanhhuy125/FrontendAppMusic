@@ -29,19 +29,16 @@
             android:padding="16dp"
             android:gravity="center_horizontal"
             android:layout_marginBottom="16dp"
-            android:elevation="4dp"
             android:layout_gravity="center">
 
-            <!-- Label: Image -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
                 android:text="Image:"
                 android:textColor="#FFFFFF"
-                android:textSize="14sp"
-                android:layout_marginBottom="4dp" />
+                android:textSize="14sp" />
 
-            <!-- Image Picker -->
             <FrameLayout
                 android:id="@+id/frameImage"
                 android:layout_width="80dp"
@@ -53,10 +50,14 @@
                     android:id="@+id/imgAddImage"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:src="@drawable/iconaddimage"
+                    android:contentDescription="Add Image"
                     android:scaleType="centerInside"
-                    android:contentDescription="Add Image" />
+                    android:src="@drawable/iconaddimage" />
             </FrameLayout>
+
+            <!-- Label: Image -->
+
+            <!-- Image Picker -->
 
             <!-- Voice Label + Button -->
             <TextView

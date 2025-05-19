@@ -2,19 +2,18 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    android:gravity="center"
-    android:padding="8dp"
-    android:background="@color/black">
+    android:gravity="center">
 
-    <ImageView
+    <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/imgArtist"
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:src="@drawable/example_artist"
         android:scaleType="centerCrop"
-        android:background="@drawable/circle_background"
-        android:clipToOutline="true" />
+        app:shapeAppearanceOverlay="@style/RoundedImageStyle"
+        />
 
     <TextView
         android:id="@+id/txtArtistName"

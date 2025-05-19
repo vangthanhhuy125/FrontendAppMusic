@@ -10,26 +10,18 @@
     android:gravity="center_vertical">
 
     <!-- Phần ảnh + icon play -->
-    <FrameLayout
-        android:layout_width="48dp"
-        android:layout_height="48dp">
 
-        <ImageView
+
+        <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/imgThumbnail"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:scaleType="centerCrop"
             android:src="@drawable/exampleavatar"
-            android:background="@drawable/box_white_background" />
+            app:shapeAppearanceOverlay="@style/RoundedCornerImageStyle"/>
 
-        <ImageView
-            android:id="@+id/imgPlayIcon"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_gravity="center"
-            android:src="@drawable/iconplay"
-            app:tint="#FFFFFF" />
-    </FrameLayout>
+
+
 
     <!-- Thông tin bài hát -->
     <LinearLayout
@@ -61,5 +53,5 @@
         android:id="@+id/imgMore"
         android:layout_width="24dp"
         android:layout_height="24dp"
-        android:src="@drawable/icon3dot" />
+        android:src="@drawable/white_baseline_more_vert_24" />
 </LinearLayout>

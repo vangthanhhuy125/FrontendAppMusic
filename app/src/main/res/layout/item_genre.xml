@@ -13,6 +13,7 @@
         android:src="@drawable/exampleavatar"
         android:contentDescription="Genre image" />
 
+
     <!-- Tên thể loại -->
     <TextView
         android:id="@+id/genreName"
