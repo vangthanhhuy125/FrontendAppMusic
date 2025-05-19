@@ -1,6 +1,10 @@
 package com.example.manhinhappmusic;
 
 import java.util.ArrayList;
+import java.util.List;
+
+import android.os.Bundle;
+
 
 public class Song {
     private String id;
@@ -9,7 +13,7 @@ public class Song {
     private String title;
     private String audioUrl;
     private String coverImageUrl;
-    private ArrayList<String> genreId;
+    private List<String> genreId;
     private Boolean isApproved;
     private Boolean isPublic;
     private String lyric;
@@ -17,7 +21,18 @@ public class Song {
     private Double views;
 
     // Constructors, Getters và Setters
-    public Song() {}
+
+    // Constructors, Getters và Setters
+    public Song(String id, String title, String artistId, String description, String audioUrl, String coverImageUrl, List<String> genreId) {
+        this.id = id;
+        this.title = title;
+        this.artistId = artistId;
+        this.description = description;
+        this.audioUrl = audioUrl;
+        this.coverImageUrl = coverImageUrl;
+        this.genreId = new ArrayList<String>();
+        genreId.addAll(genreId);
+    }
 
     public String getId() {
         return id;
@@ -27,4 +42,52 @@ public class Song {
         this.id = id;
     }
 
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getArtistId() {
+        return artistId;
+    }
+
+    public void setArtistId(String artistId) {
+        this.artistId = artistId;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getAudioUrl() {
+        return audioUrl;
+    }
+
+    public void setAudioUrl(String audioUrl) {
+        this.audioUrl = audioUrl;
+    }
+
+    public String getCoverImageUrl() {
+        return coverImageUrl;
+    }
+
+    public void setCoverImageUrl(String coverImageUrl) {
+        this.coverImageUrl = coverImageUrl;
+    }
+
+    public List<String> getGenreId() {
+        return genreId;
+    }
+
+    public void setGenreId(List<String> genreId) {
+        this.genreId.clear();
+        this.genreId.addAll(genreId);
+    }
 }
