@@ -3,7 +3,7 @@ package com.example.manhinhappmusic;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.os.Bundle;
+//import android.os.Bundle;
 
 
 public class Song {
@@ -30,8 +30,8 @@ public class Song {
         this.description = description;
         this.audioUrl = audioUrl;
         this.coverImageUrl = coverImageUrl;
-        this.genreId = new ArrayList<String>();
-        genreId.addAll(genreId);
+        this.genreId = new ArrayList<>(genreId);
+
     }
 
     public String getId() {
