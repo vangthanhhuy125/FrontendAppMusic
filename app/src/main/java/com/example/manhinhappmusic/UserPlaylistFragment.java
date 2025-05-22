@@ -9,9 +9,13 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,11 +26,15 @@ import java.util.List;
  * Use the {@link UserPlaylistFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class UserPlaylistFragment extends Fragment {
+public class UserPlaylistFragment extends BaseFragment {
 
-    private RecyclerView playlistView;
-    private PlaylistAdapter playlistAdapter;
-    private List<Song> playlistItems;
+    private ImageView playlistsCoverImage;
+    private TextView playlistsTitle;
+    private  TextView playlistsCount;
+    private RecyclerView songsView;
+    private SongAdapter songAdapter;
+    private Playlist playlist;
+
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -60,6 +68,14 @@ public class UserPlaylistFragment extends Fragment {
         return fragment;
     }
 
+
+    public UserPlaylistFragment(Playlist playlist){
+        if(playlist != null)
+            this.playlist = playlist;
+        else
+            this.playlist = new Playlist("","","",new ArrayList<>(), "dfd", "fd");
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,26 +91,23 @@ public class UserPlaylistFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        playlistsCoverImage = view.findViewById(R.id.playlists_cover_image);
+        playlistsCoverImage.setImageResource(playlist.getThumnailResID());
+        playlistsTitle = view.findViewById(R.id.playlists_title);
+        playlistsTitle.setText(playlist.getName());
+        playlistsCount = view.findViewById(R.id.playlists_count);
+        playlistsCount.setText(String.valueOf(playlist.getSongsList().size()) + "songs");
+        songAdapter = new SongAdapter(playlist.getSongsList(), new SongAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
+                callback.onRequestChangeFragment(FragmentTag.NOW_PLAYING_SONG, new Pair<Playlist, Integer>(playlist, position));
+            }
+        });
+        songsView = view.findViewById(R.id.songs_view);
+        songsView.setAdapter(songAdapter);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this.getContext());
+        songsView.setLayoutManager(linearLayoutManager);
 
-        playlistItems = new ArrayList<>();
-
-        List<String> genre1 = Arrays.asList("rock", "pop", "jazz", "electronic", "ballad");
-        List<String> genre2 = Arrays.asList("dance", "hiphop", "rap");
-
-        playlistItems.add(new Song("1", "SongA", "ABC", "YYYY", "url.mp3", "avatar.jpg", genre1));
-        playlistItems.add(new Song("2", "SongB", "HHH", "YYKLYY", "url.mp3", "avatar.jpg", genre2));
-        playlistItems.add(new Song("3", "SongC", "DDD", "YACEYYY", "url.mp3", "avatar.jpg", genre2));
-        playlistItems.add(new Song("4", "SongD", "HDHDHD", "YDETYYY", "url.mp3", "avatar.jpg", genre1));
-        playlistItems.add(new Song("5", "SongE", "OOOOOO", "ADDYYYY", "url.mp3", "avatar.jpg", genre2));
-
-        playlistAdapter = new PlaylistAdapter(playlistItems);
-        playlistView = view.findViewById(R.id.playlist);
-        playlistView.setAdapter(playlistAdapter);
-        Context context = getContext();
-        if (context != null) {
-            LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context);
-            playlistView.setLayoutManager(linearLayoutManager);
-        }
 
     }
 

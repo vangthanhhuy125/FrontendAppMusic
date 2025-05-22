@@ -54,9 +54,14 @@ public class UserLibraryFragment extends BaseFragment {
     // TODO: Rename and change types and number of parameters
     private ShapeableImageView userAvatar;
     private ImageButton addButton;
-    private RecyclerView songView;
-    private LibraryAdapter songAdapter;
-    private List<Playlist> songItems;
+    private RecyclerView playlistsView;
+    private PlaylistAdapter playlistAdapter;
+    private List<Playlist> playlistList;
+
+    public UserLibraryFragment(List<Playlist> playlistList){
+        this.playlistList = playlistList;
+    }
+
     public static UserLibraryFragment newInstance(String param1, String param2) {
         UserLibraryFragment fragment = new UserLibraryFragment();
         Bundle args = new Bundle();
@@ -90,37 +95,23 @@ public class UserLibraryFragment extends BaseFragment {
         addButton = view.findViewById(R.id.add_playlist_button);
         addButton.setOnClickListener(this::onAddPlaylistButtonClick);
 
-        List<String> songs1 = new ArrayList<>();
-        songs1.add("ABC");
-        songs1.add("DEF");
-        songs1.add("EEEE");
-        songs1.add("123456789");
-        songs1.add("HHH");
-        List<String> songs2 = new ArrayList<>();
-        songs2.add("XXXXX");
-        songs2.add("ZZZZ");
+        playlistAdapter = new PlaylistAdapter(playlistList, new PlaylistAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
+                callback.onRequestChangeFragment(FragmentTag.USER_PLAYLIST, playlistAdapter.getPlaylistList().get(position));
+            }
+        });
+        playlistsView = view.findViewById(R.id.playlists_view);
+        playlistsView.setAdapter(playlistAdapter);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this.getContext());
+        playlistsView.setLayoutManager(layoutManager);
 
-        songItems = new ArrayList<>();
-        songItems.add(new Playlist("1","Cai luong", "xxx", songs1, "1", "url"));
-        songItems.add(new Playlist("2","Tan co", "xxx", songs2, "1", "url"));
-        songItems.add(new Playlist("3","Son Tung MTP", "xxx", songs2, "1", "url"));
-        songItems.add(new Playlist("4","Nhac Remix", "xxx", songs1, "1", "url"));
-        songItems.add(new Playlist("5","Nhac Thieu Nhi", "xxx", songs1, "1", "url"));
-
-        songAdapter = new LibraryAdapter(songItems);
-        songView = view.findViewById(R.id.playlist_list);
-        songView.setAdapter(songAdapter);
-        Context context = getContext();
-        if (context != null) {
-            LinearLayoutManager layoutManager = new LinearLayoutManager(context);
-            songView.setLayoutManager(layoutManager);
-        }
 
 
     }
 
     private void onUserAvatarClick(View view){
-        callback.onRequestChangeFragment("UserProfile");
+        callback.onRequestChangeFragment(FragmentTag.USER_PROFILE, null);
     }
 
     private void onAddPlaylistButtonClick(View view){

@@ -64,9 +64,6 @@
                 />
 
         </com.google.android.material.appbar.MaterialToolbar>
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -98,17 +95,16 @@
                         android:textColor="#FFFFFF"
                         android:textSize="20sp" />
                 </LinearLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/playlists_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                </androidx.recyclerview.widget.RecyclerView>
             </LinearLayout>
-        </ScrollView>
 
 
-
-           <androidx.recyclerview.widget.RecyclerView
-               android:id="@+id/playlist_list"
-               android:layout_width="match_parent"
-               android:layout_height="wrap_content">
-
-           </androidx.recyclerview.widget.RecyclerView>
     </LinearLayout>
 
 

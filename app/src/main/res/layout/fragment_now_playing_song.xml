@@ -55,7 +55,7 @@
 
         <!-- Image of the song -->
         <com.google.android.material.imageview.ShapeableImageView
-            android:id="@+id/imgAlbum"
+            android:id="@+id/songs_cover_image"
             android:layout_width="match_parent"
             android:layout_height="400dp"
             android:scaleType="centerCrop"
@@ -73,7 +73,7 @@
                 android:layout_marginBottom="20dp">
 
                 <TextView
-                    android:id="@+id/tvSongName"
+                    android:id="@+id/songs_name_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Song's Name"
@@ -82,7 +82,7 @@
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/tvArtist"
+                    android:id="@+id/artist_name_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Artist"
@@ -132,18 +132,10 @@
             android:orientation="horizontal"
             >
 
-            <com.google.android.material.button.MaterialButtonToggleGroup
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:background="@android:color/transparent"
-                android:gravity="center"
-                android:contentDescription="ShuffleButton">
-
-
-
                 <com.google.android.material.button.MaterialButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:id="@+id/shuffle_button"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
                     android:checkable="true"
                     android:backgroundTint="@android:color/transparent"
                     app:icon="@drawable/baseline_shuffle_24"
@@ -154,21 +146,10 @@
                     android:contentDescription="ShuffleOffButton"
                     />
 
-                <com.google.android.material.button.MaterialButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:checkable="true"
-                    android:backgroundTint="@android:color/transparent"
-                    app:icon="@drawable/baseline_shuffle_24"
-                    app:iconGravity="textStart"
-                    app:iconPadding="-2dp"
-                    app:iconSize="25dp"
-                    app:iconTint="#FFFFFF"
-                    android:contentDescription="ShuffleOnButton"
-                    />
-            </com.google.android.material.button.MaterialButtonToggleGroup>
+
 
             <ImageButton
+                android:id="@+id/skip_previous_button"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:src="@drawable/baseline_skip_previous_24"
@@ -178,43 +159,24 @@
                 android:contentDescription="SkipPreviousButton"
                 />
 
-            <com.google.android.material.button.MaterialButtonToggleGroup
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/play_button"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
-                android:gravity="center"
+                android:checkable="true"
+                android:backgroundTint="@android:color/transparent"
+                app:icon="@drawable/baseline_play_circle_24"
+                app:iconGravity="textStart"
+                android:text=""
+                app:iconPadding="-2dp"
+                app:iconSize="50dp"
+                app:iconTint="#FFFFFF"
                 android:contentDescription="PlayButton"
+                />
 
-               >
-
-                <com.google.android.material.button.MaterialButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:checkable="true"
-                    android:backgroundTint="@android:color/transparent"
-                    app:icon="@drawable/baseline_play_circle_24"
-                    app:iconGravity="textStart"
-                    app:iconPadding="-2dp"
-                    app:iconSize="50dp"
-                    app:iconTint="#FFFFFF"
-                    android:contentDescription="PlayButton"
-                    />
-
-                <com.google.android.material.button.MaterialButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:checkable="true"
-                    android:backgroundTint="@android:color/transparent"
-                    app:icon="@drawable/baseline_pause_circle_24"
-                    app:iconGravity="textStart"
-                    app:iconPadding="-2dp"
-                    app:iconSize="50dp"
-                    app:iconTint="#FFFFFF"
-                    android:contentDescription="PauseButton"
-                    />
-
-            </com.google.android.material.button.MaterialButtonToggleGroup>
 
             <ImageButton
+                android:id="@+id/skip_next_button"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:src="@drawable/baseline_skip_next_24"
@@ -223,16 +185,11 @@
                 android:background="@android:color/transparent"
                 android:contentDescription="SkipNextButton"/>
 
-            <com.google.android.material.button.MaterialButtonToggleGroup
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:background="@android:color/transparent"
-                android:gravity="center"
-                android:contentDescription="RepeatButton">
 
                 <com.google.android.material.button.MaterialButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:id="@+id/repeat_button"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
                     android:checkable="true"
                     android:backgroundTint="@android:color/transparent"
                     android:contentDescription="RepeatOffButton"
@@ -242,30 +199,6 @@
                     app:iconSize="25dp"
                     app:iconTint="#CCFFFFFF" />
 
-                <com.google.android.material.button.MaterialButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:checkable="true"
-                    android:backgroundTint="@android:color/transparent"
-                    android:contentDescription="RepeatPlaylistButton"
-                    app:icon="@drawable/baseline_repeat_24"
-                    app:iconGravity="textStart"
-                    app:iconPadding="-2dp"
-                    app:iconSize="25dp"
-                    app:iconTint="#CCFFFFFF" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:checkable="true"
-                    android:backgroundTint="@android:color/transparent"
-                    android:contentDescription="RepeatSongButton"
-                    app:icon="@drawable/baseline_repeat_one_24"
-                    app:iconGravity="textStart"
-                    app:iconPadding="-2dp"
-                    app:iconSize="25dp"
-                    app:iconTint="#CCFFFFFF" />
-            </com.google.android.material.button.MaterialButtonToggleGroup>
         </com.google.android.flexbox.FlexboxLayout>
 
 

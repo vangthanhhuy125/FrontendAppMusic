@@ -49,9 +49,11 @@
     </LinearLayout>
 
     <!-- Nút ba chấm -->
-    <ImageView
-        android:id="@+id/imgMore"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:src="@drawable/white_baseline_more_vert_24" />
+    <ImageButton
+        android:id="@+id/more_options_button"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:backgroundTint="@android:color/transparent"
+        android:src="@drawable/white_baseline_more_vert_24"
+        android:contentDescription="more_options_button"/>
 </LinearLayout>

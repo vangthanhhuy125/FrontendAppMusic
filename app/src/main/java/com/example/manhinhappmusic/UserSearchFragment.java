@@ -6,12 +6,21 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.flexbox.FlexboxLayoutManager;
+import com.google.android.flexbox.JustifyContent;
 import com.google.android.material.imageview.ShapeableImageView;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -43,8 +52,16 @@ public class UserSearchFragment extends BaseFragment {
      */
     // TODO: Rename and change types and number of parameters
 
-    ShapeableImageView userAvatar;
-    AppCompatButton searchButton;
+    private ShapeableImageView userAvatar;
+    private AppCompatButton searchButton;
+    private RecyclerView browseView;
+    private BrowseAdapter browseAdapter;
+    private List<Genre> browseItems;
+
+    private RecyclerView artistView;
+    private ArtistAdapter artistAdapter;
+    private List<Artist> artistItems;
+
     public static UserSearchFragment newInstance(String param1, String param2) {
         UserSearchFragment fragment = new UserSearchFragment();
         Bundle args = new Bundle();
@@ -75,15 +92,57 @@ public class UserSearchFragment extends BaseFragment {
         super.onViewCreated(view, savedInstanceState);
         userAvatar = view.findViewById(R.id.user_avatar_image);
         userAvatar.setOnClickListener(this::onUserAvatarClick);
+
         searchButton = view.findViewById(R.id.search_button);
         searchButton.setOnClickListener(this::onSearchButtonClick);
+
+        browseItems = new ArrayList<>();
+        browseItems.add(new Genre("Fd", "US/UK", "fdsfdsf"));
+        browseItems.add(new Genre("Fd", "US/UK", "fdsfdsf"));
+        browseItems.add(new Genre("Fd", "US/UK", "fdsfdsf"));
+        browseItems.add(new Genre("Fd", "US/UK", "fdsfdsf"));
+        browseItems.add(new Genre("Fd", "US/UK", "fdsfdsf"));
+        browseItems.add(new Genre("Fd", "US/UK", "fdsfdsf"));
+        browseItems.add(new Genre("Fd", "US/UK", "fdsfdsf"));
+        browseItems.add(new Genre("Fd", "US/UK", "fdsfdsf"));
+        browseItems.add(new Genre("Fd", "US/UK", "fdsfdsf"));
+        browseItems.add(new Genre("Fd", "US/UK", "fdsfdsf"));
+        browseItems.add(new Genre("Fd", "US/UK", "fdsfdsf"));
+        browseItems.add(new Genre("Fd", "US/UK", "fdsfdsf"));
+        browseItems.add(new Genre("Fd", "US/UK", "fdsfdsf"));
+        browseItems.add(new Genre("Fd", "US/UK", "fdsfdsf"));
+        browseItems.add(new Genre("Fd", "US/UK", "fdsfdsf"));
+        browseItems.add(new Genre("Fd", "US/UK", "fdsfdsf"));
+
+        browseAdapter = new BrowseAdapter(browseItems);
+        browseView = view.findViewById(R.id.browse_view);
+        browseView.setAdapter(browseAdapter);
+        GridLayoutManager browseLayoutManager = new GridLayoutManager(this.getContext(), 2);
+        browseView.setLayoutManager(browseLayoutManager);
+        browseView.addItemDecoration(new GridSpacingItemDecoration(2, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, getResources().getDisplayMetrics()), true));
+
+        artistItems = new ArrayList<>();
+        artistItems.add(new Artist("fd", "Cafune", null, "null"));
+        artistItems.add(new Artist("fd", "Cafune", null, "null"));
+        artistItems.add(new Artist("fd", "Cafune", null, "null"));
+        artistItems.add(new Artist("fd", "Cafune", null, "null"));
+        artistItems.add(new Artist("fd", "Cafune", null, "null"));
+        artistItems.add(new Artist("fd", "Cafune", null, "null"));
+
+        artistAdapter = new ArtistAdapter(artistItems);
+        artistView = view.findViewById(R.id.artist_view);
+        artistView.setAdapter(artistAdapter);
+        LinearLayoutManager artistLayoutManager = new LinearLayoutManager(this.getContext());
+        artistLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+        artistView.addItemDecoration(new HorizontalLinearSpacingItemDecoration((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 20, getResources().getDisplayMetrics())));
+        artistView.setLayoutManager(artistLayoutManager);
     }
 
     private void onUserAvatarClick(View view){
-        callback.onRequestChangeFragment("UserProfile");
+        callback.onRequestChangeFragment(FragmentTag.USER_PROFILE, null);
     }
 
     private void onSearchButtonClick(View view){
-        callback.onRequestChangeFragment("SearchEx");
+        callback.onRequestChangeFragment(FragmentTag.SEARCH_EX, null);
     }
 }

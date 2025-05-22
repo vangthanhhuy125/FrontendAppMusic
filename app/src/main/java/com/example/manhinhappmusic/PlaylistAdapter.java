@@ -4,6 +4,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 //import android.widget.Button;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -16,64 +17,76 @@ import java.util.List;
 
 public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHolder>{
 
-    private final List<Song> playlistItems;
+    private final List<Playlist> playlistList;
+    private static OnItemClickListener onItemClickListener;
 
+    public interface OnItemClickListener{
+        void onItemClick(int position);
+    }
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_playlist, parent, false);
+
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Song song = playlistItems.get(position);
-        holder.getTextViewArtist().setText(song.getArtistId());
-        holder.getTextViewSongTitle().setText(song.getTitle());
-        holder.getImageViewMore().setImageResource(R.drawable.white_baseline_add_circle_outline_24);
-        holder.getImageViewThumbnail().setImageResource(R.drawable.exampleavatar);
+        Playlist playlist = playlistList.get(position);
+        holder.getImageViewSong().setImageResource(playlist.getThumnailResID());
+        holder.getTextViewNumOfSong().setText(String.valueOf(playlist.getSongsList().size()));
+        holder.getTextViewSongTitle().setText(playlist.getName());
 
     }
 
     @Override
     public int getItemCount() {
-        return (playlistItems != null) ? playlistItems.size() : 0;
+        return playlistList.size();
     }
 
-    public PlaylistAdapter(List<Song> playlistItems)
+    public PlaylistAdapter(List<Playlist> playlistList, OnItemClickListener onItemClickListener)
     {
-        this.playlistItems = playlistItems;
+        this.playlistList = playlistList;
+        this.onItemClickListener = onItemClickListener;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder{
-        private final TextView textViewArtist;
+        private final ImageView imageViewSong;
         private final TextView textViewSongTitle;
-        private final ImageView imageViewMore;
-        private final ShapeableImageView imageViewThumbnail;
-
+        private final TextView textViewNumOfSong;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            textViewArtist = itemView.findViewById(R.id.txtArtist);
-            textViewSongTitle = itemView.findViewById(R.id.txtSongTitle);
-            imageViewMore = itemView.findViewById(R.id.imgMore);
-            imageViewThumbnail = itemView.findViewById(R.id.imgThumbnail);
-        }
-
-        public TextView getTextViewArtist() {
-            return textViewArtist;
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int position = getAdapterPosition();
+                    if(position != RecyclerView.NO_POSITION && onItemClickListener != null)
+                    {
+                        onItemClickListener.onItemClick(position);
+                    }
+                }
+            });
+            imageViewSong = itemView.findViewById(R.id.img_song);
+            textViewSongTitle = itemView.findViewById(R.id.playlist_title_text);
+            textViewNumOfSong = itemView.findViewById(R.id.num_of_song_text);
         }
 
         public TextView getTextViewSongTitle() {
             return textViewSongTitle;
         }
 
-        public ImageView getImageViewMore() {
-            return imageViewMore;
+        public ImageView getImageViewSong() {
+            return imageViewSong;
         }
 
-        public ShapeableImageView getImageViewThumbnail() {
-            return imageViewThumbnail;
+        public TextView getTextViewNumOfSong() {
+            return textViewNumOfSong;
         }
+    }
+
+    public List<Playlist> getPlaylistList() {
+        return playlistList;
     }
 }

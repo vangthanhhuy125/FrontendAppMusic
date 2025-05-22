@@ -56,7 +56,7 @@
 
                 <!-- Tiêu đề playlist -->
                 <com.google.android.material.imageview.ShapeableImageView
-                    android:id="@+id/imgPlaylist"
+                    android:id="@+id/playlists_cover_image"
                     android:layout_width="140dp"
                     android:layout_height="140dp"
                     android:layout_gravity="center_horizontal"
@@ -66,17 +66,17 @@
                     app:shapeAppearanceOverlay="@style/RoundedCornerImageStyle" />
 
                 <TextView
-                    android:id="@+id/txtTitle"
+                    android:id="@+id/playlists_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Relax"
+                    android:text="Playlist Title"
                     android:textSize="32sp"
                     android:textColor="#FFFFFF"
                     android:layout_marginBottom="4dp" />
 
                 <!-- Số bài hát -->
                 <TextView
-                    android:id="@+id/txtCount"
+                    android:id="@+id/playlists_count"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="100 Songs"
@@ -118,7 +118,7 @@
                 </LinearLayout>
 
                <androidx.recyclerview.widget.RecyclerView
-                   android:id="@+id/playlist"
+                   android:id="@+id/songs_view"
                    android:layout_width="match_parent"
                    android:layout_height="wrap_content">
 

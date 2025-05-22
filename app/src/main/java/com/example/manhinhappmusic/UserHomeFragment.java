@@ -77,7 +77,7 @@ public class UserHomeFragment extends BaseFragment {
 
     private void onClickUserAvatarImage(View view){
         try {
-            callback.onRequestChangeFragment("UserProfile");
+            callback.onRequestChangeFragment(FragmentTag.USER_PROFILE, null);
         }catch (Exception ex)
         {
             Toast.makeText(this.getContext(), ex.getMessage(), Toast.LENGTH_SHORT).show();

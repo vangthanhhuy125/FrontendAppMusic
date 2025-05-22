@@ -20,6 +20,27 @@ public class Song {
     private Double duration;
     private Double views;
 
+    //Test purpose
+
+    private int audioResID;
+    private int coverImageResID;
+
+    public int getAudioResID() {
+        return audioResID;
+    }
+
+    public void setAudioResID(int audioResID) {
+        this.audioResID = audioResID;
+    }
+
+    public int getCoverImageResID() {
+        return coverImageResID;
+    }
+
+    public void setCoverImageResID(int coverImageResID) {
+        this.coverImageResID = coverImageResID;
+    }
+
     // Constructors, Getters và Setters
 
     // Constructors, Getters và Setters
@@ -30,7 +51,25 @@ public class Song {
         this.description = description;
         this.audioUrl = audioUrl;
         this.coverImageUrl = coverImageUrl;
-        this.genreId = new ArrayList<>(genreId);
+        this.genreId = new ArrayList<>();
+        if(genreId != null)
+        {
+            this.genreId.addAll(genreId);
+        }
+    }
+
+    public Song(String id, String title, String artistId, String description, int audioUrl, int coverImageUrl, List<String> genreId) {
+        this.id = id;
+        this.title = title;
+        this.artistId = artistId;
+        this.description = description;
+        this.audioResID = audioUrl;
+        this.coverImageResID = coverImageUrl;
+        this.genreId = new ArrayList<>();
+        if(genreId != null)
+        {
+            this.genreId.addAll(genreId);
+        }
 
     }
 
@@ -90,4 +129,6 @@ public class Song {
         this.genreId.clear();
         this.genreId.addAll(genreId);
     }
+
+
 }

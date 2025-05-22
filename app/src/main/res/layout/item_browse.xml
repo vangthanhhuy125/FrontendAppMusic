@@ -10,14 +10,14 @@
         android:layout_height="match_parent"
         android:foreground="?android:attr/selectableItemBackground">
         <ImageView
-            android:id="@+id/imgBrowse"
+            android:id="@+id/browse_img"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="centerCrop"
             android:src="@drawable/exampleavatar"
             />
         <TextView
-            android:id="@+id/txtBrowse"
+            android:id="@+id/browse_txt"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="CATEGORY"

@@ -16,7 +16,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <Toolbar
+            <com.google.android.material.appbar.MaterialToolbar
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical">
@@ -36,7 +36,7 @@
                     android:textColor="#FFFFFF"
                     android:textSize="20sp"
                     android:textStyle="bold" />
-            </Toolbar>
+            </com.google.android.material.appbar.MaterialToolbar>
 
             <!-- Search Box -->
             <androidx.appcompat.widget.AppCompatButton
@@ -57,9 +57,10 @@
 
         </LinearLayout>
 
-        <ScrollView
+        <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
             android:background="#000000"
             android:paddingHorizontal="14dp"
             android:paddingTop="20dp"
@@ -84,33 +85,14 @@
                     android:textStyle="bold" />
 
 
-                <com.google.android.flexbox.FlexboxLayout
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/artist_view"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="10dp"
-                    app:justifyContent="space_around">
+                    android:orientation="horizontal">
 
-                    <include layout="@layout/item_artist" />
+                </androidx.recyclerview.widget.RecyclerView>
 
-                    <include layout="@layout/item_artist" />
-
-                    <include layout="@layout/item_artist" />
-
-                    <include layout="@layout/item_artist" />
-
-                </com.google.android.flexbox.FlexboxLayout>
-
-
-                <!--        <androidx.recyclerview.widget.RecyclerView-->
-                <!--            android:id="@+id/recyclerTrendingArtist"-->
-                <!--            android:layout_width="match_parent"-->
-                <!--            android:layout_height="wrap_content"-->
-                <!--             android:layout_marginBottom="10dp"-->
-                <!--            android:orientation="horizontal"-->
-                <!--            android:overScrollMode="never"/>-->
-
-
-                <!-- Browse -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -121,61 +103,16 @@
                     android:textSize="16sp"
                     android:textStyle="bold" />
 
-
-                <com.google.android.flexbox.FlexboxLayout
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/browse_view"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:dividerDrawableHorizontal="@drawable/divider"
-                    app:flexWrap="wrap"
-                    app:justifyContent="space_around"
-                    app:showDividerHorizontal="middle">
+                    android:nestedScrollingEnabled="false">
 
-                    <include layout="@layout/item_browse" />
-
-                    <include layout="@layout/item_browse" />
-
-                    <include layout="@layout/item_browse" />
-
-                    <include layout="@layout/item_browse" />
-
-                    <include layout="@layout/item_browse" />
-
-                    <include layout="@layout/item_browse" />
-
-                    <include layout="@layout/item_browse" />
-
-                    <include layout="@layout/item_browse" />
-
-                    <include layout="@layout/item_browse" />
-
-                    <include layout="@layout/item_browse" />
-                    <include layout="@layout/item_browse" />
-
-                    <include layout="@layout/item_browse" />
-                    <include layout="@layout/item_browse" />
-
-                    <include layout="@layout/item_browse" />
-                    <include layout="@layout/item_browse" />
-
-                    <include layout="@layout/item_browse" />
-                    <include layout="@layout/item_browse" />
-
-                    <include layout="@layout/item_browse" />
-                    <include layout="@layout/item_browse" />
-
-                    <include layout="@layout/item_browse" />
-
-
-
-                </com.google.android.flexbox.FlexboxLayout>
-                <!--     <androidx.recyclerview.widget.RecyclerView-->
-                <!--         android:layout_width="match_parent"-->
-                <!--         android:layout_height="wrap_content">-->
-                <!--         -->
-                <!--     </androidx.recyclerview.widget.RecyclerView>-->
+                </androidx.recyclerview.widget.RecyclerView>
 
             </LinearLayout>
-        </ScrollView>
+        </androidx.core.widget.NestedScrollView>
 
     </LinearLayout>
 
