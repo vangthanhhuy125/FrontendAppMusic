@@ -1,12 +1,13 @@
 package com.example.manhinhappmusic;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 //import android.os.Bundle;
 
 
-public class Song {
+public class Song implements Serializable {
     private String id;
     private String artistId;
     private String description;

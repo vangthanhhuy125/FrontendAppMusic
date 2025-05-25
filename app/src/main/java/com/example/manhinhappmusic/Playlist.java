@@ -13,6 +13,8 @@ public class Playlist{
  private List<Song> songs = new ArrayList<>();
  private String userId;
  private String thumbnailUrl;
+ private String artist;
+ private int viewCount;
  private Boolean isPublic;
 
  //Test purpose
@@ -35,6 +37,7 @@ public class Playlist{
    this.songs.addAll(songs);
   this.userId = userId;
   this.thumbnailUrl = thumbnailUrl;
+
  }
 
  public Playlist(String id, String name, String description, List<Song> songs, String userId, int thumbnailResID){
@@ -46,6 +49,8 @@ public class Playlist{
    this.songs.addAll(songs);
   this.userId = userId;
   this.thumnailResID = thumbnailResID;
+  this.artist = artist;
+  this.viewCount = viewCount;
  }
 
  public String getId() {
@@ -105,5 +110,10 @@ public class Playlist{
    if(song != null)
      songs.add(song);
  }
+ public String getArtist() { return artist;}
+
+ public void setArtist(String artist) {this.artist = artist;}
+ public int getViewCount() { return viewCount;}
+ public void setViewCount(int viewCount) { this.viewCount = viewCount; }
 }
 
