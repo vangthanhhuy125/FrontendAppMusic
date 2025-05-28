@@ -3,7 +3,6 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:paddingVertical="8dp"
     android:background="#000000"
     android:gravity="center_vertical">
 
@@ -12,7 +11,7 @@
         android:layout_width="64dp"
         android:layout_height="64dp"
         android:layout_marginEnd="12dp"
-        android:src="@drawable/exampleavatar"
+        android:src="@drawable/white_baseline_music_note_24"
         android:scaleType="centerCrop"
         android:contentDescription="song image" />
 
@@ -26,7 +25,7 @@
             android:id="@+id/playlist_title_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Title title title"
+            android:text="Song's title"
             android:textColor="#FFFFFF"
             android:textSize="18sp"
             android:textStyle="bold" />

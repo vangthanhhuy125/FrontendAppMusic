@@ -19,7 +19,9 @@
             android:background="#282525"
             android:orientation="horizontal"
             android:layout_marginBottom="20dp"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:paddingVertical="5dp"
+            >
 
             <ImageButton
                 android:id="@+id/back_button"
@@ -41,7 +43,16 @@
                 android:textSize="20sp"
                 android:gravity="start|center_vertical"
                 android:backgroundTint="@android:color/transparent"
+
                 />
+            <ImageButton
+                android:id="@+id/delete_button"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:background="@android:color/transparent"
+                android:contentDescription="back_button"
+                android:src="@drawable/baseline_close_30"
+                app:tint="#FFFFFF" />
         </LinearLayout>
         <ScrollView
             android:layout_width="match_parent"
@@ -52,27 +63,28 @@
                 android:orientation="vertical"
                 android:paddingHorizontal="14sp">
 
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Recently"
-                        android:textColor="#FFFFFF"
-                        android:textSize="35sp"
-                        android:textStyle="bold"
-                        android:layout_marginBottom="20dp"/>
+<!--                    <TextView-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:text="Recently"-->
+<!--                        android:textColor="#FFFFFF"-->
+<!--                        android:textSize="35sp"-->
+<!--                        android:textStyle="bold"-->
+<!--                        android:layout_marginBottom="20dp"/>-->
 
                     <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/search_result_view"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="20dp"/>
 
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Delete search history"
-                    android:background="@drawable/button_background01"
-                    app:backgroundTint="@null"
-                    android:layout_gravity="center"/>
+<!--                <Button-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:text="Delete search history"-->
+<!--                    android:background="@drawable/button_background01"-->
+<!--                    app:backgroundTint="@null"-->
+<!--                    android:layout_gravity="center"/>-->
             </LinearLayout>
         </ScrollView>
 

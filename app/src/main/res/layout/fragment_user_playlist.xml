@@ -15,6 +15,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <ImageButton
+                android:id="@+id/back_button"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:src="@drawable/baseline_arrow_back_24"
@@ -55,15 +56,15 @@
                 <!-- Ảnh Playlist căn giữa -->
 
                 <!-- Tiêu đề playlist -->
-                <com.google.android.material.imageview.ShapeableImageView
+                <ImageView
                     android:id="@+id/playlists_cover_image"
                     android:layout_width="140dp"
                     android:layout_height="140dp"
                     android:layout_gravity="center_horizontal"
                     android:layout_marginBottom="16dp"
                     android:scaleType="centerCrop"
-                    android:src="@drawable/exampleavatar"
-                    app:shapeAppearanceOverlay="@style/RoundedCornerImageStyle" />
+                    android:src="@drawable/white_baseline_music_note_24"
+                    />
 
                 <TextView
                     android:id="@+id/playlists_title"
@@ -123,6 +124,9 @@
                    android:layout_height="wrap_content">
 
                </androidx.recyclerview.widget.RecyclerView>
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"/>
             </LinearLayout>
         </ScrollView>
     </LinearLayout>

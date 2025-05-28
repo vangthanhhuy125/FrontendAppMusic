@@ -79,7 +79,7 @@ public class UserProfileFragment extends BaseFragment {
     }
 
     private void onEditButtonClick(View view){
-        callback.onRequestOpenBottomSheetFragment("EditProfile");
+        callback.onRequestOpenBottomSheetFragment(FragmentTag.EDIT_PROFILE);
     }
     private void onBackButtonClick(View view){
         callback.onRequestGoBackPreviousFragment();

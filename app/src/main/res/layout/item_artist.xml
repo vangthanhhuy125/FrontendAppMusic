@@ -4,15 +4,15 @@
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    android:gravity="center">
+    android:gravity="center"
+    android:background="#000000">
 
-    <com.google.android.material.imageview.ShapeableImageView
+    <ImageView
         android:id="@+id/artist_img"
         android:layout_width="60dp"
         android:layout_height="60dp"
-        android:src="@drawable/example_artist"
+        android:src="@drawable/baseline_person_24"
         android:scaleType="centerCrop"
-        app:shapeAppearanceOverlay="@style/RoundedImageStyle"
         />
 
     <TextView

@@ -1,6 +1,9 @@
 package com.example.manhinhappmusic;
 
+import android.content.DialogInterface;
 import android.content.res.ColorStateList;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Bundle;
@@ -8,6 +11,8 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.palette.graphics.Palette;
 
 import android.os.Handler;
 import android.view.LayoutInflater;
@@ -18,6 +23,13 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.MultiTransformation;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
+import com.bumptech.glide.request.RequestOptions;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.button.MaterialButtonToggleGroup;
 
@@ -29,30 +41,18 @@ import java.util.Arrays;
  * Use the {@link NowPlayingSongFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class NowPlayingSongFragment extends BaseFragment {
+public class NowPlayingSongFragment extends BottomSheetDialogFragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
 
     public NowPlayingSongFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment NowPlayingSongFragment.
-     */
-    // TODO: Rename and change types and number of parameters
+    public NowPlayingSongFragment(MediaPlayerManager mediaPlayerManager)
+    {
+        this.mediaPlayerManager = mediaPlayerManager;
+    }
+
 
     private TextView currentPlayTimeTextView;
     private TextView songDurationTextView;
@@ -63,45 +63,74 @@ public class NowPlayingSongFragment extends BaseFragment {
     private MaterialButton repeatButton;
     private ImageButton skipPreviousButton;
     private ImageButton skipNextButton;
+    private ImageButton minimizeButton;
+    private ImageButton moreOptionButton;
     private SeekBar seekBar;
     private MaterialButton playButton;
     private Handler handler = new Handler();
-    private Runnable updateSeekBar;
+    private Runnable updateSeekBar = new Runnable() {
+        @Override
+        public void run() {
+            if(mediaPlayerManager.getMediaPlayer() != null && mediaPlayerManager.getMediaPlayer().isPlaying()){
+                seekBar.setProgress(mediaPlayerManager.getMediaPlayer().getCurrentPosition());
+                handler.postDelayed(this, 200);
+                currentPlayTimeTextView.setText(formatTime(mediaPlayerManager.getMediaPlayer().getCurrentPosition()));
+            }
+        }
+    };
     private MediaPlayerManager mediaPlayerManager;
     private Song song;
-    private Playlist playlist;
-    private int currentPosition;
+    private NowPlayingSongViewModel viewModel;
+
+    private MediaPlayerManager.OnCompletionListener onCompletionListener = new MediaPlayerManager.OnCompletionListener() {
+        @Override
+        public void onCompletion() {
+            playButton.setIconResource(R.drawable.baseline_play_circle_24);
+            handler.removeCallbacks(updateSeekBar);
+
+            if(mediaPlayerManager.isPlayingNextSong())
+            {
+                song = mediaPlayerManager.getCurrentSong();
+                handler.post(updateSeekBar);
+                playButton.setIconResource(R.drawable.baseline_pause_circle_24);
+                setSongsInformation();
+            }
+        }
+    };
 
 
-    public NowPlayingSongFragment(Song song)
-    {
-        this.song = song;
-        playlist = new Playlist("","", "",new ArrayList<>(Arrays.asList(song)),"", song.getCoverImageResID() );
-    }
-
-    public NowPlayingSongFragment(Playlist playlist, int currentPosition)
-    {
-        this.playlist = playlist;
-        this.currentPosition = currentPosition;
-        song = playlist.getSongsList().get(currentPosition);
-
-    }
-
-    public static NowPlayingSongFragment newInstance(String param1, String param2) {
+    public static NowPlayingSongFragment newInstance(MediaPlayerManager mediaPlayerManager) {
         NowPlayingSongFragment fragment = new NowPlayingSongFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
+       fragment.setMediaPlayerManager(mediaPlayerManager);
+       fragment.setSong(mediaPlayerManager.getCurrentSong());
+
         return fragment;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        View view = getView();
+        if (view != null) {
+            View parent = (View) view.getParent();
+            BottomSheetBehavior<?> behavior = BottomSheetBehavior.from(parent);
+            behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+            behavior.setSkipCollapsed(true);
+            parent.getLayoutParams().height = ViewGroup.LayoutParams.MATCH_PARENT;
+            parent.requestLayout();
+        }
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+        viewModel = new ViewModelProvider(this).get(NowPlayingSongViewModel.class);
+        if(viewModel.getMediaPlayerManager() == null && mediaPlayerManager != null && song != null)
+        {
+            viewModel.setMediaPlayerManager(mediaPlayerManager);
+        }
+        else {
+            mediaPlayerManager = viewModel.getMediaPlayerManager();
         }
     }
 
@@ -129,22 +158,21 @@ public class NowPlayingSongFragment extends BaseFragment {
         repeatButton = view.findViewById(R.id.repeat_button);
         skipNextButton = view.findViewById(R.id.skip_next_button);
         skipPreviousButton = view.findViewById(R.id.skip_previous_button);
+        minimizeButton = view.findViewById(R.id.minimize_button);
+        moreOptionButton = view.findViewById(R.id.more_options_button);
 
-        mediaPlayerManager = new MediaPlayerManager(this.getContext(), playlist.getSongsList(), currentPosition, new MediaPlayerManager.OnCompletionListener() {
-            @Override
-            public void onCompletion() {
-                song = mediaPlayerManager.getCurrentSong();
-                setSongsInformation();
-                updateSeekBar();
-            }
-        });
+        mediaPlayerManager.addOnCompletionListeners(onCompletionListener);
+        if(!mediaPlayerManager.getMediaPlayer().isPlaying())
+        {
+            playButton.setIconResource(R.drawable.baseline_play_circle_24);
 
+        }
         setSongsInformation();
 
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if(fromUser){
+                if(fromUser && mediaPlayerManager.getMediaPlayer() != null){
                     mediaPlayerManager.getMediaPlayer().seekTo(progress);
                 }
             }
@@ -163,18 +191,24 @@ public class NowPlayingSongFragment extends BaseFragment {
         playButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!mediaPlayerManager.getMediaPlayer().isPlaying()){
+                if(mediaPlayerManager != null && mediaPlayerManager.getMediaPlayer() != null)
+                {
+                    if(!mediaPlayerManager.getMediaPlayer().isPlaying()){
 
                         playButton.setIconResource(R.drawable.baseline_pause_circle_24);
                         mediaPlayerManager.play();
-                        updateSeekBar();
+                        handler.post(updateSeekBar);
+
                     }
 
-                else {
+                    else {
                         playButton.setIconResource(R.drawable.baseline_play_circle_24);
                         mediaPlayerManager.pause();
+                        handler.removeCallbacks(updateSeekBar);
 
+                    }
                 }
+
             }
         });
 
@@ -230,26 +264,32 @@ public class NowPlayingSongFragment extends BaseFragment {
             }
         });
 
-    }
-
-    private void updateSeekBar(){
-        updateSeekBar = new Runnable() {
+        minimizeButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void run() {
-                if(mediaPlayerManager.getMediaPlayer() != null && mediaPlayerManager.getMediaPlayer().isPlaying()){
-                    seekBar.setProgress(mediaPlayerManager.getMediaPlayer().getCurrentPosition());
-                    handler.postDelayed(this, 500);
-                    currentPlayTimeTextView.setText(formatTime(mediaPlayerManager.getMediaPlayer().getCurrentPosition()));
-                }
+            public void onClick(View v) {
+                dismiss();
             }
-        };
+        });
+
+        moreOptionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
 
         handler.post(updateSeekBar);
+
     }
 
     private void setSongsInformation()
     {
-        songsCoverImage.setImageResource(song.getCoverImageResID());
+        Glide.with(this.getContext())
+                .load(song.getCoverImageResID())
+                .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(15))))
+                .into(songsCoverImage);
+
         songsTitleTextView.setText(song.getTitle());
         songsArtistsNameTextView.setText(song.getArtistId());
         songDurationTextView.setText(formatTime(mediaPlayerManager.getMediaPlayer().getDuration()));
@@ -264,8 +304,19 @@ public class NowPlayingSongFragment extends BaseFragment {
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-        mediaPlayerManager.clear();
+    public void onDismiss(@NonNull DialogInterface dialog) {
+        super.onDismiss(dialog);
+        mediaPlayerManager.removeOnCompletionListeners(onCompletionListener);
+        handler.removeCallbacks(updateSeekBar);
+    }
+
+    public void setMediaPlayerManager(MediaPlayerManager mediaPlayerManager) {
+        if(this.mediaPlayerManager != null)
+            this.mediaPlayerManager.getMediaPlayer().release();
+        this.mediaPlayerManager = mediaPlayerManager;
+    }
+
+    public void setSong(Song song) {
+        this.song = song;
     }
 }

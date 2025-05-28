@@ -54,13 +54,12 @@
 
 
         <!-- Image of the song -->
-        <com.google.android.material.imageview.ShapeableImageView
+        <ImageView
             android:id="@+id/songs_cover_image"
             android:layout_width="match_parent"
             android:layout_height="400dp"
             android:scaleType="centerCrop"
-            app:shapeAppearanceOverlay="@style/RoundedCornerImageStyle"
-            android:src="@drawable/exampleavatar"
+            android:src="@drawable/white_baseline_music_note_24"
             android:layout_marginBottom="20dp"/>
 
         <!-- Song Info -->
@@ -165,7 +164,7 @@
                 android:layout_height="50dp"
                 android:checkable="true"
                 android:backgroundTint="@android:color/transparent"
-                app:icon="@drawable/baseline_play_circle_24"
+                app:icon="@drawable/baseline_pause_circle_24"
                 app:iconGravity="textStart"
                 android:text=""
                 app:iconPadding="-2dp"

@@ -5,13 +5,19 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.google.android.material.imageview.ShapeableImageView;
+
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -31,6 +37,10 @@ public class UserHomeFragment extends BaseFragment {
 
     public UserHomeFragment() {
         // Required empty public constructor
+        recentlyPlaySongList = TestData.songList;
+        newReleaseSongList = TestData.songList;
+        playlistList = TestData.playlistList;
+        featurePlaylistList = TestData.playlistList;
     }
 
     /**
@@ -52,7 +62,15 @@ public class UserHomeFragment extends BaseFragment {
     }
 
     private ShapeableImageView userAvatarImage;
+    private RecyclerView recentlyPlayView;
+    private RecyclerView newReleaseView;
+    private RecyclerView playlistView;
+    private RecyclerView featureView;
 
+    private List<Playlist> playlistList;
+    private List<Song> newReleaseSongList;
+    private List<Song> recentlyPlaySongList;
+    private List<Playlist> featurePlaylistList;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,7 +91,61 @@ public class UserHomeFragment extends BaseFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         userAvatarImage = view.findViewById(R.id.user_avatar_image);
         userAvatarImage.setOnClickListener(this::onClickUserAvatarImage);
+
+        playlistView = view.findViewById(R.id.playlist_view);
+        GridLayoutManager playlistLayoutManager = new GridLayoutManager(this.getContext(), 2);
+        HomePlaylistAdapter playlistAdapter = new HomePlaylistAdapter(playlistList, new HomePlaylistAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
+
+            }
+        });
+        playlistView.setAdapter(playlistAdapter);
+        playlistView.setLayoutManager(playlistLayoutManager);
+        playlistView.addItemDecoration(new GridSpacingItemDecoration(2, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8, getResources().getDisplayMetrics()), true));
+
+        recentlyPlayView = view.findViewById(R.id.recently_play_view);
+        LinearLayoutManager recentlyPlayViewLayoutManager = new LinearLayoutManager(this.getContext());
+        recentlyPlayViewLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+        HomeSongAdapter recentlySongAdapter = new HomeSongAdapter(recentlyPlaySongList, new HomeSongAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
+
+            }
+        });
+        recentlyPlayView.setAdapter(recentlySongAdapter);
+        recentlyPlayView.setLayoutManager(recentlyPlayViewLayoutManager);
+        recentlyPlayView.addItemDecoration(new HorizontalLinearSpacingItemDecoration((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, getResources().getDisplayMetrics())));
+
+        newReleaseView = view.findViewById(R.id.new_release_view);
+        LinearLayoutManager newReleaseViewLayoutManager = new LinearLayoutManager(this.getContext());
+        newReleaseViewLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+        HomeSongAdapter newReleaseSongAdapter = new HomeSongAdapter(newReleaseSongList, new HomeSongAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
+
+            }
+        });
+        newReleaseView.setAdapter(newReleaseSongAdapter);
+        newReleaseView.setLayoutManager(newReleaseViewLayoutManager);
+        newReleaseView.addItemDecoration(new HorizontalLinearSpacingItemDecoration((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, getResources().getDisplayMetrics())));
+
+        featureView = view.findViewById(R.id.featuring_view);
+        LinearLayoutManager featureLayoutManager = new LinearLayoutManager(this.getContext());
+        featureLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+        HomeFeatureAdapter homeFeatureAdapter = new HomeFeatureAdapter(featurePlaylistList, new HomeFeatureAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
+
+            }
+        });
+        featureView.setAdapter(homeFeatureAdapter);
+        featureView.setLayoutManager(featureLayoutManager);
+        featureView.addItemDecoration(new HorizontalLinearSpacingItemDecoration((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, getResources().getDisplayMetrics())));
+
     }
+
+
 
     private void onClickUserAvatarImage(View view){
         try {

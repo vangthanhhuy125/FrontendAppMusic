@@ -3,7 +3,7 @@ package com.example.manhinhappmusic;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Artist {
+public class Artist implements ListItem {
 
     private String id;
     private String name;
@@ -51,5 +51,10 @@ public class Artist {
 
     public void setAvatarUrl(String avatarUrl) {
         AvatarUrl = avatarUrl;
+    }
+
+    @Override
+    public ListItemType getType() {
+        return ListItemType.ARTIST;
     }
 }

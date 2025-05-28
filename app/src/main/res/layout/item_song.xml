@@ -4,21 +4,19 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:paddingVertical="8dp"
-    android:paddingHorizontal="4dp"
     android:background="@color/black"
     android:gravity="center_vertical">
 
     <!-- Phần ảnh + icon play -->
 
 
-        <com.google.android.material.imageview.ShapeableImageView
+        <ImageView
             android:id="@+id/imgThumbnail"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:scaleType="centerCrop"
-            android:src="@drawable/exampleavatar"
-            app:shapeAppearanceOverlay="@style/RoundedCornerImageStyle"/>
+            android:src="@drawable/white_baseline_music_note_24"
+            />
 
 
 

@@ -8,10 +8,11 @@ import androidx.fragment.app.Fragment;
 public class BaseFragment extends Fragment {
 
     public interface FragmentInteractionListener{
-        void onRequestChangeFragment(FragmentTag destinationTag, Object param);
-        void onRequestChangeActivity(String destinationTag);
-        void onRequestOpenBottomSheetFragment(String destinationTag);
+        void onRequestChangeFragment(FragmentTag destinationTag, Object... params);
+        void onRequestChangeActivity(FragmentTag destinationTag, Object... params);
+        void onRequestOpenBottomSheetFragment(FragmentTag destinationTag, Object... params);
         void onRequestGoBackPreviousFragment();
+        void onRequestLoadMiniPlayer(Playlist playlist, int currentPosition);
     }
 
     protected FragmentInteractionListener callback;

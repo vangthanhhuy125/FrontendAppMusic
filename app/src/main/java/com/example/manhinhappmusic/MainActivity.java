@@ -22,8 +22,15 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.Frag
 
     BottomSheetDialogFragment bottomSheetDialogFragment;
     BottomNavigationView bottomNavigationView;
+    List<Playlist> currentLibrary = new ArrayList<>();
+    Playlist currentPlaylist = new Playlist("","","",new ArrayList<>(),"",0);
+    Song currentSong = new Song("","","","",0,0,new ArrayList<>());
+    MediaPlayerManager mediaPlayerManager = new MediaPlayerManager(this, currentPlaylist.getSongsList(), 0);
+    AppFragmentFactory appFragmentFactory = new AppFragmentFactory(currentLibrary, currentPlaylist, currentSong, mediaPlayerManager);
+    MiniPlayerFragment miniPlayer;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        //getSupportFragmentManager().setFragmentFactory(appFragmentFactory);
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
@@ -40,6 +47,22 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.Frag
     private void initializeView(){
         bottomNavigationView = findViewById(R.id.bottom_nav_view);
         bottomNavigationView.setOnItemSelectedListener(this::navigation);
+    }
+
+    private void loadMiniPlayer(Playlist playlist, int currentPosition)
+    {
+        if (miniPlayer != null)
+        {
+            miniPlayer.changePlaylist(playlist, currentPosition);
+        }
+        else {
+            miniPlayer = MiniPlayerFragment.newInstance(playlist, currentPosition);
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.mini_player, miniPlayer)
+                    .commit();
+        }
+
     }
 
     private boolean loadFragment(Fragment fragment){
@@ -66,7 +89,7 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.Frag
             else if(item.getItemId() == R.id.nav_library)
             {
 
-                selectedFragment = new UserLibraryFragment(TestData.playlistList);
+                selectedFragment = UserLibraryFragment.newInstance(TestData.playlistList);
 
             }
         }
@@ -81,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.Frag
 
 
     @Override
-    public void onRequestChangeFragment(BaseFragment.FragmentTag destinationTag, Object param) {
+    public void onRequestChangeFragment(BaseFragment.FragmentTag destinationTag, Object... params) {
         Fragment destinationFragment = null;
         if(destinationTag == BaseFragment.FragmentTag.USER_PROFILE)
             destinationFragment = new UserProfileFragment();
@@ -90,32 +113,41 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.Frag
         else if(destinationTag == BaseFragment.FragmentTag.USER_PLAYLIST)
         {
             Playlist playlist = null;
-            if(param instanceof Playlist)
+            if(params[0] instanceof Playlist)
             {
-                playlist = (Playlist) param;
+                playlist = (Playlist) params[0];
+
             }
-            destinationFragment = new UserPlaylistFragment(playlist);
+            destinationFragment = UserPlaylistFragment.newInstance(playlist);
 
         }
-        else if(destinationTag == BaseFragment.FragmentTag.NOW_PLAYING_SONG)
-        {
-            Pair<Playlist, Integer> params = (Pair<Playlist, Integer>) param;
-            destinationFragment = new NowPlayingSongFragment(params.first, params.second);
-
-        }
+//        else if(destinationTag == BaseFragment.FragmentTag.NOW_PLAYING_SONG)
+//        {
+//            Playlist playlist = (Playlist) params[0];
+//            int currentPosition = (int) params[1];
+//            destinationFragment = new NowPlayingSongFragment(playlist, currentPosition);
+//
+//        }
         loadFragment(destinationFragment);
     }
 
     @Override
-    public void onRequestChangeActivity(String destinationTag) {
+    public void onRequestChangeActivity(BaseFragment.FragmentTag destinationTag, Object... params) {
 
     }
 
     @Override
-    public void onRequestOpenBottomSheetFragment(String destinationTag) {
-        if(destinationTag.equals("EditProfile"))
+    public void onRequestOpenBottomSheetFragment(BaseFragment.FragmentTag destinationTag, Object... params) {
+
+        if(destinationTag == BaseFragment.FragmentTag.EDIT_PROFILE)
         {
             bottomSheetDialogFragment = new EditProfileFragment();
+            bottomSheetDialogFragment.show(getSupportFragmentManager(),"");
+        }
+        else if(destinationTag == BaseFragment.FragmentTag.NOW_PLAYING_SONG)
+        {
+            MediaPlayerManager mediaPlayerManager = (MediaPlayerManager) params[0];
+            bottomSheetDialogFragment = NowPlayingSongFragment.newInstance(mediaPlayerManager);
             bottomSheetDialogFragment.show(getSupportFragmentManager(),"");
         }
 
@@ -124,5 +156,10 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.Frag
     @Override
     public void onRequestGoBackPreviousFragment() {
         getSupportFragmentManager().popBackStack();
+    }
+
+    @Override
+    public void onRequestLoadMiniPlayer(Playlist playlist, int currentPosition) {
+        loadMiniPlayer(playlist, currentPosition);
     }
 }

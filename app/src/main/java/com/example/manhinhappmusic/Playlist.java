@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 
-public class Playlist{
+public class Playlist implements ListItem{
 
  private String id;
  private String name;
@@ -115,5 +115,10 @@ public class Playlist{
  public void setArtist(String artist) {this.artist = artist;}
  public int getViewCount() { return viewCount;}
  public void setViewCount(int viewCount) { this.viewCount = viewCount; }
+
+ @Override
+ public ListItemType getType() {
+  return ListItemType.PLAYLIST;
+ }
 }
 

@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".UserHomeFragment">
 
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#000000"
@@ -18,7 +18,7 @@
             android:layout_height="wrap_content"
             android:padding="16dp"
             >
-            <Toolbar
+            <com.google.android.material.appbar.MaterialToolbar
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp">
@@ -46,84 +46,72 @@
                     android:layout_gravity="end"/>
 
 
-            </Toolbar>
+            </com.google.android.material.appbar.MaterialToolbar>
             <!-- Header -->
 
             <!-- Good Evening -->
 
             <!-- Buttons (For You, Relax, Pop, Workout) -->
-            <GridLayout
+<!--            <GridLayout-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:orientation="horizontal"-->
+<!--                android:gravity="center"-->
+<!--                android:layout_marginBottom="12dp"-->
+<!--                android:columnCount="4">-->
+
+<!--                <Button-->
+<!--                    android:layout_width="0dp"-->
+<!--                    android:layout_height="48dp"-->
+<!--                    android:layout_columnWeight="1"-->
+<!--                    android:backgroundTint="#444444"-->
+<!--                    android:text="For you"-->
+<!--                    android:textColor="#FFFFFF"-->
+<!--                    android:textSize="10sp"-->
+<!--                    android:layout_margin="4dp"/>-->
+
+<!--                <Button-->
+<!--                    android:layout_width="0dp"-->
+<!--                    android:layout_height="48dp"-->
+<!--                    android:backgroundTint="#444444"-->
+<!--                    android:text="Relax"-->
+<!--                    android:layout_columnWeight="1"-->
+
+<!--                    android:textColor="#FFFFFF"-->
+<!--                    android:textSize="10sp"-->
+<!--                    android:paddingHorizontal="5dp"-->
+<!--                    android:layout_margin="4dp"/>-->
+
+<!--                <Button-->
+<!--                    android:layout_width="0dp"-->
+<!--                    android:layout_height="48dp"-->
+<!--                    android:layout_columnWeight="1"-->
+
+<!--                    android:backgroundTint="#444444"-->
+<!--                    android:text="Pop"-->
+<!--                    android:textColor="#FFFFFF"-->
+<!--                    android:textSize="10sp"-->
+
+<!--                    android:layout_margin="4dp"/>-->
+
+<!--                <Button-->
+<!--                    android:layout_width="0dp"-->
+<!--                    android:layout_height="48dp"-->
+<!--                    android:layout_columnWeight="1"-->
+
+<!--                    android:backgroundTint="#444444"-->
+<!--                    android:text="Workout"-->
+<!--                    android:textColor="#FFFFFF"-->
+<!--                    android:textSize="10sp"-->
+
+<!--                    android:layout_margin="4dp"/>-->
+<!--            </GridLayout>-->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/playlist_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center"
-                android:layout_marginBottom="12dp"
-                android:columnCount="4">
+               />
 
-                <Button
-                    android:layout_width="0dp"
-                    android:layout_height="48dp"
-                    android:layout_columnWeight="1"
-                    android:backgroundTint="#444444"
-                    android:text="For you"
-                    android:textColor="#FFFFFF"
-                    android:textSize="10sp"
-                    android:layout_margin="4dp"/>
-
-                <Button
-                    android:layout_width="0dp"
-                    android:layout_height="48dp"
-                    android:backgroundTint="#444444"
-                    android:text="Relax"
-                    android:layout_columnWeight="1"
-
-                    android:textColor="#FFFFFF"
-                    android:textSize="10sp"
-                    android:paddingHorizontal="5dp"
-                    android:layout_margin="4dp"/>
-
-                <Button
-                    android:layout_width="0dp"
-                    android:layout_height="48dp"
-                    android:layout_columnWeight="1"
-
-                    android:backgroundTint="#444444"
-                    android:text="Pop"
-                    android:textColor="#FFFFFF"
-                    android:textSize="10sp"
-
-                    android:layout_margin="4dp"/>
-
-                <Button
-                    android:layout_width="0dp"
-                    android:layout_height="48dp"
-                    android:layout_columnWeight="1"
-
-                    android:backgroundTint="#444444"
-                    android:text="Workout"
-                    android:textColor="#FFFFFF"
-                    android:textSize="10sp"
-
-                    android:layout_margin="4dp"/>
-            </GridLayout>
-
-            <!-- Grid Playlist (2 cột × 3 hàng) -->
-            <com.google.android.flexbox.FlexboxLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:flexWrap="wrap"
-                app:justifyContent="space_around"
-                app:showDividerHorizontal="middle"
-
-                >
-
-                <!-- Repeat this block for 6 items -->
-                <include
-                    layout="@layout/item_playlisthome"/>
-                <include
-                    layout="@layout/item_playlisthome"/>
-
-            </com.google.android.flexbox.FlexboxLayout>
 
             <!-- Recently Played -->
             <TextView
@@ -135,27 +123,12 @@
                 android:textStyle="bold"
                 android:layout_marginBottom="8dp"/>
 
-            <GridLayout
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recently_play_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:columnCount="4"
-                android:rowCount="1"
-                android:layout_marginBottom="16dp">
+                android:orientation="horizontal" />
 
-                <include layout="@layout/item_recently" />
-                <include layout="@layout/item_recently" />
-                <include layout="@layout/item_recently" />
-                <include layout="@layout/item_recently" />
-            </GridLayout>
-
-            <!--        <androidx.recyclerview.widget.RecyclerView-->
-            <!--            android:id="@+id/recyclerRecently"-->
-            <!--            android:layout_width="match_parent"-->
-            <!--            android:layout_height="wrap_content"-->
-            <!--            android:layout_marginBottom="16dp"-->
-            <!--            android:overScrollMode="never"-->
-            <!--            android:nestedScrollingEnabled="false"-->
-            <!--            android:orientation="horizontal" />-->
 
             <!-- Featuring Today -->
             <TextView
@@ -167,7 +140,11 @@
                 android:textStyle="bold"
                 android:layout_marginBottom="8dp"/>
 
-            <include layout="@layout/item_featuring" />
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/featuring_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal" />
 
             <!-- New Release -->
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -199,29 +176,17 @@
                     android:layout_gravity="end"/>
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <GridLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:columnCount="4"
-                android:rowCount="1"
 
-                android:layout_marginBottom="16dp">
-
-                <include layout="@layout/item_newrelease" />
-                <include layout="@layout/item_newrelease" />
-                <include layout="@layout/item_newrelease" />
-                <include layout="@layout/item_newrelease" />
-            </GridLayout>
-
-            <!--        <androidx.recyclerview.widget.RecyclerView-->
-            <!--            android:id="@+id/recyclerNewRelease"-->
-            <!--            android:layout_width="match_parent"-->
-            <!--            android:layout_height="wrap_content"-->
-            <!--            android:nestedScrollingEnabled="false"-->
-            <!--            android:orientation="horizontal"-->
-            <!--            android:overScrollMode="never"/>-->
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/new_release_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal" />
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="200dp"/>
         </LinearLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
 
 </FrameLayout>

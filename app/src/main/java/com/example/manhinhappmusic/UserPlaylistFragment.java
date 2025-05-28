@@ -6,16 +6,25 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Pair;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.MultiTransformation;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
+import com.bumptech.glide.request.RequestOptions;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,60 +40,39 @@ public class UserPlaylistFragment extends BaseFragment {
     private ImageView playlistsCoverImage;
     private TextView playlistsTitle;
     private  TextView playlistsCount;
+    private ImageButton backButton;
     private RecyclerView songsView;
     private SongAdapter songAdapter;
     private Playlist playlist;
 
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
+    UserPlaylistViewModel viewModel;
     public UserPlaylistFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment UserPlaylistFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-
-    public static UserPlaylistFragment newInstance(String param1, String param2) {
-        UserPlaylistFragment fragment = new UserPlaylistFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
+    public UserPlaylistFragment(Playlist playlist)
+    {
+        this.playlist = playlist;
     }
 
 
-    public UserPlaylistFragment(Playlist playlist){
-        if(playlist != null)
-            this.playlist = playlist;
-        else
-            this.playlist = new Playlist("","","",new ArrayList<>(), "dfd", "fd");
+    public static UserPlaylistFragment newInstance(Playlist playlist) {
+        UserPlaylistFragment fragment = new UserPlaylistFragment();
+        fragment.setPlaylist(playlist);
+        return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+        viewModel = new ViewModelProvider(this).get(UserPlaylistViewModel.class);
+        if(viewModel.getPlaylist() == null && playlist != null)
+        {
+            viewModel.setPlaylist(playlist);
         }
-
-
+        else {
+            playlist = viewModel.getPlaylist();
+        }
     }
 
     @Override
@@ -92,21 +80,32 @@ public class UserPlaylistFragment extends BaseFragment {
         super.onViewCreated(view, savedInstanceState);
 
         playlistsCoverImage = view.findViewById(R.id.playlists_cover_image);
-        playlistsCoverImage.setImageResource(playlist.getThumnailResID());
+        Glide.with(this.getContext())
+                .load(playlist.getThumnailResID())
+                .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(15))))
+                .into(playlistsCoverImage);
         playlistsTitle = view.findViewById(R.id.playlists_title);
         playlistsTitle.setText(playlist.getName());
         playlistsCount = view.findViewById(R.id.playlists_count);
-        playlistsCount.setText(String.valueOf(playlist.getSongsList().size()) + "songs");
+        playlistsCount.setText(String.valueOf(playlist.getSongsList().size()) + " songs");
+        backButton = view.findViewById(R.id.back_button);
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                callback.onRequestGoBackPreviousFragment();
+            }
+        });
         songAdapter = new SongAdapter(playlist.getSongsList(), new SongAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
-                callback.onRequestChangeFragment(FragmentTag.NOW_PLAYING_SONG, new Pair<Playlist, Integer>(playlist, position));
+                callback.onRequestLoadMiniPlayer(playlist, position);
             }
         });
         songsView = view.findViewById(R.id.songs_view);
         songsView.setAdapter(songAdapter);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this.getContext());
         songsView.setLayoutManager(linearLayoutManager);
+        songsView.addItemDecoration(new VerticalLinearSpacingItemDecoration((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, getResources().getDisplayMetrics())));
 
 
     }
@@ -116,5 +115,9 @@ public class UserPlaylistFragment extends BaseFragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_user_playlist, container, false);
+    }
+
+    public void setPlaylist(Playlist playlist) {
+        this.playlist = playlist;
     }
 }

@@ -1,5 +1,7 @@
 package com.example.manhinhappmusic;
 
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -7,26 +9,47 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.MultiTransformation;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
+import com.bumptech.glide.request.RequestOptions;
 import com.google.android.flexbox.AlignSelf;
 import com.google.android.flexbox.FlexboxLayoutManager;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
 public class BrowseAdapter extends RecyclerView.Adapter<BrowseAdapter.ViewHolder> {
 
-    private List<Genre> borwseItems;
+    private List<Genre> genreList;
+    public interface OnItemClickListener{
+        void onItemClick(int position);
+    }
+    public OnItemClickListener onItemClickListener;
 
+    private static int[] colors = new int[]{
+            R.color.red,
+            R.color.amber,
+            R.color.pigment_green,
+            R.color.process_cyan,
+            R.color.magenta_dye
+    };
 
     public static class ViewHolder extends RecyclerView.ViewHolder{
         private final ImageView browseImage;
         private final TextView browseText;
+        private final CardView browseHolderCardView;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             browseImage = itemView.findViewById(R.id.browse_img);
             browseText = itemView.findViewById(R.id.browse_txt);
+            browseHolderCardView = itemView.findViewById(R.id.browse_holder_cardview);
         }
 
         public ImageView getBrowseImage() {
@@ -36,10 +59,15 @@ public class BrowseAdapter extends RecyclerView.Adapter<BrowseAdapter.ViewHolder
         public TextView getBrowseText() {
             return browseText;
         }
+
+        public CardView getBrowseHolderCardView() {
+            return browseHolderCardView;
+        }
     }
 
-    public BrowseAdapter(List<Genre> browseItems){
-        this.borwseItems = browseItems;
+    public BrowseAdapter(List<Genre> genreList, OnItemClickListener onItemClickListener){
+        this.genreList = genreList;
+        this.onItemClickListener = onItemClickListener;
     }
 
     @NonNull
@@ -53,20 +81,25 @@ public class BrowseAdapter extends RecyclerView.Adapter<BrowseAdapter.ViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Genre genre = borwseItems.get(position);
+        Genre genre = genreList.get(position);
         holder.getBrowseText().setText(genre.getName());
-        holder.getBrowseImage().setImageResource(R.drawable.avatar_app_music);
-//        ViewGroup.LayoutParams lp = holder.getBrowseImage().getLayoutParams();
-//        if (lp instanceof FlexboxLayoutManager.LayoutParams) {
-//            FlexboxLayoutManager.LayoutParams flexboxLp = (FlexboxLayoutManager.LayoutParams) lp;
-//            flexboxLp.setFlexGrow(1.0f);
-//            flexboxLp.setAlignSelf(AlignSelf.AUTO);
-//        }
+        Glide.with(holder.itemView.getContext())
+                .load(genre.getThumbnailResID())
+                .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(15))))
+                .into(holder.getBrowseImage());
+        holder.getBrowseHolderCardView().setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(holder.itemView.getContext(), colors[position % Array.getLength(colors)])));
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onItemClickListener.onItemClick(holder.getAdapterPosition());
+            }
+        });
+
     }
 
     @Override
     public int getItemCount() {
-        return borwseItems.size();
+        return genreList.size();
     }
 
 

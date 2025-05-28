@@ -11,6 +11,11 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.MultiTransformation;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
+import com.bumptech.glide.request.RequestOptions;
 import com.google.android.material.imageview.ShapeableImageView;
 
 import java.util.List;
@@ -34,8 +39,10 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
         Song song = songList.get(position);
         holder.getTextViewArtist().setText(song.getArtistId());
         holder.getTextViewSongTitle().setText(song.getTitle());
-        holder.getImageViewThumbnail().setImageResource(song.getCoverImageResID());
-
+        Glide.with(holder.itemView.getContext())
+                .load(song.getCoverImageResID())
+                .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(15))))
+                .into(holder.getImageViewThumbnail());
     }
 
     @Override
@@ -53,7 +60,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
         private final TextView textViewArtist;
         private final TextView textViewSongTitle;
         private final ImageButton moreOptionsButton;
-        private final ShapeableImageView imageViewThumbnail;
+        private final ImageView imageViewThumbnail;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -91,7 +98,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
             return moreOptionsButton;
         }
 
-        public ShapeableImageView getImageViewThumbnail() {
+        public ImageView getImageViewThumbnail() {
             return imageViewThumbnail;
         }
     }

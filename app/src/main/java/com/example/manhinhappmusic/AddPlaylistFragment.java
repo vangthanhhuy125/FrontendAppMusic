@@ -9,12 +9,14 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.EditText;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -23,46 +25,40 @@ import android.widget.Button;
  */
 public class AddPlaylistFragment extends DialogFragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private AddPlaylistViewModel viewModel;
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
 
     public AddPlaylistFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment AddPlaylistFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-
-    Button createButton;
-    Button cancelButton;
-    public static AddPlaylistFragment newInstance(String param1, String param2) {
+    public static AddPlaylistFragment newInstance(OnCreateButtonClickListener onCreateButtonClickListener) {
         AddPlaylistFragment fragment = new AddPlaylistFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
+        fragment.setOnCreateButtonClickListener(onCreateButtonClickListener);
         return fragment;
     }
+    public interface OnCreateButtonClickListener{
+        void onCreateButtonClick(String name);
+    }
+
+    private OnCreateButtonClickListener onCreateButtonClickListener;
+    Button createButton;
+    Button cancelButton;
+    EditText playlistsNameEditText;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+        viewModel = new ViewModelProvider(this).get(AddPlaylistViewModel.class);
+        if(viewModel.getOnCreateButtonClickListener() == null && onCreateButtonClickListener != null)
+        {
+            viewModel.setOnCreateButtonClickListener(onCreateButtonClickListener);
+        }
+        else
+        {
+            onCreateButtonClickListener = viewModel.getOnCreateButtonClickListener();
+
         }
     }
 
@@ -96,11 +92,14 @@ public class AddPlaylistFragment extends DialogFragment {
         createButton.setOnClickListener(this::onCreateButtonClick);
         cancelButton = view.findViewById(R.id.cancel_button);
         cancelButton.setOnClickListener(this::onCancelButtonClick);
+        playlistsNameEditText = view.findViewById(R.id.playlists_name_edittext);
     }
 
     private void onCreateButtonClick(View view)
     {
-
+        if(onCreateButtonClickListener != null)
+            onCreateButtonClickListener.onCreateButtonClick(playlistsNameEditText.getText().toString());
+        dismiss();
     }
 
     private void onCancelButtonClick(View view)
@@ -108,5 +107,7 @@ public class AddPlaylistFragment extends DialogFragment {
         dismiss();
     }
 
-
+    public void setOnCreateButtonClickListener(OnCreateButtonClickListener onCreateButtonClickListener) {
+        this.onCreateButtonClickListener = onCreateButtonClickListener;
+    }
 }

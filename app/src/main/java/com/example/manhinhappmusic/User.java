@@ -4,7 +4,7 @@ package com.example.manhinhappmusic;
 import java.util.ArrayList;
 
 
-public class User {
+public class User implements ListItem {
 
     private String id;
     private String email;
@@ -18,6 +18,9 @@ public class User {
     private Boolean isVerified;
     private String resetToken;
 
+    //test purpose
+    private int avatarResID;
+
     public User(String id, String email, String password, String lastName, String fullName, String role, String avatarUrl)
     {
         this.id = id;
@@ -28,6 +31,19 @@ public class User {
         this.role = role;
         this.avatarUrl = avatarUrl;
     }
+
+    public User(String id, String email, String password, String lastName, String fullName, String role, int avatarResID)
+    {
+        this.id = id;
+        this.email = email;
+        this.password = password;
+        this.lastName = lastName;
+        this.fullName = fullName;
+        this.role = role;
+        this.avatarResID = avatarResID;
+    }
+
+
 
     public String getId() {
         return id;
@@ -83,5 +99,18 @@ public class User {
 
     public void setAvatarUrl(String avatarUrl) {
         this.avatarUrl = avatarUrl;
+    }
+
+    public int getAvatarResID() {
+        return avatarResID;
+    }
+
+    public void setAvatarResID(int avatarResID) {
+        this.avatarResID = avatarResID;
+    }
+
+    @Override
+    public ListItemType getType() {
+        return ListItemType.ARTIST;
     }
 }

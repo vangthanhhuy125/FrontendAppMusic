@@ -16,14 +16,16 @@ public class MediaPlayerManager {
 
     }
 
-    private  OnCompletionListener completionListener;
+    private List<OnCompletionListener> onCompletionListeners = new ArrayList<>();
+
     public  MediaPlayer mediaPlayer;
     private  Context context;
     private  List<Song> playlist;
     private  List<Song> shufflePlaylist;
     public  int currentPosition = -1;
     private  Song currentSong;
-    public  boolean isShuffle = false;
+    public boolean isShuffle = false;
+    private boolean isPlayingNextSong = true;
     public static enum RepeatMode{
         NONE,
         REPEAT_ALL,
@@ -31,13 +33,15 @@ public class MediaPlayerManager {
     }
     private RepeatMode repeatMode = RepeatMode.NONE;
 
-    public MediaPlayerManager(Context context, List<Song> playlist, int currentPosition, OnCompletionListener completionListener)
+
+
+    public MediaPlayerManager(Context context, List<Song> playlist, int currentPosition)
     {
         this.context = context;
         this.playlist = playlist;
         this.currentPosition = currentPosition;
-        this.completionListener = completionListener;
-        mediaPlayer = MediaPlayer.create(context, playlist.get(currentPosition).getAudioResID());
+        this.currentSong = playlist.get(currentPosition);
+        mediaPlayer = MediaPlayer.create(context, currentSong.getAudioResID());
         mediaPlayer.setOnCompletionListener(this::complete);
     }
 
@@ -60,8 +64,9 @@ public class MediaPlayerManager {
                 }
             }
 
-            if(completionListener != null)
-                completionListener.onCompletion();
+            for (OnCompletionListener onCompletionListener: onCompletionListeners) {
+                 onCompletionListener.onCompletion();
+            }
         }
         else
         {
@@ -97,11 +102,14 @@ public class MediaPlayerManager {
     {
         if(!isShuffle){
             loadNextSong(playlist);
-            completionListener.onCompletion();
+
         }
         else {
             loadNextSong(shufflePlaylist);
-            completionListener.onCompletion();
+        }
+
+        for (OnCompletionListener onCompletionListener: onCompletionListeners) {
+            onCompletionListener.onCompletion();
         }
     }
 
@@ -109,13 +117,13 @@ public class MediaPlayerManager {
     {
         if(!isShuffle){
             loadPreviousSong(playlist);
-            completionListener.onCompletion();
-
         }
         else {
             loadPreviousSong(shufflePlaylist);
-            completionListener.onCompletion();
+        }
 
+        for (OnCompletionListener onCompletionListener: onCompletionListeners) {
+            onCompletionListener.onCompletion();
         }
     }
 
@@ -123,7 +131,9 @@ public class MediaPlayerManager {
     {
         if(currentPosition < playlist.size() - 1)
         {
+            isPlayingNextSong = true;
             currentSong = playlist.get(++currentPosition);
+            //mediaPlayer.pause();
             mediaPlayer.release();
             mediaPlayer = MediaPlayer.create(context, currentSong.getAudioResID());
             mediaPlayer.setOnCompletionListener(this::complete);
@@ -131,11 +141,16 @@ public class MediaPlayerManager {
         }
         else if(repeatMode == RepeatMode.REPEAT_ALL)
         {
+            isPlayingNextSong = true;
             currentSong = playlist.get(0);
+            //mediaPlayer.pause();
             mediaPlayer.release();
             mediaPlayer = MediaPlayer.create(context, currentSong.getAudioResID());
             mediaPlayer.setOnCompletionListener(this::complete);
             play();
+        }
+        else {
+            isPlayingNextSong = false;
         }
     }
 
@@ -143,7 +158,9 @@ public class MediaPlayerManager {
     {
         if(currentPosition > 0)
         {
+            isPlayingNextSong = true;
             currentSong = playlist.get(--currentPosition);
+            //mediaPlayer.pause();
             mediaPlayer.release();
             mediaPlayer = MediaPlayer.create(context, currentSong.getAudioResID());
             mediaPlayer.setOnCompletionListener(this::complete);
@@ -181,5 +198,21 @@ public class MediaPlayerManager {
         repeatMode = RepeatMode.NONE;
         playlist = null;
         shufflePlaylist = null;
+    }
+
+
+    public void addOnCompletionListeners(OnCompletionListener onCompletionListener)
+    {
+        if(onCompletionListener != null)
+            onCompletionListeners.add(onCompletionListener);
+    }
+
+    public void removeOnCompletionListeners(OnCompletionListener onCompletionListener) {
+        if(onCompletionListener != null)
+            onCompletionListeners.remove(onCompletionListener);
+    }
+
+    public boolean isPlayingNextSong() {
+        return isPlayingNextSong;
     }
 }

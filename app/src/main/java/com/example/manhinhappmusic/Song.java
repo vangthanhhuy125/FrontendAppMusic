@@ -7,7 +7,7 @@ import java.util.List;
 //import android.os.Bundle;
 
 
-public class Song implements Serializable {
+public class Song implements Serializable, ListItem {
     private String id;
     private String artistId;
     private String description;
@@ -132,4 +132,8 @@ public class Song implements Serializable {
     }
 
 
+    @Override
+    public ListItemType getType() {
+        return ListItemType.SONG;
+    }
 }

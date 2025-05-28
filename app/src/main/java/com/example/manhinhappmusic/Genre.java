@@ -10,6 +10,9 @@ public class Genre {
 
     private String urlCoverImage;
 
+    //test purpose
+
+    private int thumbnailResID;
     public Genre(String id, String name, String description){
         this.id = id;
         this.name = name;
@@ -21,6 +24,13 @@ public class Genre {
         this.name = name;
         this.description = description;
         this.urlCoverImage = urlCoverImage;
+    }
+
+    public Genre(String id, String name, String description, int thumbnailResID){
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.thumbnailResID = thumbnailResID;
     }
 
     public String getId() {
@@ -53,5 +63,13 @@ public class Genre {
 
     public void setUrlCoverImage(String urlCoverImage) {
         this.urlCoverImage = urlCoverImage;
+    }
+
+    public int getThumbnailResID() {
+        return thumbnailResID;
+    }
+
+    public void setThumbnailResID(int thumbnailResID) {
+        this.thumbnailResID = thumbnailResID;
     }
 }
