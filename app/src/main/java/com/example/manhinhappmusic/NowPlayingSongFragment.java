@@ -79,8 +79,6 @@ public class NowPlayingSongFragment extends BottomSheetDialogFragment {
         }
     };
     private MediaPlayerManager mediaPlayerManager;
-    private Song song;
-    private NowPlayingSongViewModel viewModel;
 
     private MediaPlayerManager.OnCompletionListener onCompletionListener = new MediaPlayerManager.OnCompletionListener() {
         @Override
@@ -90,7 +88,6 @@ public class NowPlayingSongFragment extends BottomSheetDialogFragment {
 
             if(mediaPlayerManager.isPlayingNextSong())
             {
-                song = mediaPlayerManager.getCurrentSong();
                 handler.post(updateSeekBar);
                 playButton.setIconResource(R.drawable.baseline_pause_circle_24);
                 setSongsInformation();
@@ -98,12 +95,22 @@ public class NowPlayingSongFragment extends BottomSheetDialogFragment {
         }
     };
 
+    private MediaPlayerManager.OnPlayingStateChangeListener onPlayingStateChangeListener = new MediaPlayerManager.OnPlayingStateChangeListener() {
+        @Override
+        public void onPlayingStateChange(boolean isPlaying) {
+            if(isPlaying)
+            {
+                playButton.setIconResource(R.drawable.baseline_pause_circle_24);
+            }
+            else {
+                playButton.setIconResource(R.drawable.baseline_play_circle_24);
+            }
+        }
+    };
+
 
     public static NowPlayingSongFragment newInstance(MediaPlayerManager mediaPlayerManager) {
         NowPlayingSongFragment fragment = new NowPlayingSongFragment();
-       fragment.setMediaPlayerManager(mediaPlayerManager);
-       fragment.setSong(mediaPlayerManager.getCurrentSong());
-
         return fragment;
     }
 
@@ -124,14 +131,7 @@ public class NowPlayingSongFragment extends BottomSheetDialogFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        viewModel = new ViewModelProvider(this).get(NowPlayingSongViewModel.class);
-        if(viewModel.getMediaPlayerManager() == null && mediaPlayerManager != null && song != null)
-        {
-            viewModel.setMediaPlayerManager(mediaPlayerManager);
-        }
-        else {
-            mediaPlayerManager = viewModel.getMediaPlayerManager();
-        }
+//
     }
 
     @Override
@@ -162,12 +162,15 @@ public class NowPlayingSongFragment extends BottomSheetDialogFragment {
         moreOptionButton = view.findViewById(R.id.more_options_button);
 
         mediaPlayerManager.addOnCompletionListeners(onCompletionListener);
-        if(!mediaPlayerManager.getMediaPlayer().isPlaying())
+        mediaPlayerManager.addOnPlayingStateChangeListeners(onPlayingStateChangeListener);
+        setSongsInformation();
+
+        if(mediaPlayerManager.getMediaPlayer() != null && !mediaPlayerManager.getMediaPlayer().isPlaying())
         {
             playButton.setIconResource(R.drawable.baseline_play_circle_24);
-
+            seekBar.setProgress(mediaPlayerManager.getMediaPlayer().getCurrentPosition());
+            currentPlayTimeTextView.setText(formatTime(mediaPlayerManager.getMediaPlayer().getCurrentPosition()));
         }
-        setSongsInformation();
 
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -195,14 +198,12 @@ public class NowPlayingSongFragment extends BottomSheetDialogFragment {
                 {
                     if(!mediaPlayerManager.getMediaPlayer().isPlaying()){
 
-                        playButton.setIconResource(R.drawable.baseline_pause_circle_24);
                         mediaPlayerManager.play();
                         handler.post(updateSeekBar);
 
                     }
 
                     else {
-                        playButton.setIconResource(R.drawable.baseline_play_circle_24);
                         mediaPlayerManager.pause();
                         handler.removeCallbacks(updateSeekBar);
 
@@ -286,12 +287,12 @@ public class NowPlayingSongFragment extends BottomSheetDialogFragment {
     private void setSongsInformation()
     {
         Glide.with(this.getContext())
-                .load(song.getCoverImageResID())
+                .load(mediaPlayerManager.getCurrentSong().getCoverImageResID())
                 .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(15))))
                 .into(songsCoverImage);
 
-        songsTitleTextView.setText(song.getTitle());
-        songsArtistsNameTextView.setText(song.getArtistId());
+        songsTitleTextView.setText(mediaPlayerManager.getCurrentSong().getTitle());
+        songsArtistsNameTextView.setText(mediaPlayerManager.getCurrentSong().getArtistId());
         songDurationTextView.setText(formatTime(mediaPlayerManager.getMediaPlayer().getDuration()));
         seekBar.setMax(mediaPlayerManager.getMediaPlayer().getDuration());
 
@@ -307,6 +308,7 @@ public class NowPlayingSongFragment extends BottomSheetDialogFragment {
     public void onDismiss(@NonNull DialogInterface dialog) {
         super.onDismiss(dialog);
         mediaPlayerManager.removeOnCompletionListeners(onCompletionListener);
+        mediaPlayerManager.removeOnPlayingStateChangeListeners(onPlayingStateChangeListener);
         handler.removeCallbacks(updateSeekBar);
     }
 
@@ -316,7 +318,5 @@ public class NowPlayingSongFragment extends BottomSheetDialogFragment {
         this.mediaPlayerManager = mediaPlayerManager;
     }
 
-    public void setSong(Song song) {
-        this.song = song;
-    }
+
 }

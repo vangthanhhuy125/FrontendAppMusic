@@ -13,11 +13,13 @@ import java.util.Random;
 public class MediaPlayerManager {
     public interface OnCompletionListener{
         void onCompletion();
-
+    }
+    public interface OnPlayingStateChangeListener{
+        void onPlayingStateChange(boolean isPlaying);
     }
 
     private List<OnCompletionListener> onCompletionListeners = new ArrayList<>();
-
+    private List<OnPlayingStateChangeListener> onPlayingStateChangeListeners = new ArrayList<>();
     public  MediaPlayer mediaPlayer;
     private  Context context;
     private  List<Song> playlist;
@@ -42,7 +44,12 @@ public class MediaPlayerManager {
         this.currentPosition = currentPosition;
         this.currentSong = playlist.get(currentPosition);
         mediaPlayer = MediaPlayer.create(context, currentSong.getAudioResID());
-        mediaPlayer.setOnCompletionListener(this::complete);
+        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                complete(mp);
+            }
+        });
     }
 
     private void complete(MediaPlayer mp)
@@ -89,13 +96,27 @@ public class MediaPlayerManager {
     public void play()
     {
         if(mediaPlayer != null)
+        {
             mediaPlayer.start();
+            for(OnPlayingStateChangeListener onPlayingStateChangeListener: onPlayingStateChangeListeners)
+            {
+                onPlayingStateChangeListener.onPlayingStateChange(mediaPlayer.isPlaying());
+            }
+
+        }
     }
 
     public void pause()
     {
         if(mediaPlayer != null)
+        {
             mediaPlayer.pause();
+            for(OnPlayingStateChangeListener onPlayingStateChangeListener: onPlayingStateChangeListeners)
+            {
+                onPlayingStateChangeListener.onPlayingStateChange(mediaPlayer.isPlaying());
+            }
+        }
+
     }
 
     public void skipNext()
@@ -186,17 +207,18 @@ public class MediaPlayerManager {
         return mediaPlayer;
     }
 
-    public void clear()
+    public int getCurrentPosition() {
+        return currentPosition;
+    }
+
+    public List<Song> getPlaylist() {
+        return playlist;
+    }
+
+    public void clearAllStates()
     {
-        if(mediaPlayer != null)
-            mediaPlayer.release();
-        mediaPlayer = null;
-        currentPosition = -1;
-        currentSong = null;
-        context = null;
         isShuffle = false;
         repeatMode = RepeatMode.NONE;
-        playlist = null;
         shufflePlaylist = null;
     }
 
@@ -207,12 +229,35 @@ public class MediaPlayerManager {
             onCompletionListeners.add(onCompletionListener);
     }
 
+    public void addOnPlayingStateChangeListeners(OnPlayingStateChangeListener onPlayingStateChangeListener) {
+        if(onPlayingStateChangeListener != null)
+            onPlayingStateChangeListeners.add(onPlayingStateChangeListener);
+    }
+
     public void removeOnCompletionListeners(OnCompletionListener onCompletionListener) {
         if(onCompletionListener != null)
             onCompletionListeners.remove(onCompletionListener);
     }
+    public void removeOnPlayingStateChangeListeners(OnPlayingStateChangeListener onPlayingStateChangeListener) {
+        if(onPlayingStateChangeListener != null)
+            onPlayingStateChangeListeners.remove(onPlayingStateChangeListener);
+    }
 
     public boolean isPlayingNextSong() {
         return isPlayingNextSong;
+    }
+
+    public void setPlaylist(List<Song> playlist, int currentPosition) {
+        if(this.playlist != playlist)
+        {
+            this.playlist = playlist;
+            clearAllStates();
+        }
+        this.currentPosition = currentPosition;
+        this.currentSong = playlist.get(currentPosition);
+        if(mediaPlayer != null)
+            mediaPlayer.release();
+        mediaPlayer = MediaPlayer.create(context, currentSong.getAudioResID());
+        mediaPlayer.start();
     }
 }

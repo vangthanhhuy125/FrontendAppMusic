@@ -40,9 +40,6 @@ public class MiniPlayerFragment extends BaseFragment {
 
     private CardView miniPlayerBackground;
 
-    private Playlist playlist;
-    private int currentPosition;
-    private  Song currentSong;
 
     private Runnable updateSeekBar = new Runnable() {
         @Override
@@ -57,7 +54,6 @@ public class MiniPlayerFragment extends BaseFragment {
 
     private  MediaPlayerManager mediaPlayerManager;
 
-    private MiniPlayerViewModel viewModel;
 
     public MiniPlayerFragment() {
         // Required empty public constructor
@@ -70,30 +66,14 @@ public class MiniPlayerFragment extends BaseFragment {
 
     public static MiniPlayerFragment newInstance(Playlist playlist, int currentPosition) {
         MiniPlayerFragment fragment = new MiniPlayerFragment();
-        fragment.setPlaylist(playlist);
-        fragment.setCurrentPosition(currentPosition);
-        fragment.setCurrentSong(playlist.getSongsList().get(currentPosition));
+
         return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        viewModel = new ViewModelProvider(this).get(MiniPlayerViewModel.class);
-        if(viewModel.getMediaPlayerManager() == null && playlist != null && currentSong != null)
-        {
-            viewModel.setPlaylist(playlist);
-            viewModel.setCurrentPosition(currentPosition);
-            viewModel.setCurrentSong(currentSong);
-            mediaPlayerManager = new MediaPlayerManager(this.getContext(), playlist.getSongsList(), currentPosition);
-            viewModel.setMediaPlayerManager(mediaPlayerManager);
-        }
-        else {
-            playlist = viewModel.getPlaylist();
-            currentPosition = viewModel.getCurrentPosition();
-            currentSong = viewModel.getCurrentSong();
-            mediaPlayerManager = viewModel.getMediaPlayerManager();
-        }
+
     }
 
     @Override
@@ -108,11 +88,8 @@ public class MiniPlayerFragment extends BaseFragment {
         super.onViewCreated(view, savedInstanceState);
 
         songsCoverImage = view.findViewById(R.id.songs_cover_image);
-        songsCoverImage.setImageResource(currentSong.getAudioResID());
         songsNameText = view.findViewById(R.id.songs_name_text);
-        songsNameText.setText(currentSong.getTitle());
         artistsNameText = view.findViewById(R.id.artist_name_text);
-        artistsNameText.setText(currentSong.getArtistId());
         miniPlayerBackground = view.findViewById(R.id.mini_player_background);
         seekBar = view.findViewById(R.id.seekBar);
         skipPreviousButton = view.findViewById(R.id.skip_previous_button);
@@ -127,10 +104,22 @@ public class MiniPlayerFragment extends BaseFragment {
 
                 if(mediaPlayerManager.isPlayingNextSong())
                 {
-                    currentSong = mediaPlayerManager.getCurrentSong();
                     handler.post(updateSeekBar);
                     playButton.setImageResource(R.drawable.baseline_pause_circle_24);
                     setSongsInformation();
+                }
+            }
+        });
+
+        mediaPlayerManager.addOnPlayingStateChangeListeners(new MediaPlayerManager.OnPlayingStateChangeListener() {
+            @Override
+            public void onPlayingStateChange(boolean isPlaying) {
+                if(isPlaying)
+                {
+                    playButton.setImageResource(R.drawable.baseline_pause_circle_24);
+                }
+                else {
+                    playButton.setImageResource(R.drawable.baseline_play_circle_24);
                 }
             }
         });
@@ -149,13 +138,11 @@ public class MiniPlayerFragment extends BaseFragment {
             public void onClick(View v) {
                 if(!mediaPlayerManager.getMediaPlayer().isPlaying())
                 {
-                    playButton.setImageResource(R.drawable.baseline_pause_circle_24);
                     handler.post(updateSeekBar);
                     mediaPlayerManager.play();
                 }
                 else
                 {
-                    playButton.setImageResource(R.drawable.baseline_play_circle_24);
                     handler.removeCallbacks(updateSeekBar);
                     mediaPlayerManager.pause();
                 }
@@ -175,7 +162,7 @@ public class MiniPlayerFragment extends BaseFragment {
         miniPlayerBackground.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                callback.onRequestOpenBottomSheetFragment(FragmentTag.NOW_PLAYING_SONG, mediaPlayerManager);
+                callback.onRequestOpenBottomSheetFragment(FragmentTag.NOW_PLAYING_SONG);
             }
         });
 
@@ -186,46 +173,29 @@ public class MiniPlayerFragment extends BaseFragment {
 
     private void setSongsInformation()
     {
-        songsCoverImage.setImageResource(currentSong.getCoverImageResID());
-        songsNameText.setText(currentSong.getTitle());
-        artistsNameText.setText(currentSong.getArtistId());
+        songsCoverImage.setImageResource(mediaPlayerManager.getCurrentSong().getCoverImageResID());
+        songsNameText.setText(mediaPlayerManager.getCurrentSong().getTitle());
+        artistsNameText.setText(mediaPlayerManager.getCurrentSong().getArtistId());
         seekBar.setMax(mediaPlayerManager.getMediaPlayer().getDuration());
-        Palette.from(BitmapFactory.decodeStream(this.getContext().getResources().openRawResource(currentSong.getCoverImageResID()))).generate(palette -> {
+        Palette.from(BitmapFactory.decodeStream(this.getContext().getResources().openRawResource(mediaPlayerManager.getCurrentSong().getCoverImageResID()))).generate(palette -> {
             int vibrant = palette.getVibrantColor(Color.GRAY);
             miniPlayerBackground.setBackgroundTintList(ColorStateList.valueOf(vibrant));
         });
     }
 
     public void changePlaylist(Playlist playlist, int currentPosition) {
-        this.playlist = playlist;
-        this.currentPosition = currentPosition;
-        this.currentSong = playlist.getSongsList().get(currentPosition);
-        setSongsInformation();
         if(mediaPlayerManager != null)
         {
-            mediaPlayerManager.clear();
-            mediaPlayerManager = new MediaPlayerManager(getContext(), playlist.getSongsList(), currentPosition);
+            mediaPlayerManager.setPlaylist(playlist.getSongsList(), currentPosition);
+            setSongsInformation();
             mediaPlayerManager.play();
 
         }
+
     }
 
-    public void setPlaylist(Playlist playlist) {
-        this.playlist = playlist;
-    }
 
-    public void setCurrentSong(Song currentSong) {
-        this.currentSong = currentSong;
-    }
-
-    public void setCurrentPosition(int currentPosition) {
-        this.currentPosition = currentPosition;
-    }
-    public void setMediaPlayerManager(MediaPlayerManager mediaPlayerManager){
-        if(this.mediaPlayerManager!= null)
-        {
-            this.mediaPlayerManager.getMediaPlayer().release();
-        }
-        this.mediaPlayerManager = mediaPlayerManager;
+    public MediaPlayerManager getMediaPlayerManager() {
+        return mediaPlayerManager;
     }
 }

@@ -42,4 +42,36 @@ public class AppFragmentFactory extends FragmentFactory {
         return super.instantiate(classLoader, className);
 
     }
+
+    public void setLibrary(List<Playlist> library) {
+        this.library = library;
+    }
+
+    public void setPlaylist(Playlist playlist) {
+        this.playlist = playlist;
+    }
+
+    public void setSong(Song song) {
+        this.song = song;
+    }
+
+    public void setMediaPlayerManager(MediaPlayerManager mediaPlayerManager) {
+        this.mediaPlayerManager = mediaPlayerManager;
+    }
+
+    public List<Playlist> getLibrary() {
+        return library;
+    }
+
+    public Playlist getPlaylist() {
+        return playlist;
+    }
+
+    public Song getSong() {
+        return song;
+    }
+
+    public MediaPlayerManager getMediaPlayerManager() {
+        return mediaPlayerManager;
+    }
 }

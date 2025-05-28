@@ -45,7 +45,6 @@ public class UserPlaylistFragment extends BaseFragment {
     private SongAdapter songAdapter;
     private Playlist playlist;
 
-    UserPlaylistViewModel viewModel;
     public UserPlaylistFragment() {
         // Required empty public constructor
     }
@@ -58,21 +57,13 @@ public class UserPlaylistFragment extends BaseFragment {
 
     public static UserPlaylistFragment newInstance(Playlist playlist) {
         UserPlaylistFragment fragment = new UserPlaylistFragment();
-        fragment.setPlaylist(playlist);
         return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        viewModel = new ViewModelProvider(this).get(UserPlaylistViewModel.class);
-        if(viewModel.getPlaylist() == null && playlist != null)
-        {
-            viewModel.setPlaylist(playlist);
-        }
-        else {
-            playlist = viewModel.getPlaylist();
-        }
+
     }
 
     @Override
@@ -117,7 +108,5 @@ public class UserPlaylistFragment extends BaseFragment {
         return inflater.inflate(R.layout.fragment_user_playlist, container, false);
     }
 
-    public void setPlaylist(Playlist playlist) {
-        this.playlist = playlist;
-    }
+
 }

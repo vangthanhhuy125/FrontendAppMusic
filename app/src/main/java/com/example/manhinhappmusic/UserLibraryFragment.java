@@ -47,25 +47,16 @@ public class UserLibraryFragment extends BaseFragment {
     private RecyclerView playlistsView;
     private PlaylistAdapter playlistAdapter;
     private List<Playlist> playlistList;
-    private UserLibraryViewModel viewModel;
 
     public static UserLibraryFragment newInstance(List<Playlist> playlistList) {
         UserLibraryFragment fragment = new UserLibraryFragment();
-        fragment.setPlaylistList(playlistList);
         return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        viewModel = new ViewModelProvider(this).get(UserLibraryViewModel.class);
-        if(viewModel.getPlaylistList() == null && playlistList != null)
-        {
-            viewModel.setPlaylistList(playlistList);
-        }
-        else {
-            playlistList = viewModel.getPlaylistList();
-        }
+//
     }
 
     @Override
@@ -118,7 +109,4 @@ public class UserLibraryFragment extends BaseFragment {
 
     }
 
-    public void setPlaylistList(List<Playlist> playlistList) {
-        this.playlistList = playlistList;
-    }
 }
