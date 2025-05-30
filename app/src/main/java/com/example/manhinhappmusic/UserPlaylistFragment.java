@@ -37,6 +37,9 @@ import java.util.List;
  */
 public class UserPlaylistFragment extends BaseFragment {
 
+    private static final String ARG_ID = "ID";
+    private String id;
+
     private ImageView playlistsCoverImage;
     private TextView playlistsTitle;
     private  TextView playlistsCount;
@@ -49,20 +52,23 @@ public class UserPlaylistFragment extends BaseFragment {
         // Required empty public constructor
     }
 
-    public UserPlaylistFragment(Playlist playlist)
-    {
-        this.playlist = playlist;
-    }
-
-
-    public static UserPlaylistFragment newInstance(Playlist playlist) {
+    public static UserPlaylistFragment newInstance(String id) {
         UserPlaylistFragment fragment = new UserPlaylistFragment();
+        Bundle args = new Bundle();
+        args.putString(ARG_ID, id);
+        fragment.setArguments(args);
         return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if(getArguments() != null)
+        {
+            id = getArguments().getString(ARG_ID);
+        }
+
+        playlist = PlaylistRepository.getInstance().getItemById(id).getValue();
 
     }
 
@@ -89,7 +95,11 @@ public class UserPlaylistFragment extends BaseFragment {
         songAdapter = new SongAdapter(playlist.getSongsList(), new SongAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
-                callback.onRequestLoadMiniPlayer(playlist, position);
+                MediaPlayerManager mediaPlayerManager = MediaPlayerManager.getInstance(null);
+                mediaPlayerManager.setCurrentSong(position);
+                mediaPlayerManager.play();
+                callback.onRequestLoadMiniPlayer();
+
             }
         });
         songsView = view.findViewById(R.id.songs_view);

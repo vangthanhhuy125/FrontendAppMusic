@@ -12,7 +12,7 @@ public class BaseFragment extends Fragment {
         void onRequestChangeActivity(FragmentTag destinationTag, Object... params);
         void onRequestOpenBottomSheetFragment(FragmentTag destinationTag, Object... params);
         void onRequestGoBackPreviousFragment();
-        void onRequestLoadMiniPlayer(Playlist playlist, int currentPosition);
+        void onRequestLoadMiniPlayer();
     }
 
     protected FragmentInteractionListener callback;

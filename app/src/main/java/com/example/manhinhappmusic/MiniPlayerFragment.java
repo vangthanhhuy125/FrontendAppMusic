@@ -59,10 +59,6 @@ public class MiniPlayerFragment extends BaseFragment {
         // Required empty public constructor
     }
 
-    public MiniPlayerFragment(MediaPlayerManager mediaPlayerManager)
-    {
-        this.mediaPlayerManager = mediaPlayerManager;
-    }
 
     public static MiniPlayerFragment newInstance(Playlist playlist, int currentPosition) {
         MiniPlayerFragment fragment = new MiniPlayerFragment();
@@ -96,7 +92,9 @@ public class MiniPlayerFragment extends BaseFragment {
         playButton = view.findViewById(R.id.play_button);
         skipNextButton = view.findViewById(R.id.skip_next_button);
 
-        mediaPlayerManager.addOnCompletionListeners(new MediaPlayerManager.OnCompletionListener() {
+        mediaPlayerManager = MediaPlayerManager.getInstance(null);
+
+        mediaPlayerManager.addOnCompletionListener(new MediaPlayerManager.OnCompletionListener() {
             @Override
             public void onCompletion() {
                 playButton.setImageResource(R.drawable.baseline_play_circle_24);
@@ -109,9 +107,9 @@ public class MiniPlayerFragment extends BaseFragment {
                     setSongsInformation();
                 }
             }
-        });
+        }, MiniPlayerFragment.class.getName());
 
-        mediaPlayerManager.addOnPlayingStateChangeListeners(new MediaPlayerManager.OnPlayingStateChangeListener() {
+        mediaPlayerManager.addOnPlayingStateChangeListener(new MediaPlayerManager.OnPlayingStateChangeListener() {
             @Override
             public void onPlayingStateChange(boolean isPlaying) {
                 if(isPlaying)
@@ -122,7 +120,14 @@ public class MiniPlayerFragment extends BaseFragment {
                     playButton.setImageResource(R.drawable.baseline_play_circle_24);
                 }
             }
-        });
+        }, MiniPlayerFragment.class.getName());
+
+        mediaPlayerManager.addOnPlayingSongChangeListener(new MediaPlayerManager.OnPlayingSongChangeListener() {
+            @Override
+            public void onPlayingSongChange(Song song) {
+                setSongsInformation();
+            }
+        }, MiniPlayerFragment.class.getName());
 
         setSongsInformation();
 
@@ -183,19 +188,15 @@ public class MiniPlayerFragment extends BaseFragment {
         });
     }
 
-    public void changePlaylist(Playlist playlist, int currentPosition) {
-        if(mediaPlayerManager != null)
-        {
-            mediaPlayerManager.setPlaylist(playlist.getSongsList(), currentPosition);
-            setSongsInformation();
-            mediaPlayerManager.play();
-
-        }
-
-    }
-
-
     public MediaPlayerManager getMediaPlayerManager() {
         return mediaPlayerManager;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mediaPlayerManager.removeOnCompletionListener(MiniPlayerFragment.class.getName());
+        mediaPlayerManager.removeOnPlayingStateChangeListener(MiniPlayerFragment.class.getName());
+        mediaPlayerManager.removeOnPlayingSongChangeListener(MiniPlayerFragment.class.getName());
     }
 }

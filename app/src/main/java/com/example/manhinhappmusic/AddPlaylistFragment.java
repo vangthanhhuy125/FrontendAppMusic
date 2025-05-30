@@ -1,6 +1,7 @@
 package com.example.manhinhappmusic;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -25,23 +26,16 @@ import android.widget.EditText;
  */
 public class AddPlaylistFragment extends DialogFragment {
 
-    private AddPlaylistViewModel viewModel;
-
-
     public AddPlaylistFragment() {
         // Required empty public constructor
     }
 
-    public static AddPlaylistFragment newInstance(OnCreateButtonClickListener onCreateButtonClickListener) {
+    public static AddPlaylistFragment newInstance() {
         AddPlaylistFragment fragment = new AddPlaylistFragment();
-        fragment.setOnCreateButtonClickListener(onCreateButtonClickListener);
         return fragment;
     }
-    public interface OnCreateButtonClickListener{
-        void onCreateButtonClick(String name);
-    }
 
-    private OnCreateButtonClickListener onCreateButtonClickListener;
+
     Button createButton;
     Button cancelButton;
     EditText playlistsNameEditText;
@@ -50,16 +44,6 @@ public class AddPlaylistFragment extends DialogFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        viewModel = new ViewModelProvider(this).get(AddPlaylistViewModel.class);
-        if(viewModel.getOnCreateButtonClickListener() == null && onCreateButtonClickListener != null)
-        {
-            viewModel.setOnCreateButtonClickListener(onCreateButtonClickListener);
-        }
-        else
-        {
-            onCreateButtonClickListener = viewModel.getOnCreateButtonClickListener();
-
-        }
     }
 
     @Override
@@ -85,6 +69,8 @@ public class AddPlaylistFragment extends DialogFragment {
         );
     }
 
+
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -97,8 +83,9 @@ public class AddPlaylistFragment extends DialogFragment {
 
     private void onCreateButtonClick(View view)
     {
-        if(onCreateButtonClickListener != null)
-            onCreateButtonClickListener.onCreateButtonClick(playlistsNameEditText.getText().toString());
+        Bundle result = new Bundle();
+        result.putString("playlist_name", playlistsNameEditText.getText().toString());
+        getParentFragmentManager().setFragmentResult("request_add_playlist", result);
         dismiss();
     }
 
@@ -107,7 +94,5 @@ public class AddPlaylistFragment extends DialogFragment {
         dismiss();
     }
 
-    public void setOnCreateButtonClickListener(OnCreateButtonClickListener onCreateButtonClickListener) {
-        this.onCreateButtonClickListener = onCreateButtonClickListener;
-    }
+
 }

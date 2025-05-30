@@ -37,11 +37,6 @@ public class UserLibraryFragment extends BaseFragment {
         // Required empty public constructor
     }
 
-    public UserLibraryFragment(List<Playlist> playlistList)
-    {
-        this.playlistList = playlistList;
-    }
-
     private ShapeableImageView userAvatar;
     private ImageButton addButton;
     private RecyclerView playlistsView;
@@ -74,19 +69,30 @@ public class UserLibraryFragment extends BaseFragment {
         addButton = view.findViewById(R.id.add_playlist_button);
         addButton.setOnClickListener(this::onAddPlaylistButtonClick);
 
+        playlistList = LibraryRepository.getInstance().getItemById("").getValue();
+
         playlistAdapter = new PlaylistAdapter(playlistList, new PlaylistAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
-                callback.onRequestChangeFragment(FragmentTag.USER_PLAYLIST, playlistAdapter.getPlaylistList().get(position));
+                MediaPlayerManager.getInstance(null)
+                        .setPlaylist(playlistAdapter.getPlaylistList().get(position).getSongsList());
+                callback.onRequestChangeFragment(FragmentTag.USER_PLAYLIST,
+                        playlistAdapter.getPlaylistList().get(position).getId());
             }
         });
+
+
+
         playlistsView = view.findViewById(R.id.playlists_view);
         playlistsView.setAdapter(playlistAdapter);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this.getContext());
         playlistsView.setLayoutManager(layoutManager);
         playlistsView.addItemDecoration(new VerticalLinearSpacingItemDecoration((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, getResources().getDisplayMetrics())));
 
-
+        getParentFragmentManager().setFragmentResultListener("request_add_playlist", getViewLifecycleOwner(), (requestKey, result) ->{
+            playlistList.add(new Playlist("dfd", result.getString("playlist_name"), "Fdfd", new ArrayList<>(),"",0));
+            playlistAdapter.notifyDataSetChanged();
+        });
 
     }
 
@@ -97,16 +103,11 @@ public class UserLibraryFragment extends BaseFragment {
     private void onAddPlaylistButtonClick(View view){
 
         AddPlaylistFragment addPlaylistFragment = new AddPlaylistFragment();
-        addPlaylistFragment.setOnCreateButtonClickListener(new AddPlaylistFragment.OnCreateButtonClickListener() {
-            @Override
-            public void onCreateButtonClick(String playlistsName) {
-                playlistList.add(new Playlist("dfd", playlistsName, "Fdfd", new ArrayList<>(),"",0));
-                playlistAdapter.notifyDataSetChanged();
-            }
-        });
         addPlaylistFragment.show(getParentFragmentManager(), null);
 
 
     }
+
+
 
 }

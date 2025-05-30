@@ -5,9 +5,15 @@ import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 
+import androidx.annotation.Nullable;
+
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Dictionary;
+import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 public class MediaPlayerManager {
@@ -18,8 +24,13 @@ public class MediaPlayerManager {
         void onPlayingStateChange(boolean isPlaying);
     }
 
-    private List<OnCompletionListener> onCompletionListeners = new ArrayList<>();
-    private List<OnPlayingStateChangeListener> onPlayingStateChangeListeners = new ArrayList<>();
+    public interface OnPlayingSongChangeListener{
+        void onPlayingSongChange(Song song);
+    }
+
+    private Map<String,OnCompletionListener> onCompletionListeners = new HashMap<>();
+    private Map<String,OnPlayingStateChangeListener> onPlayingStateChangeListeners = new HashMap<>();
+    private Map<String,OnPlayingSongChangeListener> onPlayingSongChangeListeners = new HashMap<>();
     public  MediaPlayer mediaPlayer;
     private  Context context;
     private  List<Song> playlist;
@@ -36,20 +47,19 @@ public class MediaPlayerManager {
     private RepeatMode repeatMode = RepeatMode.NONE;
 
 
+    private static MediaPlayerManager instance;
 
-    public MediaPlayerManager(Context context, List<Song> playlist, int currentPosition)
+    public static MediaPlayerManager getInstance(@Nullable Context context) {
+        if(instance == null && context != null)
+        {
+            instance = new MediaPlayerManager(context);
+        }
+        return  instance;
+    }
+
+    private MediaPlayerManager(Context context)
     {
         this.context = context;
-        this.playlist = playlist;
-        this.currentPosition = currentPosition;
-        this.currentSong = playlist.get(currentPosition);
-        mediaPlayer = MediaPlayer.create(context, currentSong.getAudioResID());
-        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mp) {
-                complete(mp);
-            }
-        });
     }
 
     private void complete(MediaPlayer mp)
@@ -71,7 +81,7 @@ public class MediaPlayerManager {
                 }
             }
 
-            for (OnCompletionListener onCompletionListener: onCompletionListeners) {
+            for (OnCompletionListener onCompletionListener: onCompletionListeners.values()) {
                  onCompletionListener.onCompletion();
             }
         }
@@ -98,7 +108,7 @@ public class MediaPlayerManager {
         if(mediaPlayer != null)
         {
             mediaPlayer.start();
-            for(OnPlayingStateChangeListener onPlayingStateChangeListener: onPlayingStateChangeListeners)
+            for(OnPlayingStateChangeListener onPlayingStateChangeListener: onPlayingStateChangeListeners.values())
             {
                 onPlayingStateChangeListener.onPlayingStateChange(mediaPlayer.isPlaying());
             }
@@ -111,7 +121,7 @@ public class MediaPlayerManager {
         if(mediaPlayer != null)
         {
             mediaPlayer.pause();
-            for(OnPlayingStateChangeListener onPlayingStateChangeListener: onPlayingStateChangeListeners)
+            for(OnPlayingStateChangeListener onPlayingStateChangeListener: onPlayingStateChangeListeners.values())
             {
                 onPlayingStateChangeListener.onPlayingStateChange(mediaPlayer.isPlaying());
             }
@@ -129,7 +139,7 @@ public class MediaPlayerManager {
             loadNextSong(shufflePlaylist);
         }
 
-        for (OnCompletionListener onCompletionListener: onCompletionListeners) {
+        for (OnCompletionListener onCompletionListener: onCompletionListeners.values()) {
             onCompletionListener.onCompletion();
         }
     }
@@ -143,7 +153,7 @@ public class MediaPlayerManager {
             loadPreviousSong(shufflePlaylist);
         }
 
-        for (OnCompletionListener onCompletionListener: onCompletionListeners) {
+        for (OnCompletionListener onCompletionListener: onCompletionListeners.values()) {
             onCompletionListener.onCompletion();
         }
     }
@@ -223,41 +233,60 @@ public class MediaPlayerManager {
     }
 
 
-    public void addOnCompletionListeners(OnCompletionListener onCompletionListener)
+    public void addOnCompletionListener(OnCompletionListener onCompletionListener, String className)
     {
         if(onCompletionListener != null)
-            onCompletionListeners.add(onCompletionListener);
+            onCompletionListeners.put(className, onCompletionListener);
     }
 
-    public void addOnPlayingStateChangeListeners(OnPlayingStateChangeListener onPlayingStateChangeListener) {
+    public void addOnPlayingStateChangeListener(OnPlayingStateChangeListener onPlayingStateChangeListener, String className) {
         if(onPlayingStateChangeListener != null)
-            onPlayingStateChangeListeners.add(onPlayingStateChangeListener);
+            onPlayingStateChangeListeners.put(className, onPlayingStateChangeListener);
     }
 
-    public void removeOnCompletionListeners(OnCompletionListener onCompletionListener) {
-        if(onCompletionListener != null)
-            onCompletionListeners.remove(onCompletionListener);
+    public void addOnPlayingSongChangeListener(OnPlayingSongChangeListener onPlayingSongChangeListener, String className)
+    {
+        if(onPlayingSongChangeListener != null)
+            onPlayingSongChangeListeners.put(className, onPlayingSongChangeListener);
     }
-    public void removeOnPlayingStateChangeListeners(OnPlayingStateChangeListener onPlayingStateChangeListener) {
-        if(onPlayingStateChangeListener != null)
-            onPlayingStateChangeListeners.remove(onPlayingStateChangeListener);
+
+    public void removeOnCompletionListener(String className) {
+            onCompletionListeners.remove(className);
+    }
+    public void removeOnPlayingStateChangeListener(String className) {
+            onPlayingStateChangeListeners.remove(className);
+    }
+
+    public void removeOnPlayingSongChangeListener(String className)
+    {
+            onPlayingSongChangeListeners.remove(className);
     }
 
     public boolean isPlayingNextSong() {
         return isPlayingNextSong;
     }
 
-    public void setPlaylist(List<Song> playlist, int currentPosition) {
-        if(this.playlist != playlist)
-        {
-            this.playlist = playlist;
-            clearAllStates();
-        }
-        this.currentPosition = currentPosition;
-        this.currentSong = playlist.get(currentPosition);
+    public void setPlaylist(List<Song> playlist) {
+        clearAllStates();
+       this.playlist = playlist;
         if(mediaPlayer != null)
             mediaPlayer.release();
-        mediaPlayer = MediaPlayer.create(context, currentSong.getAudioResID());
-        mediaPlayer.start();
+    }
+
+    public void setCurrentSong(int currentPosition)
+    {
+        if(playlist != null && playlist.size() > currentPosition)
+        {
+            this.currentPosition = currentPosition;
+            this.currentSong = playlist.get(currentPosition);
+            if(mediaPlayer != null)
+                mediaPlayer.release();
+            mediaPlayer = MediaPlayer.create(context, currentSong.getAudioResID());
+            mediaPlayer.setOnCompletionListener(this::complete);
+            for(OnPlayingSongChangeListener onPlayingSongChangeListener: onPlayingSongChangeListeners.values())
+            {
+                onPlayingSongChangeListener.onPlayingSongChange(currentSong);
+            }
+        }
     }
 }

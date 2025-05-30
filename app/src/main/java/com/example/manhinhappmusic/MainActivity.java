@@ -22,11 +22,11 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.Frag
 
     BottomSheetDialogFragment bottomSheetDialogFragment;
     BottomNavigationView bottomNavigationView;
-    AppFragmentFactory appFragmentFactory;
+//    AppFragmentFactory appFragmentFactory;
     MiniPlayerFragment miniPlayer;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        getSupportFragmentManager().setFragmentFactory(appFragmentFactory);
+//        getSupportFragmentManager().setFragmentFactory(appFragmentFactory);
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
@@ -36,8 +36,10 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.Frag
             return insets;
         });
 
-        appFragmentFactory = new AppFragmentFactory(null, null, null, null);
-        appFragmentFactory.setLibrary(TestData.playlistList);
+//        appFragmentFactory = new AppFragmentFactory(null, null, null, null);
+//        appFragmentFactory.setLibrary(TestData.playlistList);
+        MediaPlayerManager.getInstance(this);
+
         loadFragment(new UserHomeFragment());
         initializeView();
     }
@@ -47,15 +49,11 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.Frag
         bottomNavigationView.setOnItemSelectedListener(this::navigation);
     }
 
-    private void loadMiniPlayer(Playlist playlist, int currentPosition)
+    private void loadMiniPlayer()
     {
-        if (miniPlayer != null)
+        if (miniPlayer == null)
         {
-            miniPlayer.changePlaylist(playlist, currentPosition);
-        }
-        else {
-            appFragmentFactory.setMediaPlayerManager(new MediaPlayerManager(this, playlist.getSongsList(), currentPosition));
-            miniPlayer = (MiniPlayerFragment) appFragmentFactory.instantiate(getClassLoader(), MiniPlayerFragment.class.getName());
+            miniPlayer = new MiniPlayerFragment() ;
             getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.mini_player, miniPlayer)
@@ -87,9 +85,8 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.Frag
                 selectedFragment = new UserSearchFragment();
             else if(item.getItemId() == R.id.nav_library)
             {
+                selectedFragment = new UserLibraryFragment();
 
-//                selectedFragment = UserLibraryFragment.newInstance(TestData.playlistList);
-                selectedFragment = appFragmentFactory.instantiate(getClassLoader(), UserLibraryFragment.class.getName());
 
             }
         }
@@ -112,22 +109,15 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.Frag
             destinationFragment = new SeacrhExFragment();
         else if(destinationTag == BaseFragment.FragmentTag.USER_PLAYLIST)
         {
-            if(params[0] instanceof Playlist)
+            String id = null;
+            if(params[0] instanceof String)
             {
-                appFragmentFactory.setPlaylist((Playlist) params[0]);
-
+                id = (String) params[0];
             }
-//            destinationFragment = UserPlaylistFragment.newInstance(playlist);
-            destinationFragment = appFragmentFactory.instantiate(getClassLoader(), UserPlaylistFragment.class.getName());
+            destinationFragment = UserPlaylistFragment.newInstance(id);
 
         }
-//        else if(destinationTag == BaseFragment.FragmentTag.NOW_PLAYING_SONG)
-//        {
-//            Playlist playlist = (Playlist) params[0];
-//            int currentPosition = (int) params[1];
-//            destinationFragment = new NowPlayingSongFragment(playlist, currentPosition);
-//
-//        }
+
         loadFragment(destinationFragment);
     }
 
@@ -146,9 +136,7 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.Frag
         }
         else if(destinationTag == BaseFragment.FragmentTag.NOW_PLAYING_SONG)
         {
-//            MediaPlayerManager mediaPlayerManager = (MediaPlayerManager) params[0];
-//            appFragmentFactory.setMediaPlayerManager(mediaPlayerManager);
-            bottomSheetDialogFragment =(BottomSheetDialogFragment) appFragmentFactory.instantiate(getClassLoader(), NowPlayingSongFragment.class.getName());
+            bottomSheetDialogFragment = new NowPlayingSongFragment();
             bottomSheetDialogFragment.show(getSupportFragmentManager(),"");
         }
 
@@ -160,7 +148,7 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.Frag
     }
 
     @Override
-    public void onRequestLoadMiniPlayer(Playlist playlist, int currentPosition) {
-        loadMiniPlayer(playlist, currentPosition);
+    public void onRequestLoadMiniPlayer() {
+        loadMiniPlayer();
     }
 }

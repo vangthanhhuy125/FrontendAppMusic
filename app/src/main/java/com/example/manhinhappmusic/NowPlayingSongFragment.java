@@ -48,12 +48,6 @@ public class NowPlayingSongFragment extends BottomSheetDialogFragment {
         // Required empty public constructor
     }
 
-    public NowPlayingSongFragment(MediaPlayerManager mediaPlayerManager)
-    {
-        this.mediaPlayerManager = mediaPlayerManager;
-    }
-
-
     private TextView currentPlayTimeTextView;
     private TextView songDurationTextView;
     private ImageView songsCoverImage;
@@ -79,34 +73,6 @@ public class NowPlayingSongFragment extends BottomSheetDialogFragment {
         }
     };
     private MediaPlayerManager mediaPlayerManager;
-
-    private MediaPlayerManager.OnCompletionListener onCompletionListener = new MediaPlayerManager.OnCompletionListener() {
-        @Override
-        public void onCompletion() {
-            playButton.setIconResource(R.drawable.baseline_play_circle_24);
-            handler.removeCallbacks(updateSeekBar);
-
-            if(mediaPlayerManager.isPlayingNextSong())
-            {
-                handler.post(updateSeekBar);
-                playButton.setIconResource(R.drawable.baseline_pause_circle_24);
-                setSongsInformation();
-            }
-        }
-    };
-
-    private MediaPlayerManager.OnPlayingStateChangeListener onPlayingStateChangeListener = new MediaPlayerManager.OnPlayingStateChangeListener() {
-        @Override
-        public void onPlayingStateChange(boolean isPlaying) {
-            if(isPlaying)
-            {
-                playButton.setIconResource(R.drawable.baseline_pause_circle_24);
-            }
-            else {
-                playButton.setIconResource(R.drawable.baseline_play_circle_24);
-            }
-        }
-    };
 
 
     public static NowPlayingSongFragment newInstance(MediaPlayerManager mediaPlayerManager) {
@@ -145,7 +111,7 @@ public class NowPlayingSongFragment extends BottomSheetDialogFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-
+        mediaPlayerManager = MediaPlayerManager.getInstance(null);
 
         seekBar = view.findViewById(R.id.seekBar);
         songsCoverImage = view.findViewById(R.id.songs_cover_image);
@@ -161,8 +127,40 @@ public class NowPlayingSongFragment extends BottomSheetDialogFragment {
         minimizeButton = view.findViewById(R.id.minimize_button);
         moreOptionButton = view.findViewById(R.id.more_options_button);
 
-        mediaPlayerManager.addOnCompletionListeners(onCompletionListener);
-        mediaPlayerManager.addOnPlayingStateChangeListeners(onPlayingStateChangeListener);
+        mediaPlayerManager.addOnCompletionListener(new MediaPlayerManager.OnCompletionListener() {
+            @Override
+            public void onCompletion() {
+                playButton.setIconResource(R.drawable.baseline_play_circle_24);
+                handler.removeCallbacks(updateSeekBar);
+
+                if(mediaPlayerManager.isPlayingNextSong())
+                {
+                    handler.post(updateSeekBar);
+                    playButton.setIconResource(R.drawable.baseline_pause_circle_24);
+                    setSongsInformation();
+                }
+            }
+        }, NowPlayingSongFragment.class.getName());
+        mediaPlayerManager.addOnPlayingStateChangeListener(new MediaPlayerManager.OnPlayingStateChangeListener() {
+            @Override
+            public void onPlayingStateChange(boolean isPlaying) {
+                if(isPlaying)
+                {
+                    playButton.setIconResource(R.drawable.baseline_pause_circle_24);
+                }
+                else {
+                    playButton.setIconResource(R.drawable.baseline_play_circle_24);
+                }
+            }
+        }, NowPlayingSongFragment.class.getName());
+
+        mediaPlayerManager.addOnPlayingSongChangeListener(new MediaPlayerManager.OnPlayingSongChangeListener() {
+            @Override
+            public void onPlayingSongChange(Song song) {
+                setSongsInformation();
+            }
+        }, NowPlayingSongFragment.class.getName());
+
         setSongsInformation();
 
         if(mediaPlayerManager.getMediaPlayer() != null && !mediaPlayerManager.getMediaPlayer().isPlaying())
@@ -307,8 +305,9 @@ public class NowPlayingSongFragment extends BottomSheetDialogFragment {
     @Override
     public void onDismiss(@NonNull DialogInterface dialog) {
         super.onDismiss(dialog);
-        mediaPlayerManager.removeOnCompletionListeners(onCompletionListener);
-        mediaPlayerManager.removeOnPlayingStateChangeListeners(onPlayingStateChangeListener);
+        mediaPlayerManager.removeOnCompletionListener(NowPlayingSongFragment.class.getName());
+        mediaPlayerManager.removeOnPlayingStateChangeListener(NowPlayingSongFragment.class.getName());
+        mediaPlayerManager.removeOnPlayingSongChangeListener(NowPlayingSongFragment.class.getName());
         handler.removeCallbacks(updateSeekBar);
     }
 

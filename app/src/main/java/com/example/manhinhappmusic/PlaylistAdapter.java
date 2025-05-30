@@ -17,7 +17,7 @@ import java.util.List;
 
 public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHolder>{
 
-    private final List<Playlist> playlistList;
+    private  List<Playlist> playlistList;
     private static OnItemClickListener onItemClickListener;
 
     public interface OnItemClickListener{
@@ -89,5 +89,9 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
 
     public List<Playlist> getPlaylistList() {
         return playlistList;
+    }
+
+    public void setPlaylistList(List<Playlist> playlistList) {
+        this.playlistList = playlistList;
     }
 }
