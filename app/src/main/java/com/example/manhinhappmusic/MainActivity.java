@@ -1,7 +1,6 @@
 package com.example.manhinhappmusic;
 
 import android.os.Bundle;
-import android.util.Pair;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -14,9 +13,6 @@ import androidx.fragment.app.Fragment;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements BaseFragment.FragmentInteractionListener {
 
@@ -66,7 +62,19 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.Frag
         if(fragment != null){
             getSupportFragmentManager()
                     .beginTransaction()
-                    .replace(R.id.frame_container, fragment)
+                    .add(R.id.frame_container, fragment)
+                    .addToBackStack(null)
+                    .commit();
+            return true;
+        }
+        return false;
+    }
+
+    private boolean loadFrontFragment(Fragment fragment){
+        if(fragment != null){
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .add(R.id.front_frame_container, fragment)
                     .addToBackStack(null)
                     .commit();
             return true;
@@ -117,8 +125,68 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.Frag
             destinationFragment = UserPlaylistFragment.newInstance(id);
 
         }
+        else if (destinationTag == BaseFragment.FragmentTag.LIBRARY_SEARCH) {
+            destinationFragment = new UserLibrarySearchFragment();
+        }
+        else if (destinationTag == BaseFragment.FragmentTag.PLAYLIST_ADD_SONG) {
+            String id = null;
+            if(params[0] instanceof String) {
+                id = (String) params[0];
+            }
+            destinationFragment = UserPlaylistAddSongFragment.newInstance(id);
+
+        }
+        else if(destinationTag == BaseFragment.FragmentTag.USER_GENRE)
+        {
+            String id = null;
+            if(params[0] instanceof String) {
+                id = (String) params[0];
+            }
+            destinationFragment = UserGenreFragment.newInstance(id);
+        }
+        else if(destinationTag == BaseFragment.FragmentTag.USER_ARTIST)
+        {
+            String id = null;
+            if(params[0] instanceof String) {
+                id = (String) params[0];
+            }
+            destinationFragment = UserArtistFragment.newInstance(id);
+        }
+//        else if(destinationTag == BaseFragment.FragmentTag.USER_SEARCH_ADD_SONG)
+//        {
+//            String id = null;
+//            if(params[0] instanceof String) {
+//                id = (String) params[0];
+//            }
+//            destinationFragment = UserSearchAddSongFragment.newInstance(id);
+//        }
+
+
 
         loadFragment(destinationFragment);
+    }
+
+    @Override
+    public void onRequestChangeFrontFragment(BaseFragment.FragmentTag destinationTag, Object... params) {
+        Fragment destinationFragment = null;
+        if(destinationTag == BaseFragment.FragmentTag.USER_SEARCH_ADD_SONG)
+        {
+            String id = null;
+            if(params[0] instanceof String) {
+                id = (String) params[0];
+            }
+            destinationFragment = UserSearchAddSongFragment.newInstance(id);
+        }
+        else if(destinationTag == BaseFragment.FragmentTag.PLAYLIST_EDIT)
+        {
+            String id = null;
+            if(params[0] instanceof String) {
+                id = (String) params[0];
+            }
+            destinationFragment = EditPlaylistFragment.newInstance(id);
+        }
+
+        loadFrontFragment(destinationFragment);
     }
 
     @Override
@@ -139,6 +207,15 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.Frag
             bottomSheetDialogFragment = new NowPlayingSongFragment();
             bottomSheetDialogFragment.show(getSupportFragmentManager(),"");
         }
+//        else if(destinationTag == BaseFragment.FragmentTag.USER_SEARCH_ADD_SONG)
+//        {
+//            String id = null;
+//            if(params[0] instanceof String) {
+//                id = (String) params[0];
+//            }
+//            bottomSheetDialogFragment = UserSearchAddSongFragment.newInstance(id);
+//            bottomSheetDialogFragment.show(getSupportFragmentManager(),"");
+//        }
 
     }
 

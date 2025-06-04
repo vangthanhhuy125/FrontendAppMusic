@@ -22,13 +22,13 @@
             android:padding="10dp">
 
 
-            <com.google.android.material.imageview.ShapeableImageView
+            <ImageView
                 android:id="@+id/songs_cover_image"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_marginEnd="10dp"
                 android:scaleType="centerCrop"
-                android:src="@drawable/exampleavatar"
+                android:src="@drawable/white_baseline_music_note_24"
                 app:shapeAppearanceOverlay="@style/RoundedCornerImageStyle" />
 
             <LinearLayout

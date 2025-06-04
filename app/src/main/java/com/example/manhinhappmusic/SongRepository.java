@@ -3,12 +3,15 @@ package com.example.manhinhappmusic;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import java.util.List;
+
 public class SongRepository implements AppRepository<Song>{
 
     private static SongRepository instance;
+    private MutableLiveData<List<Song>> songs = new MutableLiveData<>();
     private SongRepository()
     {
-
+        songs.setValue(TestData.songList);
     }
 
     public static SongRepository getInstance()
@@ -30,5 +33,10 @@ public class SongRepository implements AppRepository<Song>{
 
         song.postValue(TestData.getSongById(id));
         return song;
+    }
+
+    public LiveData<List<Song>> getAll()
+    {
+        return songs;
     }
 }

@@ -39,6 +39,7 @@ public class UserLibraryFragment extends BaseFragment {
 
     private ShapeableImageView userAvatar;
     private ImageButton addButton;
+    private ImageButton searchButton;
     private RecyclerView playlistsView;
     private PlaylistAdapter playlistAdapter;
     private List<Playlist> playlistList;
@@ -68,14 +69,21 @@ public class UserLibraryFragment extends BaseFragment {
         userAvatar.setOnClickListener(this::onUserAvatarClick);
         addButton = view.findViewById(R.id.add_playlist_button);
         addButton.setOnClickListener(this::onAddPlaylistButtonClick);
+        searchButton = view.findViewById(R.id.search_playlist_button);
+
+        searchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                callback.onRequestChangeFragment(FragmentTag.LIBRARY_SEARCH);
+            }
+        });
 
         playlistList = LibraryRepository.getInstance().getItemById("").getValue();
 
         playlistAdapter = new PlaylistAdapter(playlistList, new PlaylistAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
-                MediaPlayerManager.getInstance(null)
-                        .setPlaylist(playlistAdapter.getPlaylistList().get(position).getSongsList());
+
                 callback.onRequestChangeFragment(FragmentTag.USER_PLAYLIST,
                         playlistAdapter.getPlaylistList().get(position).getId());
             }
@@ -90,7 +98,7 @@ public class UserLibraryFragment extends BaseFragment {
         playlistsView.addItemDecoration(new VerticalLinearSpacingItemDecoration((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, getResources().getDisplayMetrics())));
 
         getParentFragmentManager().setFragmentResultListener("request_add_playlist", getViewLifecycleOwner(), (requestKey, result) ->{
-            playlistList.add(new Playlist("dfd", result.getString("playlist_name"), "Fdfd", new ArrayList<>(),"",0));
+            playlistList.add(new Playlist("dfd", result.getString("playlist_name"), "Fdfd", new ArrayList<>(),"",0,"",new ArrayList<>()));
             playlistAdapter.notifyDataSetChanged();
         });
 

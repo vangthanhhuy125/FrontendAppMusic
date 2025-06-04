@@ -17,9 +17,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.MultiTransformation;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
+import com.bumptech.glide.request.RequestOptions;
 import com.google.android.material.imageview.ShapeableImageView;
 
 /**
@@ -30,7 +36,7 @@ import com.google.android.material.imageview.ShapeableImageView;
 public class MiniPlayerFragment extends BaseFragment {
 
 
-    private ShapeableImageView songsCoverImage;
+    private ImageView songsCoverImage;
     private TextView songsNameText;
     private TextView artistsNameText;
     private SeekBar seekBar;
@@ -178,7 +184,10 @@ public class MiniPlayerFragment extends BaseFragment {
 
     private void setSongsInformation()
     {
-        songsCoverImage.setImageResource(mediaPlayerManager.getCurrentSong().getCoverImageResID());
+        Glide.with(this.getContext())
+                .load(mediaPlayerManager.getCurrentSong().getCoverImageResID())
+                .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(15))))
+                .into(songsCoverImage);
         songsNameText.setText(mediaPlayerManager.getCurrentSong().getTitle());
         artistsNameText.setText(mediaPlayerManager.getCurrentSong().getArtistId());
         seekBar.setMax(mediaPlayerManager.getMediaPlayer().getDuration());

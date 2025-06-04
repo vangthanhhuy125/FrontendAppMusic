@@ -102,7 +102,7 @@ public class UserSearchFragment extends BaseFragment {
         browseAdapter = new BrowseAdapter(genreList, new BrowseAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
-
+                callback.onRequestChangeFragment(FragmentTag.USER_GENRE, genreList.get(position).getId());
             }
         });
         browseView = view.findViewById(R.id.browse_view);
@@ -116,7 +116,7 @@ public class UserSearchFragment extends BaseFragment {
         artistAdapter = new ArtistAdapter(artistList, new ArtistAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
-
+                callback.onRequestChangeFragment(FragmentTag.USER_ARTIST, artistList.get(position).getId());
             }
         });
         artistView = view.findViewById(R.id.artist_view);

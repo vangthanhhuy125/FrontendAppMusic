@@ -1,5 +1,6 @@
 package com.example.manhinhappmusic;
 
+import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -8,14 +9,24 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.SparseBooleanArray;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.ImageButton;
 
+import com.google.android.material.snackbar.Snackbar;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -35,9 +46,6 @@ public class SeacrhExFragment extends BaseFragment {
 
     public SeacrhExFragment() {
         // Required empty public constructor
-        searchResultList = new ArrayList<>();
-        searchResultList.addAll(TestData.artistList);
-        searchResultList.addAll(TestData.songList);
     }
 
     /**
@@ -52,7 +60,10 @@ public class SeacrhExFragment extends BaseFragment {
 
     ImageButton backButton;
     RecyclerView searchResultView;
-    List<ListItem> searchResultList;
+    List<ListItem> sourceList = new ArrayList<>();
+    EditText searchEditText;
+    private int modifiedPosition = -1;
+
     public static SeacrhExFragment newInstance(String param1, String param2) {
         SeacrhExFragment fragment = new SeacrhExFragment();
         Bundle args = new Bundle();
@@ -84,20 +95,191 @@ public class SeacrhExFragment extends BaseFragment {
         backButton = view.findViewById(R.id.back_button);
         backButton.setOnClickListener(this::onBackButtonClick);
         searchResultView = view.findViewById(R.id.search_result_view);
-        SearchResultAdapter searchResultAdapter = new SearchResultAdapter(searchResultList, new SearchResultAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(int position) {
+        searchEditText = view.findViewById(R.id.search_edit_text);
 
+        sourceList.addAll(TestData.songList);
+        sourceList.addAll(TestData.artistList);
+        sourceList.addAll(TestData.userPlaylistList);
+        sourceList.addAll(TestData.nonUserPlaylistList);
+
+        SearchResultAdapter searchResultAdapter = new SearchResultAdapter(new ArrayList<>(), new SparseBooleanArray(),
+        new SearchResultAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(int position, ListItem item) {
+
+                if(item.getType() == ListItemType.SONG)
+                {
+                    MediaPlayerManager mediaPlayerManager = MediaPlayerManager.getInstance(null);
+                    mediaPlayerManager.setPlaylist(new ArrayList<>(Arrays.asList((Song) item)));
+                    mediaPlayerManager.setCurrentSong(0);
+                    callback.onRequestLoadMiniPlayer();
+                    mediaPlayerManager.play();
+                }
             }
         });
+        searchResultAdapter.setOnItemCheckBoxClickListener(new SearchResultAdapter.OnItemCheckBoxClickListener() {
+            @Override
+            public void onItemCheckBoxClick(int position, ListItem item, CheckBox checkBox) {
+                if(item.getType() == ListItemType.SONG)
+                {
+                    checkBox.setChecked(true);
+                    searchResultAdapter.getCheckStates().put(position, true);
+                    modifiedPosition = position;
+                    callback.onRequestChangeFrontFragment(FragmentTag.USER_SEARCH_ADD_SONG, ((Song)item).getId());
+                }
+                else if(item.getType() == ListItemType.PLAYLIST)
+                {
+                    Snackbar snackbar =  Snackbar.make(view,"Removed playlist from library", Snackbar.LENGTH_SHORT);
+                    snackbar.setBackgroundTint(Color.WHITE);
+                    snackbar.setTextColor(Color.BLACK);
+                    snackbar.show();
+                    TestData.userPlaylistList.remove((Playlist) item);
+                }
+
+            }
+        }, false);
+
+        searchResultAdapter.setOnItemCheckBoxClickListener(new SearchResultAdapter.OnItemCheckBoxClickListener() {
+            @Override
+            public void onItemCheckBoxClick(int position, ListItem item, CheckBox checkBox) {
+                if(item.getType() == ListItemType.SONG)
+                {
+                    PlaylistRepository.getInstance().getItemById("-1").getValue().addSong((Song)item);
+                    Snackbar snackbar = Snackbar.make(view,"", Snackbar.LENGTH_LONG);
+                    View snackBarCustomLayout = LayoutInflater
+                            .from(view.getContext())
+                            .inflate(R.layout.snackbar_add_song_to_favorites, null);
+                    snackBarCustomLayout.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            modifiedPosition = position;
+                            callback.onRequestChangeFrontFragment(FragmentTag.USER_SEARCH_ADD_SONG, ((Song)item).getId());
+                            snackbar.dismiss();
+                        }
+                    });
+
+                    ViewGroup snackBarLayout = (ViewGroup) snackbar.getView();
+                    snackBarLayout.removeAllViews();
+                    snackBarLayout.addView(snackBarCustomLayout);
+                    snackbar.show();
+                }
+                else if(item.getType() == ListItemType.PLAYLIST)
+                {
+                    Snackbar snackbar =  Snackbar.make(view,"Add playlist to library", Snackbar.LENGTH_SHORT);
+                    snackbar.setBackgroundTint(Color.WHITE);
+                    snackbar.setTextColor(Color.BLACK);
+                    snackbar.show();
+                    TestData.userPlaylistList.add((Playlist) item);
+                }
+
+
+            }
+        }, true);
+
+
+
         LinearLayoutManager searchResultLayoutManager = new LinearLayoutManager(this.getContext());
         searchResultView.setAdapter(searchResultAdapter);
         searchResultView.setLayoutManager(searchResultLayoutManager);
         searchResultView.addItemDecoration(new VerticalLinearSpacingItemDecoration((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, getResources().getDisplayMetrics())));
 
+        searchEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                List<ListItem> searchResultList = search(s.toString(), sourceList);
+                SparseBooleanArray checkStates = checkItemInLibrary(searchResultList);
+                searchResultAdapter.setNewData(searchResultList, checkStates);
+                searchResultAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
+        getParentFragmentManager().setFragmentResultListener("remove_song", getViewLifecycleOwner(), (requestKey, result) ->{
+
+            if(modifiedPosition != -1)
+            {
+                searchResultAdapter.getCheckStates().put(modifiedPosition, false);
+                searchResultAdapter.notifyItemChanged(modifiedPosition);
+
+            }
+            Snackbar snackbar =  Snackbar.make(view,"Removed song from library", Snackbar.LENGTH_SHORT);
+            snackbar.setBackgroundTint(Color.WHITE);
+            snackbar.setTextColor(Color.BLACK);
+            snackbar.show();
+        });
+        getParentFragmentManager().setFragmentResultListener("change", getViewLifecycleOwner(), (requestKey, result) ->{
+            Snackbar snackbar =  Snackbar.make(view,"Saved changes", Snackbar.LENGTH_SHORT);
+            snackbar.setBackgroundTint(Color.WHITE);
+            snackbar.setTextColor(Color.BLACK);
+            snackbar.show();
+
+        });
+
     }
 
     private void onBackButtonClick(View view){
         callback.onRequestGoBackPreviousFragment();
+    }
+
+    private List<ListItem> search(String keyWord, List<ListItem> items)
+    {
+        if(!keyWord.isBlank())
+        {
+            return items.stream()
+                    .filter(listItem -> Pattern
+                            .compile("\\b" + keyWord + ".*", Pattern.CASE_INSENSITIVE)
+                            .matcher(listItem.getSearchKeyWord())
+                            .find())
+                    .collect(Collectors.toList());
+        }
+        return new ArrayList<>();
+    }
+
+    private SparseBooleanArray checkItemInLibrary(List<ListItem> items)
+    {
+        SparseBooleanArray checkStates = new SparseBooleanArray();
+        for(int i = 0 ; i < items.size(); i++)
+        {
+            if(items.get(i).getType() == ListItemType.PLAYLIST)
+            {
+                Playlist playlist = (Playlist) items.get(i);
+                for(Playlist userPlaylist: TestData.userPlaylistList){
+                    if(userPlaylist.getId().equals(playlist.getId())){
+                        checkStates.put(i, true);
+                        break;
+                    }
+                }
+            }
+            else if(items.get(i).getType() == ListItemType.SONG)
+            {
+                Song song  = (Song) items.get(i);
+                for(Playlist playlist: TestData.userPlaylistList)
+                {
+                    boolean isFound = false;
+                    for(Song userSong: playlist.getSongsList())
+                    {
+                        if(song.getId().equals(userSong.getId()))
+                        {
+                            checkStates.put(i, true);
+                            isFound = true;
+                            break;
+                        }
+                    }
+                    if(isFound)
+                        break;
+                }
+            }
+        }
+
+        return checkStates;
     }
 }

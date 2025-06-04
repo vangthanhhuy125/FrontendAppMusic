@@ -136,4 +136,9 @@ public class Song implements Serializable, ListItem {
     public ListItemType getType() {
         return ListItemType.SONG;
     }
+
+    @Override
+    public String getSearchKeyWord() {
+        return title;
+    }
 }

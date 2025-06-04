@@ -15,6 +15,7 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -38,15 +39,20 @@ import java.util.List;
 public class UserPlaylistFragment extends BaseFragment {
 
     private static final String ARG_ID = "ID";
+    private static final String ARG_IS_THIS_PLAYING = "IS_THIS_PLAYING";
     private String id;
 
     private ImageView playlistsCoverImage;
     private TextView playlistsTitle;
-    private  TextView playlistsCount;
+    private TextView playlistsCount;
     private ImageButton backButton;
+    private Button addButton;
+    private Button editButton;
     private RecyclerView songsView;
     private SongAdapter songAdapter;
     private Playlist playlist;
+    private boolean isPlaying =  false;
+
 
     public UserPlaylistFragment() {
         // Required empty public constructor
@@ -61,11 +67,18 @@ public class UserPlaylistFragment extends BaseFragment {
     }
 
     @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(ARG_IS_THIS_PLAYING, isPlaying);
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if(getArguments() != null)
         {
             id = getArguments().getString(ARG_ID);
+            isPlaying = getArguments().getBoolean(ARG_IS_THIS_PLAYING);
         }
 
         playlist = PlaylistRepository.getInstance().getItemById(id).getValue();
@@ -92,10 +105,29 @@ public class UserPlaylistFragment extends BaseFragment {
                 callback.onRequestGoBackPreviousFragment();
             }
         });
+        addButton = view.findViewById(R.id.add_button);
+        addButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                callback.onRequestChangeFragment(FragmentTag.PLAYLIST_ADD_SONG, playlist.getId());
+            }
+        });
+        editButton = view.findViewById(R.id.edit_button);
+        editButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                callback.onRequestChangeFrontFragment(FragmentTag.PLAYLIST_EDIT, playlist.getId());
+            }
+        });
         songAdapter = new SongAdapter(playlist.getSongsList(), new SongAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
                 MediaPlayerManager mediaPlayerManager = MediaPlayerManager.getInstance(null);
+                if(!isPlaying)
+                {
+                    mediaPlayerManager.setPlaylist(playlist.getSongsList());
+                    isPlaying = true;
+                }
                 mediaPlayerManager.setCurrentSong(position);
                 mediaPlayerManager.play();
                 callback.onRequestLoadMiniPlayer();
@@ -108,6 +140,9 @@ public class UserPlaylistFragment extends BaseFragment {
         songsView.setLayoutManager(linearLayoutManager);
         songsView.addItemDecoration(new VerticalLinearSpacingItemDecoration((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, getResources().getDisplayMetrics())));
 
+        getParentFragmentManager().setFragmentResultListener("update_playlist", getViewLifecycleOwner(), (requestKey, result)->{
+            songAdapter.notifyDataSetChanged();
+        });
 
     }
 

@@ -9,6 +9,8 @@ public class BaseFragment extends Fragment {
 
     public interface FragmentInteractionListener{
         void onRequestChangeFragment(FragmentTag destinationTag, Object... params);
+        void onRequestChangeFrontFragment(FragmentTag destinationTag, Object... params);
+
         void onRequestChangeActivity(FragmentTag destinationTag, Object... params);
         void onRequestOpenBottomSheetFragment(FragmentTag destinationTag, Object... params);
         void onRequestGoBackPreviousFragment();
@@ -33,7 +35,13 @@ public class BaseFragment extends Fragment {
         CONFIRM_DELETING_SONG,
         CONFIRM_LOGGING_OUT,
         CHANGE_PASSWORD,
-        ADD_PLAYLIST;
+        ADD_PLAYLIST,
+        LIBRARY_SEARCH,
+        PLAYLIST_ADD_SONG,
+        USER_GENRE,
+        USER_ARTIST,
+        USER_SEARCH_ADD_SONG,
+        PLAYLIST_EDIT,
 
     }
 

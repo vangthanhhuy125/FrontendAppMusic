@@ -57,4 +57,9 @@ public class Artist implements ListItem {
     public ListItemType getType() {
         return ListItemType.ARTIST;
     }
+
+    @Override
+    public String getSearchKeyWord() {
+        return name;
+    }
 }

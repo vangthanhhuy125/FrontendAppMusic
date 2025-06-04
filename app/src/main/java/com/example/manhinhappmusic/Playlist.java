@@ -13,8 +13,9 @@ public class Playlist implements ListItem{
  private List<Song> songs = new ArrayList<>();
  private String userId;
  private String thumbnailUrl;
- private String artist;
+ private List<String> artists;
  private int viewCount;
+ private String genreId;
  private Boolean isPublic;
 
  //Test purpose
@@ -40,7 +41,7 @@ public class Playlist implements ListItem{
 
  }
 
- public Playlist(String id, String name, String description, List<Song> songs, String userId, int thumbnailResID){
+ public Playlist(String id, String name, String description, List<Song> songs, String userId, int thumbnailResID, String genreId, List<String> artists){
   this.id = id;
   this.name = name;
   this.description = description;
@@ -49,8 +50,9 @@ public class Playlist implements ListItem{
    this.songs.addAll(songs);
   this.userId = userId;
   this.thumnailResID = thumbnailResID;
-  this.artist = artist;
-  this.viewCount = viewCount;
+  this.genreId = genreId;
+  this.artists = artists;
+
  }
 
  public String getId() {
@@ -110,15 +112,41 @@ public class Playlist implements ListItem{
    if(song != null)
      songs.add(song);
  }
- public String getArtist() { return artist;}
+ public String getArtistName() {
+  String artistsName = "";
+  if(artists != null && artists.size() > 0)
+  {
+    artistsName = artists.get(0);
+    for(int i = 1; i < artists.size(); i++)
+    {
+     artistsName += ", " + artists.get(i);
+    }
+  }
 
- public void setArtist(String artist) {this.artist = artist;}
+  return artistsName;
+
+ }
+
+ public void setArtist(List<String> artists) {this.artists = artists;}
  public int getViewCount() { return viewCount;}
  public void setViewCount(int viewCount) { this.viewCount = viewCount; }
+
+ public String getGenreId() {
+  return genreId;
+ }
+
+ public void setGenreId(String genreId) {
+  this.genreId = genreId;
+ }
 
  @Override
  public ListItemType getType() {
   return ListItemType.PLAYLIST;
+ }
+
+ @Override
+ public String getSearchKeyWord() {
+  return name;
  }
 }
 

@@ -267,10 +267,9 @@ public class MediaPlayerManager {
     }
 
     public void setPlaylist(List<Song> playlist) {
+
         clearAllStates();
        this.playlist = playlist;
-        if(mediaPlayer != null)
-            mediaPlayer.release();
     }
 
     public void setCurrentSong(int currentPosition)

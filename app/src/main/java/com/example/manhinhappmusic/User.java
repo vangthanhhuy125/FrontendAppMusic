@@ -113,4 +113,9 @@ public class User implements ListItem {
     public ListItemType getType() {
         return ListItemType.ARTIST;
     }
+
+    @Override
+    public String getSearchKeyWord() {
+        return fullName;
+    }
 }
