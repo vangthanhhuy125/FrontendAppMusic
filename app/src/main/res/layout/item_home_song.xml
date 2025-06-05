@@ -22,6 +22,7 @@
         android:layout_height="wrap_content"
         android:textColor="#FFFFFF"
         android:textSize="15sp"
+        android:maxLines="1"
         android:text="Song's name"/>
     <TextView
         android:id="@+id/artist_name_text"
@@ -29,6 +30,7 @@
         android:layout_height="wrap_content"
         android:textColor="#AAAAAA"
         android:textSize="15sp"
+        android:maxLines="1"
         android:text="Artist"/>
 
 

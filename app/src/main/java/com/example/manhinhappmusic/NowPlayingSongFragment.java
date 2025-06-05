@@ -54,7 +54,7 @@ public class NowPlayingSongFragment extends BottomSheetDialogFragment {
     private ImageButton skipPreviousButton;
     private ImageButton skipNextButton;
     private ImageButton minimizeButton;
-    private ImageButton moreOptionButton;
+//    private ImageButton moreOptionButton;
     private SeekBar seekBar;
     private MaterialButton playButton;
     private Handler handler = new Handler();
@@ -118,7 +118,7 @@ public class NowPlayingSongFragment extends BottomSheetDialogFragment {
         skipNextButton = view.findViewById(R.id.skip_next_button);
         skipPreviousButton = view.findViewById(R.id.skip_previous_button);
         minimizeButton = view.findViewById(R.id.minimize_button);
-        moreOptionButton = view.findViewById(R.id.more_options_button);
+//        moreOptionButton = view.findViewById(R.id.more_options_button);
 
         mediaPlayerManager.addOnCompletionListener(new MediaPlayerManager.OnCompletionListener() {
             @Override
@@ -277,12 +277,12 @@ public class NowPlayingSongFragment extends BottomSheetDialogFragment {
             }
         });
 
-        moreOptionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
+//        moreOptionButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//
+//            }
+//        });
 
 
         handler.post(updateSeekBar);

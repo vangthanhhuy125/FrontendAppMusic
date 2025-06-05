@@ -129,7 +129,6 @@ public class EditPlaylistFragment extends BaseFragment {
         playlistSongEditAdapter = new PlaylistSongEditAdapter(songList, new PlaylistSongEditAdapter.OnItemChangeListener() {
             @Override
             public void onItemChange() {
-                Log.println(Log.INFO,"",Boolean.toString(isModified));
 
                 if(!playlist.getSongsList().equals(playlistSongEditAdapter.getSongList()))
                 {
@@ -150,11 +149,18 @@ public class EditPlaylistFragment extends BaseFragment {
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getParentFragmentManager().setFragmentResultListener("discard_changes", getViewLifecycleOwner(), (requestKey, result) -> {
+                if(isModified)
+                {
+                    getParentFragmentManager().setFragmentResultListener("discard_changes", getViewLifecycleOwner(), (requestKey, result) -> {
+                        callback.onRequestGoBackPreviousFragment();
+                    });
+                    ConfirmDiscardingChangesFragment confirmDiscardingChangesFragment = new ConfirmDiscardingChangesFragment();
+                    confirmDiscardingChangesFragment.show(getParentFragmentManager(), "");
+                }
+                else
                     callback.onRequestGoBackPreviousFragment();
-                });
-                ConfirmDiscardingChangesFragment confirmDiscardingChangesFragment = new ConfirmDiscardingChangesFragment();
-                confirmDiscardingChangesFragment.show(getParentFragmentManager(), "");
+
+
             }
         });
         saveButton.setOnClickListener(new View.OnClickListener() {
@@ -170,7 +176,6 @@ public class EditPlaylistFragment extends BaseFragment {
 
     private void setModified(boolean modified) {
         isModified = modified;
-        Log.println(Log.INFO,"",Boolean.toString(isModified));
         if(isModified)
         {
             saveButton.setClickable(true);
