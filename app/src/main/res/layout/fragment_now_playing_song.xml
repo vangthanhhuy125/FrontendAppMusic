@@ -4,17 +4,19 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:clickable="true"
+    android:focusable="true"
+    android:background="#000000"
     tools:context=".NowPlayingSongFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:background="#000000"
         android:padding="14dp">
 
         <!-- Header -->
-        <LinearLayout
+        <com.google.android.material.appbar.MaterialToolbar
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
@@ -31,26 +33,26 @@
 
             <TextView
                 android:id="@+id/tvPlayingNow"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
+                android:layout_gravity="center"
                 android:text="Playing Now"
                 android:textColor="#FFFFFF"
                 android:textStyle="bold"
                 android:textSize="18sp"
                 />
 
-            <ImageButton
-                android:id="@+id/more_options_button"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:src="@drawable/white_baseline_more_vert_24"
-                app:tint="#FFFFFF"
-                android:background="@android:color/transparent"
-                android:contentDescription="MoreOptionsButton"/>
+<!--            <ImageButton-->
+<!--                android:id="@+id/more_options_button"-->
+<!--                android:layout_width="50dp"-->
+<!--                android:layout_height="50dp"-->
+<!--                android:src="@drawable/white_baseline_more_vert_24"-->
+<!--                app:tint="#FFFFFF"-->
+<!--                android:layout_gravity="end"-->
+<!--                android:background="@android:color/transparent"-->
+<!--                android:contentDescription="MoreOptionsButton"/>-->
 
-        </LinearLayout>
+        </com.google.android.material.appbar.MaterialToolbar>
 
 
         <!-- Image of the song -->
@@ -135,7 +137,6 @@
                     android:id="@+id/shuffle_button"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
-                    android:checkable="true"
                     android:backgroundTint="@android:color/transparent"
                     app:icon="@drawable/baseline_shuffle_24"
                     app:iconGravity="textStart"
@@ -189,7 +190,6 @@
                     android:id="@+id/repeat_button"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
-                    android:checkable="true"
                     android:backgroundTint="@android:color/transparent"
                     android:contentDescription="RepeatOffButton"
                     app:icon="@drawable/baseline_repeat_24"

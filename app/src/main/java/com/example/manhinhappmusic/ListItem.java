@@ -1,8 +1,10 @@
 package com.example.manhinhappmusic;
 
+import java.util.List;
+
 public interface ListItem {
     ListItemType getType();
-    String getSearchKeyWord();
+    List<String> getSearchKeyWord();
 }
 
 enum ListItemType{

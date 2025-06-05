@@ -2,6 +2,7 @@ package com.example.manhinhappmusic;
 
 
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class User implements ListItem {
@@ -115,7 +116,8 @@ public class User implements ListItem {
     }
 
     @Override
-    public String getSearchKeyWord() {
-        return fullName;
-    }
+    public List<String> getSearchKeyWord() {
+        List<String> keyWords = new ArrayList<>();
+        keyWords.add(fullName);
+        return keyWords;    }
 }

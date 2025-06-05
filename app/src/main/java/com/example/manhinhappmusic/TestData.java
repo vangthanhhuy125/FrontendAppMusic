@@ -16,7 +16,7 @@ public class TestData {
 
     public static Playlist getPlaylistById(String id)
     {
-        return userPlaylistList.stream()
+        return playlistList.stream()
                 .filter(playlist -> playlist.getId().equals(id))
                 .findFirst()
                 .orElse(null);

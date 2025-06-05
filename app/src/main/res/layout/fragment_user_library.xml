@@ -4,12 +4,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#000000"
+    android:clickable="true"
+    android:focusable="true"
     tools:context=".UserLibraryFragment">
+    
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:background="#000000"
         >
 
         <!-- Header: Avatar + "Library" -->
@@ -72,29 +75,20 @@
                 android:paddingHorizontal="14dp"
                 android:paddingTop="10dp">
 
-                <LinearLayout
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/sort_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="10dp">
-
-                    <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:layout_marginEnd="4dp"
-                        android:contentDescription="Arrow icon"
-                        android:src="@drawable/white_baseline_swap_vert_24"
-                        app:tint="#FFFFFF" />
-
-                    <TextView
-                        android:id="@+id/textRecently"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Recently"
-                        android:textColor="#FFFFFF"
-                        android:textSize="20sp" />
-                </LinearLayout>
+                    android:backgroundTint="@android:color/transparent"
+                    android:text="Recently"
+                    android:textSize="20sp"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold"
+                    app:icon="@drawable/white_baseline_swap_vert_24"
+                    app:iconSize="24dp"
+                    app:iconTint="#FFFFFF"
+                    app:iconPadding="10dp"
+                    android:paddingHorizontal="0dp"/>
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/playlists_view"

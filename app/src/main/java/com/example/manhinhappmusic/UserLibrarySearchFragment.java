@@ -10,7 +10,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.SparseBooleanArray;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,7 +17,6 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -30,10 +28,9 @@ import java.util.stream.Collectors;
  */
 public class UserLibrarySearchFragment extends BaseFragment {
 
-    private EditText searchText;
+    private ClearableEditText searchText;
     private RecyclerView searchResultsView;
     private ImageButton backButton;
-    private ImageButton deleteSearchTextButton;
     private List<Playlist> sourcePlaylistList;
 
     private static final String ARG_ID = "id";
@@ -65,7 +62,7 @@ public class UserLibrarySearchFragment extends BaseFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_user_playlist_search, container, false);
+        return inflater.inflate(R.layout.fragment_user_library_search, container, false);
     }
 
     @Override
@@ -74,7 +71,6 @@ public class UserLibrarySearchFragment extends BaseFragment {
         searchText = view.findViewById(R.id.search_text);
         searchResultsView = view.findViewById(R.id.search_result_view);
         backButton = view.findViewById(R.id.back_button);
-        deleteSearchTextButton = view.findViewById(R.id.delete_button);
 
         sourcePlaylistList = LibraryRepository.getInstance().getItemById("").getValue();
 
@@ -96,6 +92,7 @@ public class UserLibrarySearchFragment extends BaseFragment {
                 callback.onRequestGoBackPreviousFragment();
             }
         });
+        searchText.setHint("Search in this library");
         searchText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {

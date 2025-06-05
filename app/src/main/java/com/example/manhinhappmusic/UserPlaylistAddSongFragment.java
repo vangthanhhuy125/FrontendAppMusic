@@ -34,10 +34,9 @@ import java.util.stream.Collectors;
  */
 public class UserPlaylistAddSongFragment extends BaseFragment {
 
-    private EditText searchText;
+    private ClearableEditText searchText;
     private RecyclerView searchResultsView;
     private ImageButton backButton;
-    private ImageButton deleteSearchTextButton;
     private List<Song> sourceSongList;
     private SearchResultAdapter  adapter;
 
@@ -81,7 +80,6 @@ public class UserPlaylistAddSongFragment extends BaseFragment {
         searchText = view.findViewById(R.id.search_text);
         searchResultsView = view.findViewById(R.id.search_result_view);
         backButton = view.findViewById(R.id.back_button);
-        deleteSearchTextButton = view.findViewById(R.id.delete_button);
 
         playlist = PlaylistRepository.getInstance().getItemById(id).getValue();
 
@@ -151,6 +149,7 @@ public class UserPlaylistAddSongFragment extends BaseFragment {
                 callback.onRequestGoBackPreviousFragment();
             }
         });
+        searchText.setHint("Search");
         searchText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -179,10 +178,18 @@ public class UserPlaylistAddSongFragment extends BaseFragment {
         if(!keyWord.isBlank())
         {
             return songs.stream()
-                            .filter(song -> Pattern
-                                    .compile("\\b" + keyWord + ".*", Pattern.CASE_INSENSITIVE)
-                                    .matcher(song.getTitle())
-                                    .find())
+                            .filter(song -> {
+                                for(String itemKeyWord: song.getSearchKeyWord())
+                                {
+                                    if(Pattern.compile("\\b" + keyWord + ".*", Pattern.CASE_INSENSITIVE)
+                                            .matcher(itemKeyWord)
+                                            .find())
+                                    {
+                                        return true;
+                                    }
+                                }
+                                return false;
+                            })
                             .collect(Collectors.toList());
 
         }
@@ -195,18 +202,15 @@ public class UserPlaylistAddSongFragment extends BaseFragment {
         SparseBooleanArray checkStates = new SparseBooleanArray();
         for(int i = 0; i < songs.size(); i++)
         {
-            boolean isFound = false;
             for(Song song: playlist.getSongsList())
             {
                 if(song.getId().equals(songs.get(i).getId()))
                 {
                     checkStates.put(i,true);
-                    isFound = true;
                     break;
                 }
             }
-            if(isFound)
-                break;
+
         }
         return  checkStates;
     }

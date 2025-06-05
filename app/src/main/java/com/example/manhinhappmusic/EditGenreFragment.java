@@ -153,7 +153,7 @@ public class EditGenreFragment extends Fragment {
                     "Mô tả mới",
                     new ArrayList<>(),
                     "user1",
-                    R.drawable.exampleavatar);
+                    R.drawable.exampleavatar,"", null);
             playlistList.add(newPlaylist);
             playlistAdapter.notifyItemInserted(playlistList.size() - 1);
         });

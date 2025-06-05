@@ -138,7 +138,9 @@ public class Song implements Serializable, ListItem {
     }
 
     @Override
-    public String getSearchKeyWord() {
-        return title;
-    }
+    public List<String> getSearchKeyWord() {
+        List<String> keyWords = new ArrayList<>();
+        keyWords.add(title);
+        keyWords.add(artistId);
+        return keyWords;    }
 }

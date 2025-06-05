@@ -113,10 +113,10 @@ public class AdminPlaylistFragment extends Fragment {
             filteredList.addAll(playlistList);
         } else {
             for (Playlist p : playlistList) {
-                if (p.getName().toLowerCase().contains(keyword.toLowerCase()) ||
-                        p.getArtist().toLowerCase().contains(keyword.toLowerCase())) {
-                    filteredList.add(p);
-                }
+//                if (p.getName().toLowerCase().contains(keyword.toLowerCase()) ||
+//                        p.getArtist().toLowerCase().contains(keyword.toLowerCase())) {
+//                    filteredList.add(p);
+//                }
             }
         }
         playlistTrendAdapter.notifyDataSetChanged();

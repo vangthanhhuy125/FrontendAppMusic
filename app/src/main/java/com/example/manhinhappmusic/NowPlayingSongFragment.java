@@ -36,11 +36,7 @@ import com.google.android.material.button.MaterialButtonToggleGroup;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link NowPlayingSongFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+
 public class NowPlayingSongFragment extends BottomSheetDialogFragment {
 
 
@@ -75,10 +71,7 @@ public class NowPlayingSongFragment extends BottomSheetDialogFragment {
     private MediaPlayerManager mediaPlayerManager;
 
 
-    public static NowPlayingSongFragment newInstance(MediaPlayerManager mediaPlayerManager) {
-        NowPlayingSongFragment fragment = new NowPlayingSongFragment();
-        return fragment;
-    }
+
 
     @Override
     public void onStart() {
@@ -211,22 +204,36 @@ public class NowPlayingSongFragment extends BottomSheetDialogFragment {
             }
         });
 
+        if(mediaPlayerManager.isShuffle())
+        {
+            shuffleButton.setIconTint(ColorStateList.valueOf(Color.parseColor("#FFFFFF")));
+
+        }
         shuffleButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!mediaPlayerManager.isShuffle)
+                boolean isShuffle = mediaPlayerManager.isShuffle();
+                if(!isShuffle)
                 {
                     shuffleButton.setIconTint(ColorStateList.valueOf(Color.parseColor("#FFFFFF")));
-                    mediaPlayerManager.shuffle();
                 }
                 else
                 {
                     shuffleButton.setIconTint(ColorStateList.valueOf(Color.parseColor("#CCFFFFFF")));
                 }
-                mediaPlayerManager.isShuffle = !mediaPlayerManager.isShuffle;
+                mediaPlayerManager.setShuffle(!isShuffle);
             }
         });
 
+        switch (mediaPlayerManager.getRepeatMode())
+        {
+            case REPEAT_ALL:
+                repeatButton.setIconTint(ColorStateList.valueOf(Color.parseColor("#FFFFFF")));
+                break;
+            case REPEAT_ONE:
+                repeatButton.setIconResource(R.drawable.baseline_repeat_one_24);
+                break;
+        }
         repeatButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

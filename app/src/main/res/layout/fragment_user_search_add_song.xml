@@ -4,6 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:clickable="true"
+    android:focusable="true"
     android:background="#000000"
     tools:context=".UserSearchAddSongFragment">
 
@@ -52,17 +54,22 @@
                    android:textStyle="bold"
                    android:layout_gravity="center_horizontal"
                    android:layout_marginVertical="20dp"/>
-               <EditText
+               <com.example.manhinhappmusic.ClearableEditText
                    android:id="@+id/search_edit_text"
                    android:layout_width="match_parent"
                    android:layout_height="wrap_content"
-                   android:drawableStart="@drawable/black_baseline_search_24"
-                   android:drawableTint="#FFFFFF"
-                   android:hint="Search your playlist"
-                   android:textColorHint="#AAAAAA"
-                   android:textColor="#FFFFFF"
-                   android:textStyle="bold"
-                   android:textSize="20sp"/>
+                   />
+<!--               <EditText-->
+<!--                   android:id="@+id/search_edit_text"-->
+<!--                   android:layout_width="match_parent"-->
+<!--                   android:layout_height="wrap_content"-->
+<!--                   android:drawableStart="@drawable/black_baseline_search_24"-->
+<!--                   android:drawableTint="#FFFFFF"-->
+<!--                   android:hint="Search your playlist"-->
+<!--                   android:textColorHint="#AAAAAA"-->
+<!--                   android:textColor="#FFFFFF"-->
+<!--                   android:textStyle="bold"-->
+<!--                   android:textSize="20sp"/>-->
                <LinearLayout
                    android:id="@+id/saved_playlist_container"
                    android:layout_width="match_parent"

@@ -21,10 +21,14 @@ import com.google.android.material.imageview.ShapeableImageView;
 import java.util.List;
 
 public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
-    private final List<Song> songList;
+    private  List<Song> songList;
     private static OnItemClickListener itemClickListener;
+    private OnItemMoreOptionsClickListener onItemMoreOptionsClickListener;
     public interface OnItemClickListener{
-        void onItemClick(int position);
+        void onItemClick(int position, Song song);
+    }
+    public interface OnItemMoreOptionsClickListener{
+        void onItemMoreOptionsCLick(int position, Song song);
     }
     @NonNull
     @Override
@@ -43,6 +47,24 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
                 .load(song.getCoverImageResID())
                 .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(15))))
                 .into(holder.getImageViewThumbnail());
+        holder.getMoreOptionsButton().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(onItemMoreOptionsClickListener != null)
+                {
+                    onItemMoreOptionsClickListener.onItemMoreOptionsCLick(holder.getAdapterPosition(), song);
+                }
+            }
+        });
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(itemClickListener != null)
+                {
+                    itemClickListener.onItemClick(holder.getAdapterPosition(), song);
+                }
+            }
+        });
     }
 
     @Override
@@ -68,16 +90,6 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
             textViewSongTitle = itemView.findViewById(R.id.txtSongTitle);
             moreOptionsButton = itemView.findViewById(R.id.more_options_button);
             imageViewThumbnail = itemView.findViewById(R.id.imgThumbnail);
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    int position = getAdapterPosition();
-                    if(position != RecyclerView.NO_POSITION && itemClickListener != null)
-                    {
-                        itemClickListener.onItemClick(position);
-                    }
-                }
-            });
             moreOptionsButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -105,5 +117,13 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
 
     public List<Song> getSongList() {
         return songList;
+    }
+
+    public void setSongList(List<Song> songList) {
+        this.songList = songList;
+    }
+
+    public void setOnItemMoreOptionsClickListener(OnItemMoreOptionsClickListener onItemMoreOptionsClickListener) {
+        this.onItemMoreOptionsClickListener = onItemMoreOptionsClickListener;
     }
 }

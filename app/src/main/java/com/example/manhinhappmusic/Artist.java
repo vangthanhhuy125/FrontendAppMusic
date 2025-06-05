@@ -59,7 +59,9 @@ public class Artist implements ListItem {
     }
 
     @Override
-    public String getSearchKeyWord() {
-        return name;
+    public List<String> getSearchKeyWord() {
+        List<String> keyWords = new ArrayList<>();
+        keyWords.add(name);
+        return keyWords;
     }
 }

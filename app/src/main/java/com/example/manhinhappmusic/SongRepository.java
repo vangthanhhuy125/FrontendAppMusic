@@ -31,7 +31,7 @@ public class SongRepository implements AppRepository<Song>{
 //
 //        }).start();
 
-        song.postValue(TestData.getSongById(id));
+        song.setValue(TestData.getSongById(id));
         return song;
     }
 

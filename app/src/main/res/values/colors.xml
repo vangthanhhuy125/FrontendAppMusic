@@ -7,5 +7,9 @@
     <color name="amber">#FFBD00</color>
     <color name="pigment_green">#3B9B3D</color>
     <color name="magenta_dye">#D30C7B</color>
+    <color name="light_blue_400">#FF29B6F6</color>
+    <color name="light_blue_600">#FF039BE5</color>
+    <color name="gray_400">#FFBDBDBD</color>
+    <color name="gray_600">#FF757575</color>
 
 </resources>

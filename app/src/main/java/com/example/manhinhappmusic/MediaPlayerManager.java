@@ -37,7 +37,7 @@ public class MediaPlayerManager {
     private  List<Song> shufflePlaylist;
     public  int currentPosition = -1;
     private  Song currentSong;
-    public boolean isShuffle = false;
+    private boolean isShuffle = false;
     private boolean isPlayingNextSong = true;
     public static enum RepeatMode{
         NONE,
@@ -93,7 +93,7 @@ public class MediaPlayerManager {
     }
 
 
-    public void shuffle()
+    private void shuffle()
     {
             shufflePlaylist = new ArrayList<>(playlist);
             shufflePlaylist.remove(currentSong);
@@ -200,6 +200,15 @@ public class MediaPlayerManager {
 
     }
 
+    public boolean isShuffle() {
+        return isShuffle;
+    }
+
+    public void setShuffle(boolean shuffle) {
+        isShuffle = shuffle;
+        if(isShuffle)
+            shuffle();
+    }
 
     public Song getCurrentSong() {
         return currentSong;

@@ -41,7 +41,7 @@ public class PlaylistTrendAdapter extends RecyclerView.Adapter<PlaylistTrendAdap
         Playlist playlist = playlists.get(position);
         holder.getThumbnail().setImageResource(R.drawable.exampleavatar);
         holder.getTextTitle().setText(playlist.getDescription());
-        holder.getTextArtist().setText(playlist.getArtist());
+//        holder.getTextArtist().setText(playlist.getArtist());
         holder.getTextViews().setText(String.valueOf(playlist.getViewCount()));
     }
 

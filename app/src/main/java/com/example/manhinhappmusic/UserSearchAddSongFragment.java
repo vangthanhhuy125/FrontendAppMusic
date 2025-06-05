@@ -39,7 +39,7 @@ public class UserSearchAddSongFragment extends BaseFragment {
 
     private ImageButton backButton;
     private Button newPlaylistButton;
-    private EditText searchEditText;
+    private ClearableEditText searchEditText;
     private TextView deleteAllText;
     private RecyclerView savedPlaylistView;
     private RecyclerView relativePlaylistView;
@@ -164,6 +164,7 @@ public class UserSearchAddSongFragment extends BaseFragment {
             relevantPlaylistAdapter.notifyDataSetChanged();
         });
 
+        searchEditText.setHint("Search for your playlist");
         searchEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {

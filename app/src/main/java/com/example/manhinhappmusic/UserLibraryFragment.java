@@ -20,6 +20,7 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.imageview.ShapeableImageView;
 
 import java.util.ArrayList;
@@ -40,9 +41,11 @@ public class UserLibraryFragment extends BaseFragment {
     private ShapeableImageView userAvatar;
     private ImageButton addButton;
     private ImageButton searchButton;
+    private MaterialButton sortButton;
     private RecyclerView playlistsView;
     private PlaylistAdapter playlistAdapter;
     private List<Playlist> playlistList;
+    private int currentPlaylistPosition = -1;
 
     public static UserLibraryFragment newInstance(List<Playlist> playlistList) {
         UserLibraryFragment fragment = new UserLibraryFragment();
@@ -70,6 +73,7 @@ public class UserLibraryFragment extends BaseFragment {
         addButton = view.findViewById(R.id.add_playlist_button);
         addButton.setOnClickListener(this::onAddPlaylistButtonClick);
         searchButton = view.findViewById(R.id.search_playlist_button);
+        sortButton = view.findViewById(R.id.sort_button);
 
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -83,7 +87,7 @@ public class UserLibraryFragment extends BaseFragment {
         playlistAdapter = new PlaylistAdapter(playlistList, new PlaylistAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
-
+                currentPlaylistPosition = position;
                 callback.onRequestChangeFragment(FragmentTag.USER_PLAYLIST,
                         playlistAdapter.getPlaylistList().get(position).getId());
             }
@@ -97,9 +101,25 @@ public class UserLibraryFragment extends BaseFragment {
         playlistsView.setLayoutManager(layoutManager);
         playlistsView.addItemDecoration(new VerticalLinearSpacingItemDecoration((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, getResources().getDisplayMetrics())));
 
+        sortButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
         getParentFragmentManager().setFragmentResultListener("request_add_playlist", getViewLifecycleOwner(), (requestKey, result) ->{
             playlistList.add(new Playlist("dfd", result.getString("playlist_name"), "Fdfd", new ArrayList<>(),"",0,"",new ArrayList<>()));
             playlistAdapter.notifyDataSetChanged();
+        });
+
+        getParentFragmentManager().setFragmentResultListener("update_library_when_playlist_got_deleted", getViewLifecycleOwner(), (requestKey, result) ->{
+            if(currentPlaylistPosition != -1)
+                playlistAdapter.notifyItemRemoved(currentPlaylistPosition);
+        });
+
+        getParentFragmentManager().setFragmentResultListener("update_library_when_playlist_got_modified", getViewLifecycleOwner(), (requestKey, result) ->{
+            if(currentPlaylistPosition != -1)
+                playlistAdapter.notifyItemChanged(currentPlaylistPosition);
         });
 
     }

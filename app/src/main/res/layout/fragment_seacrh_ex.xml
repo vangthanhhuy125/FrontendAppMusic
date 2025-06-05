@@ -5,6 +5,8 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:clickable="true"
+    android:focusable="true"
     android:background="#000000"
     tools:context=".SeacrhExFragment">
 
@@ -34,27 +36,24 @@
                 app:tint="#FFFFFF" />
 
 
-            <EditText
+            <com.example.manhinhappmusic.ClearableEditText
                 android:id="@+id/search_edit_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:hint="What do you want to hear?"
-                android:textColor="#FFFFFF"
-                android:textColorHint="#99FFFFFF"
-                android:textSize="20sp"
-                android:gravity="start|center_vertical"
-                android:backgroundTint="@android:color/transparent"
-
                 />
-            <ImageButton
-                android:id="@+id/delete_button"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:background="@android:color/transparent"
-                android:contentDescription="back_button"
-                android:src="@drawable/baseline_close_30"
-                app:tint="#FFFFFF" />
+<!--            <EditText-->
+<!--                android:id="@+id/search_edit_text"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_weight="1"-->
+<!--                android:hint="What do you want to hear?"-->
+<!--                android:textColor="#FFFFFF"-->
+<!--                android:textColorHint="#99FFFFFF"-->
+<!--                android:textSize="20sp"-->
+<!--                android:gravity="start|center_vertical"-->
+<!--                android:backgroundTint="@android:color/transparent"-->
+
+<!--                />-->
         </LinearLayout>
         <ScrollView
             android:layout_width="match_parent"

@@ -16,7 +16,7 @@ public class Playlist implements ListItem{
  private List<String> artists;
  private int viewCount;
  private String genreId;
- private Boolean isPublic;
+ private boolean isPublic;
 
  //Test purpose
  private int thumnailResID;
@@ -145,8 +145,19 @@ public class Playlist implements ListItem{
  }
 
  @Override
- public String getSearchKeyWord() {
-  return name;
+ public List<String> getSearchKeyWord() {
+  List<String> keyWords = new ArrayList<>();
+  keyWords.add(name);
+  keyWords.addAll(artists);
+  return keyWords;
+ }
+
+ public void setPublic(Boolean aPublic) {
+  isPublic = aPublic;
+ }
+
+ public boolean getPublic() {
+  return isPublic;
  }
 }
 

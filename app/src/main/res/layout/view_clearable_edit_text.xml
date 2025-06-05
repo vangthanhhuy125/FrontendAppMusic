@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:id="@+id/edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Text"
+            android:textSize="20sp"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#AAAAAA"
+            android:paddingEnd="40dp"
+            android:drawableStart="@drawable/black_baseline_search_24"
+            android:drawableTint="#FFFFFF"
+            android:drawablePadding="10dp"/>
+
+        <ImageButton
+            android:id="@+id/btn_clear"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="end|center_vertical"
+            android:layout_marginEnd="8dp"
+            android:background="@android:color/transparent"
+            android:src="@drawable/baseline_close_30"
+            app:tint="#FFFFFF"
+            android:visibility="gone"
+            android:contentDescription="Clear" />
+    </FrameLayout>
+
+</merge>

@@ -61,7 +61,7 @@ public class SeacrhExFragment extends BaseFragment {
     ImageButton backButton;
     RecyclerView searchResultView;
     List<ListItem> sourceList = new ArrayList<>();
-    EditText searchEditText;
+    ClearableEditText searchEditText;
     private int modifiedPosition = -1;
 
     public static SeacrhExFragment newInstance(String param1, String param2) {
@@ -114,6 +114,10 @@ public class SeacrhExFragment extends BaseFragment {
                     mediaPlayerManager.setCurrentSong(0);
                     callback.onRequestLoadMiniPlayer();
                     mediaPlayerManager.play();
+                }
+                else if(item.getType() == ListItemType.PLAYLIST)
+                {
+                    callback.onRequestChangeFragment(FragmentTag.USER_PLAYLIST, ((Playlist)item).getId());
                 }
             }
         });
@@ -183,6 +187,7 @@ public class SeacrhExFragment extends BaseFragment {
         searchResultView.setLayoutManager(searchResultLayoutManager);
         searchResultView.addItemDecoration(new VerticalLinearSpacingItemDecoration((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, getResources().getDisplayMetrics())));
 
+        searchEditText.setHint("Search");
         searchEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -235,10 +240,18 @@ public class SeacrhExFragment extends BaseFragment {
         if(!keyWord.isBlank())
         {
             return items.stream()
-                    .filter(listItem -> Pattern
-                            .compile("\\b" + keyWord + ".*", Pattern.CASE_INSENSITIVE)
-                            .matcher(listItem.getSearchKeyWord())
-                            .find())
+                    .filter(listItem -> {
+                        for(String itemKeyWord: listItem.getSearchKeyWord())
+                        {
+                            if(Pattern.compile("\\b" + keyWord + ".*", Pattern.CASE_INSENSITIVE)
+                                    .matcher(itemKeyWord)
+                                    .find())
+                            {
+                                return true;
+                            }
+                        }
+                        return false;
+                       })
                     .collect(Collectors.toList());
         }
         return new ArrayList<>();
