@@ -17,21 +17,30 @@ import com.bumptech.glide.request.RequestOptions;
 import com.example.manhinhappmusic.R;
 import com.example.manhinhappmusic.model.Playlist;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class HomePlaylistAdapter extends RecyclerView.Adapter<HomePlaylistAdapter.ViewHolder> {
 
-    private List<Playlist> playlistList;
-    public interface OnItemClickListener{
+    private List<Playlist> playlistList = new ArrayList<>();
+
+    public interface OnItemClickListener {
         void onItemClick(int position);
     }
-    private OnItemClickListener onItemClickListener;
 
-    public HomePlaylistAdapter(List<Playlist> playlistList, OnItemClickListener onItemClickListener)
-    {
-        this.playlistList = playlistList;
+    private final OnItemClickListener onItemClickListener;
+
+    public HomePlaylistAdapter(List<Playlist> playlistList, OnItemClickListener onItemClickListener) {
+        if (playlistList != null)
+            this.playlistList = playlistList;
         this.onItemClickListener = onItemClickListener;
     }
+
+    public void setData(List<Playlist> newPlaylistList) {
+        this.playlistList = newPlaylistList != null ? newPlaylistList : new ArrayList<>();
+        notifyDataSetChanged();
+    }
+
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -47,28 +56,26 @@ public class HomePlaylistAdapter extends RecyclerView.Adapter<HomePlaylistAdapte
                 .load(playlist.getThumbnailUrl())
                 .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(15))))
                 .into(holder.getPlaylistsCoverImage());
+
         holder.getPlaylistsTitleText().setText(playlist.getName());
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+
+        holder.itemView.setOnClickListener(v -> {
+            if (onItemClickListener != null)
                 onItemClickListener.onItemClick(holder.getAdapterPosition());
-            }
         });
     }
 
     @Override
     public int getItemCount() {
-        if (playlistList == null) return 0;
-        return playlistList.size();
+        return playlistList != null ? playlistList.size() : 0;
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder
-    {
+    public static class ViewHolder extends RecyclerView.ViewHolder {
         private final ImageView playlistsCoverImage;
         private final TextView playlistsTitleText;
+
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-
             playlistsCoverImage = itemView.findViewById(R.id.playlists_cover_image);
             playlistsTitleText = itemView.findViewById(R.id.playlists_title_text);
         }

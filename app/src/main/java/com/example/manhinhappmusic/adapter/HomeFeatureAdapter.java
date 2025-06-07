@@ -64,8 +64,6 @@ public class HomeFeatureAdapter extends RecyclerView.Adapter<HomeFeatureAdapter.
         return playlistList.size();
     }
 
-
-
     public static class ViewHolder extends RecyclerView.ViewHolder{
 
         private final ImageView featuresCoverImage;

@@ -42,9 +42,7 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.Frag
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-
-//        appFragmentFactory = new AppFragmentFactory(null, null, null, null);
-//        appFragmentFactory.setLibrary(TestData.playlistList);
+        
         MediaPlayerManager.getInstance(this);
 
         loadFragment(new UserHomeFragment());
