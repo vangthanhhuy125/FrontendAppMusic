@@ -7,7 +7,7 @@
     android:clickable="true"
     android:focusable="true"
     android:background="#000000"
-    tools:context=".UserGenreFragment">
+    tools:context=".fragment.UserGenreFragment">
 
    <LinearLayout
        android:layout_width="match_parent"

@@ -7,7 +7,7 @@
     android:clickable="true"
     android:focusable="true"
     android:background="#000000"
-    tools:context=".UserArtistFragment">
+    tools:context=".fragment.UserArtistFragment">
     <ImageView
         android:id="@+id/artist_image"
         android:layout_width="match_parent"

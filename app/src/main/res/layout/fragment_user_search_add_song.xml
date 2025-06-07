@@ -7,7 +7,7 @@
     android:clickable="true"
     android:focusable="true"
     android:background="#000000"
-    tools:context=".UserSearchAddSongFragment">
+    tools:context=".fragment.UserSearchAddSongFragment">
 
    <LinearLayout
        android:layout_width="match_parent"
@@ -54,7 +54,7 @@
                    android:textStyle="bold"
                    android:layout_gravity="center_horizontal"
                    android:layout_marginVertical="20dp"/>
-               <com.example.manhinhappmusic.ClearableEditText
+               <com.example.manhinhappmusic.view.ClearableEditText
                    android:id="@+id/search_edit_text"
                    android:layout_width="match_parent"
                    android:layout_height="wrap_content"

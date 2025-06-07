@@ -33,7 +33,12 @@ android {
 
 dependencies {
 
+    compileOnly("org.projectlombok:lombok:1.18.38")
+    annotationProcessor("org.projectlombok:lombok:1.18.38")
     implementation(libs.appcompat)
+    implementation ("com.google.code.gson:gson:2.8.5")
+    implementation ("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation ("com.squareup.retrofit2:converter-gson:2.11.0")
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
