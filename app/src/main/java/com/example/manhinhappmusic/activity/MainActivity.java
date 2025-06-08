@@ -16,6 +16,8 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.manhinhappmusic.R;
+import com.example.manhinhappmusic.dto.AuthResponse;
+import com.example.manhinhappmusic.dto.LoginRequest;
 import com.example.manhinhappmusic.fragment.BaseFragment;
 import com.example.manhinhappmusic.fragment.EditPlaylistFragment;
 import com.example.manhinhappmusic.fragment.EditProfileFragment;
@@ -33,8 +35,16 @@ import com.example.manhinhappmusic.fragment.UserProfileFragment;
 import com.example.manhinhappmusic.fragment.UserSearchAddSongFragment;
 import com.example.manhinhappmusic.fragment.UserSearchFragment;
 import com.example.manhinhappmusic.model.MediaPlayerManager;
+import com.example.manhinhappmusic.model.Playlist;
+import com.example.manhinhappmusic.network.ApiClient;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity implements BaseFragment.FragmentInteractionListener {
 
@@ -56,33 +66,65 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.Frag
 
 //        appFragmentFactory = new AppFragmentFactory(null, null, null, null);
 //        appFragmentFactory.setLibrary(TestData.playlistList);
-        MediaPlayerManager mediaPlayerManager = MediaPlayerManager.getInstance(this);
+       // MediaPlayerManager mediaPlayerManager = MediaPlayerManager.getInstance(this);
 
-//        loadFragment(new UserHomeFragment());
-        MediaPlayer mediaPlayer = mediaPlayerManager.getMediaPlayer();
-        AudioAttributes audioAttributes = new AudioAttributes.Builder()
-                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                .setUsage(AudioAttributes.USAGE_MEDIA)
-                .build();
+//loadFragment(new UserLibraryFragment());
+//        MediaPlayer mediaPlayer = mediaPlayerManager.getMediaPlayer();
+//        AudioAttributes audioAttributes = new AudioAttributes.Builder()
+//                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+//                .setUsage(AudioAttributes.USAGE_MEDIA)
+//                .build();
 
-        mediaPlayer.setAudioAttributes(audioAttributes);        try
-        {
-            mediaPlayer.setDataSource("http://localhost:8081/api/artist/song/stream/683dabc3648d3b3112c873b0");
-            mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                @Override
-                public void onPrepared(MediaPlayer mp) {
-                    mp.start();
-                }
-            });
-            mediaPlayer.prepareAsync();
-        }
-        catch (Exception ex)
-        {
-            Log.println(Log.INFO, "eff", ex.getMessage());
-        }
+//        mediaPlayer.setAudioAttributes(audioAttributes);        try
+//        {
+//            mediaPlayer.setDataSource("http://localhost:8081/api/artist/song/stream/683dabc3648d3b3112c873b0");
+//            mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+//                @Override
+//                public void onPrepared(MediaPlayer mp) {
+//                    mp.start();
+//                }
+//            });
+//            mediaPlayer.prepareAsync();
+//        }
+//        catch (Exception ex)
+//        {
+//            Log.println(Log.INFO, "eff", ex.getMessage());
+//        }
 
 
         //loadFragment(new NowPlayingSongFragment());
+
+        ApiClient apiClient = ApiClient.getInstance();
+        apiClient.createAuthApi();
+        apiClient.getApiService().login(new LoginRequest("23521766@gm.uit.edu.vn", "333")).enqueue(new Callback<AuthResponse>() {
+            @Override
+            public void onResponse(Call<AuthResponse> call, Response<AuthResponse> response) {
+                Log.d("Login", response.body().getToken());
+                apiClient.createAuthApiWithToken(response.body().getToken());
+                apiClient.getApiService().getAllPlaylists().enqueue(new Callback<List<Playlist>>() {
+                    @Override
+                    public void onResponse(Call<List<Playlist>> call, Response<List<Playlist>> response) {
+                        Log.d("Playlist", Boolean.toString(response.isSuccessful()));
+                        for(Playlist playlist: response.body())
+                        {
+                            Log.d("Playlist", playlist.getId());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<List<Playlist>> call, Throwable throwable) {
+                        Log.e("Playlist", throwable.getMessage());
+
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure(Call<AuthResponse> call, Throwable throwable) {
+                Log.e("Login", throwable.getMessage());
+
+            }
+        });
         initializeView();
     }
 

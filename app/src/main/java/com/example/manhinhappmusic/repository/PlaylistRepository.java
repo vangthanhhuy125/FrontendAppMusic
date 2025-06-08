@@ -6,6 +6,8 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.manhinhappmusic.TestData;
+import com.example.manhinhappmusic.dto.AuthResponse;
+import com.example.manhinhappmusic.dto.LoginRequest;
 import com.example.manhinhappmusic.model.Playlist;
 
 import java.util.List;
@@ -21,12 +23,25 @@ public class PlaylistRepository implements AppRepository<Playlist> {
     {
 
     }
-
+    private static String token;
     public static PlaylistRepository getInstance()
     {
         if(instance == null)
         {
             instance = new PlaylistRepository();
+            apiClient.getApiService().login(new LoginRequest("23521766@gm.uit.edu.vn", "333")).enqueue(new Callback<AuthResponse>() {
+                @Override
+                public void onResponse(Call<AuthResponse> call, Response<AuthResponse> response) {
+                    token = response.body().getToken();
+                    Log.d("Login", token);
+                }
+
+                @Override
+                public void onFailure(Call<AuthResponse> call, Throwable throwable) {
+                    Log.e("Login", throwable.getMessage());
+
+                }
+            });
         }
         return  instance;
     }
