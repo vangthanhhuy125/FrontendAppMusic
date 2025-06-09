@@ -22,13 +22,15 @@ import java.util.List;
 public class HomeSongAdapter extends RecyclerView.Adapter<HomeSongAdapter.ViewHolder> {
 
     private List<Song> songList;
+    private final String token;
     public interface OnItemClickListener{
         void onItemClick(int position);
     }
     private OnItemClickListener onItemClickListener;
 
-    public HomeSongAdapter(List<Song> songList, OnItemClickListener onItemClickListener)
+    public HomeSongAdapter(List<Song> songList, OnItemClickListener onItemClickListener, String token)
     {
+        this.token = token;
         this.songList = songList;
         this.onItemClickListener = onItemClickListener;
     }

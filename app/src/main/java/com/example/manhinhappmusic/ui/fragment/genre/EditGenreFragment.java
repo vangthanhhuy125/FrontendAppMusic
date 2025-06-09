@@ -23,11 +23,9 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.example.manhinhappmusic.adapter.PlaylistAdapter;
 import com.example.manhinhappmusic.R;
 import com.example.manhinhappmusic.model.Genre;
 import com.example.manhinhappmusic.model.Playlist;
-import com.example.manhinhappmusic.model.Song;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -70,7 +68,6 @@ public class EditGenreFragment extends Fragment {
 
     private Genre genre;
     private List<Playlist> playlistList = new ArrayList<>();
-    private PlaylistAdapter playlistAdapter;
 
     private ActivityResultLauncher<Intent> pickImageLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
@@ -133,10 +130,10 @@ public class EditGenreFragment extends Fragment {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this.getContext());
         recyclerView.setLayoutManager(layoutManager);
 
-        playlistAdapter = new PlaylistAdapter(playlistList, position -> {
-            Toast.makeText(getContext(), "Clicked playlist: " + playlistList.get(position).getName(), Toast.LENGTH_SHORT).show();
-        });
-        recyclerView.setAdapter(playlistAdapter);
+        //playlistAdapter = new PlaylistAdapter(playlistList, position -> {
+//            Toast.makeText(getContext(), "Clicked playlist: " + playlistList.get(position).getName(), Toast.LENGTH_SHORT).show();
+//        });
+//        recyclerView.setAdapter(playlistAdapter);
 
         btnEditImage.setOnClickListener(v -> {
             Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
@@ -148,14 +145,16 @@ public class EditGenreFragment extends Fragment {
                     "p" + (playlistList.size() + 1),
                     "New Playlist " + (playlistList.size() + 1),
                     "Mô tả mới",
-                    new ArrayList<Song>(),
+                    new ArrayList<String>(),
                     "user1",
                     "",
                     "",
                     100,
-                    true);
+                    true,
+                    "",
+                    "");
             playlistList.add(newPlaylist);
-            playlistAdapter.notifyItemInserted(playlistList.size() - 1);
+            //playlistAdapter.notifyItemInserted(playlistList.size() - 1);
         });
 
         btnSave.setOnClickListener(v -> {

@@ -1,8 +1,9 @@
 package com.example.manhinhappmusic.adapter;
+
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-//import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -16,16 +17,31 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.manhinhappmusic.R;
+import com.example.manhinhappmusic.api.common.CommonSongApi;
+import com.example.manhinhappmusic.api.ApiClient;
 import com.example.manhinhappmusic.model.Song;
 
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
-    private final List<Song> songList;
+    private final List<String> songIds;
     private static OnItemClickListener itemClickListener;
-    public interface OnItemClickListener{
+    private final Context context;
+
+    public interface OnItemClickListener {
         void onItemClick(int position);
     }
+
+    public SongAdapter(Context context, List<String> songIds, OnItemClickListener itemClickListener) {
+        this.context = context;
+        this.songIds = songIds;
+        this.itemClickListener = itemClickListener;
+    }
+
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -36,27 +52,37 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Song song = songList.get(position);
-        holder.getTextViewArtist().setText(song.getArtistId());
-        holder.getTextViewSongTitle().setText(song.getTitle());
-        Glide.with(holder.itemView.getContext())
-                .load(song.getCoverImageUrl())
-                .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(15))))
-                .into(holder.getImageViewThumbnail());
+        String songId = songIds.get(position);
+
+        // Gọi API để lấy thông tin bài hát từ songId
+        CommonSongApi apiService = ApiClient.getRetrofitWithAuth(context).create(CommonSongApi.class);
+        apiService.getSong(songId).enqueue(new Callback<Song>() {
+            @Override
+            public void onResponse(Call<Song> call, Response<Song> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    Song song = response.body();
+                    holder.getTextViewArtist().setText(song.getArtistId());
+                    holder.getTextViewSongTitle().setText(song.getTitle());
+                    Glide.with(holder.itemView.getContext())
+                            .load(song.getCoverImageUrl())
+                            .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(15))))
+                            .into(holder.getImageViewThumbnail());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Song> call, Throwable t) {
+                // Xử lý lỗi nếu gọi API thất bại
+            }
+        });
     }
 
     @Override
     public int getItemCount() {
-        return (songList != null) ? songList.size() : 0;
+        return (songIds != null) ? songIds.size() : 0;
     }
 
-    public SongAdapter(List<Song> songList, OnItemClickListener itemClickListener)
-    {
-        this.songList = songList;
-        this.itemClickListener = itemClickListener;
-    }
-
-    public static class ViewHolder extends RecyclerView.ViewHolder{
+    public static class ViewHolder extends RecyclerView.ViewHolder {
         private final TextView textViewArtist;
         private final TextView textViewSongTitle;
         private final ImageButton moreOptionsButton;
@@ -68,21 +94,14 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
             textViewSongTitle = itemView.findViewById(R.id.txtSongTitle);
             moreOptionsButton = itemView.findViewById(R.id.more_options_button);
             imageViewThumbnail = itemView.findViewById(R.id.imgThumbnail);
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    int position = getAdapterPosition();
-                    if(position != RecyclerView.NO_POSITION && itemClickListener != null)
-                    {
-                        itemClickListener.onItemClick(position);
-                    }
+            itemView.setOnClickListener(v -> {
+                int position = getAdapterPosition();
+                if (position != RecyclerView.NO_POSITION && itemClickListener != null) {
+                    itemClickListener.onItemClick(position);
                 }
             });
-            moreOptionsButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-                }
+            moreOptionsButton.setOnClickListener(v -> {
+                // Thực hiện các thao tác khác nếu cần
             });
         }
 
@@ -103,7 +122,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
         }
     }
 
-    public List<Song> getSongList() {
-        return songList;
+    public List<String> getSongList() {
+        return songIds;
     }
 }

@@ -6,7 +6,7 @@ import java.util.List;
 import lombok.Data;
 
 @Data
-public class Song extends BaseDocument {
+public class Song {
     private String id;
     private String artistId;
     private String description;
@@ -19,8 +19,10 @@ public class Song extends BaseDocument {
     private String lyric;
     private Double duration;
     private Double views;
+    private String createdAt;
+    private String updatedAt;
 
-    public Song(String id, String title, String artistId, String description, String audioUrl, String coverImageUrl, List<String> genreId, Boolean isApproved, Boolean isPublic, String lyric, Double duration, Double views) {
+    public Song(String id, String title, String artistId, String description, String audioUrl, String coverImageUrl, List<String> genreId, Boolean isApproved, Boolean isPublic, String lyric, Double duration, Double views, String createdAt, String updatedAt) {
         this.id = id;
         this.title = title;
         this.artistId = artistId;
@@ -34,6 +36,8 @@ public class Song extends BaseDocument {
         this.lyric = lyric;
         this.duration = duration;
         this.views = views;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
 
     public void setGenreId(List<String> genreId) {

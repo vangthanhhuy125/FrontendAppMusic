@@ -1,5 +1,6 @@
 package com.example.manhinhappmusic.ui.fragment.user;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.TypedValue;
@@ -25,6 +26,7 @@ import com.example.manhinhappmusic.decoration.GridSpacingItemDecoration;
 import com.example.manhinhappmusic.decoration.HorizontalLinearSpacingItemDecoration;
 import com.example.manhinhappmusic.model.Playlist;
 import com.example.manhinhappmusic.model.Song;
+import com.example.manhinhappmusic.ui.activity.MainActivity;
 import com.example.manhinhappmusic.ui.fragment.BaseFragment;
 import com.google.android.material.imageview.ShapeableImageView;
 
@@ -48,6 +50,13 @@ public class UserHomeFragment extends BaseFragment {
     private HomeFeatureAdapter featureAdapter;
     private HomeSongAdapter recentlySongAdapter;
     private HomeSongAdapter newReleaseSongAdapter;
+    private String token;
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        token = ((MainActivity) requireActivity()).getToken();
+    }
 
     @Nullable
     @Override
@@ -68,31 +77,31 @@ public class UserHomeFragment extends BaseFragment {
         userAvatarImage.setOnClickListener(this::onClickUserAvatarImage);
 
         // Playlist view
-        playlistAdapter = new HomePlaylistAdapter(playlistList, position -> {});
+        playlistAdapter = new HomePlaylistAdapter(playlistList, position -> {}, token);
         playlistView.setLayoutManager(new GridLayoutManager(getContext(), 2));
         playlistView.setAdapter(playlistAdapter);
-        playlistView.addItemDecoration(new GridSpacingItemDecoration(2, dpToPx(8), true));
+        playlistView.addItemDecoration(new GridSpacingItemDecoration(2, dpToPx(12), true));
 
         // Recently Played
-        recentlySongAdapter = new HomeSongAdapter(recentlyPlaySongList, position -> {});
+        recentlySongAdapter = new HomeSongAdapter(recentlyPlaySongList, position -> {}, token);
         LinearLayoutManager recentlyLayout = new LinearLayoutManager(getContext(), RecyclerView.HORIZONTAL, false);
         recentlyPlayView.setLayoutManager(recentlyLayout);
         recentlyPlayView.setAdapter(recentlySongAdapter);
-        recentlyPlayView.addItemDecoration(new HorizontalLinearSpacingItemDecoration(dpToPx(10)));
+        recentlyPlayView.addItemDecoration(new HorizontalLinearSpacingItemDecoration(dpToPx(12)));
 
         // New Release
-        newReleaseSongAdapter = new HomeSongAdapter(newReleaseSongList, position -> {});
+        newReleaseSongAdapter = new HomeSongAdapter(newReleaseSongList, position -> {}, token);
         LinearLayoutManager newReleaseLayout = new LinearLayoutManager(getContext(), RecyclerView.HORIZONTAL, false);
         newReleaseView.setLayoutManager(newReleaseLayout);
         newReleaseView.setAdapter(newReleaseSongAdapter);
-        newReleaseView.addItemDecoration(new HorizontalLinearSpacingItemDecoration(dpToPx(10)));
+        newReleaseView.addItemDecoration(new HorizontalLinearSpacingItemDecoration(dpToPx(12)));
 
         // Featuring playlists
-        featureAdapter = new HomeFeatureAdapter(featurePlaylistList, position -> {});
+        featureAdapter = new HomeFeatureAdapter(token, featurePlaylistList, position ->{});
         LinearLayoutManager featureLayout = new LinearLayoutManager(getContext(), RecyclerView.HORIZONTAL, false);
         featureView.setLayoutManager(featureLayout);
         featureView.setAdapter(featureAdapter);
-        featureView.addItemDecoration(new HorizontalLinearSpacingItemDecoration(dpToPx(10)));
+        featureView.addItemDecoration(new HorizontalLinearSpacingItemDecoration(dpToPx(12)));
 
         loadPlaylistsFromApi();
     }
@@ -105,7 +114,6 @@ public class UserHomeFragment extends BaseFragment {
             @Override
             public void onResponse(Call<List<Playlist>> call, Response<List<Playlist>> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    playlistList.clear();
                     featurePlaylistList.clear();
 
                     playlistList.addAll(response.body());
@@ -120,7 +128,6 @@ public class UserHomeFragment extends BaseFragment {
 
             @Override
             public void onFailure(Call<List<Playlist>> call, Throwable t) {
-                Log.e("API_ERROR", "Lỗi khi tải playlists", t);
                 Toast.makeText(getContext(), "Lỗi kết nối khi tải playlist", Toast.LENGTH_SHORT).show();
             }
         });

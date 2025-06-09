@@ -1,5 +1,6 @@
 package com.example.manhinhappmusic.ui.fragment.auth;
 
+import android.content.Context;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -41,6 +42,16 @@ public class RegisterFragment extends Fragment {
 
     private AuthApi authApi;
 
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        if (context instanceof RegisterFragmentListener) {
+            listener = (RegisterFragmentListener) context;
+        } else {
+            throw new RuntimeException(context.toString() + " must implement RegisterFragmentListener");
+        }
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -53,12 +64,11 @@ public class RegisterFragment extends Fragment {
         registerButton = view.findViewById(R.id.registerButton);
         signInTextView = view.findViewById(R.id.signInTextView);
 
-        authApi = ApiClient.getAuthApi(requireContext()); // Lấy API client
+        authApi = ApiClient.getAuthApi(); // Lấy API client
 
         registerButton.setOnClickListener(v -> handleRegister());
 
         signInTextView.setOnClickListener(v -> {
-            // Quay lại Login Fragment
             if (listener != null) listener.onBackToLogin();
         });
 
@@ -95,7 +105,6 @@ public class RegisterFragment extends Fragment {
                 Log.e("RegisterFragment", "Lỗi kết nối khi gọi API register", t);
                 Toast.makeText(getContext(), "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
-
         });
     }
 }

@@ -30,11 +30,6 @@ import com.example.manhinhappmusic.model.MediaPlayerManager;
 import com.example.manhinhappmusic.model.Playlist;
 import com.example.manhinhappmusic.repository.PlaylistRepository;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link UserPlaylistFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class UserPlaylistFragment extends BaseFragment {
 
     private static final String ARG_ID = "ID";
@@ -42,7 +37,7 @@ public class UserPlaylistFragment extends BaseFragment {
 
     private ImageView playlistsCoverImage;
     private TextView playlistsTitle;
-    private  TextView playlistsCount;
+    private TextView playlistsCount;
     private ImageButton backButton;
     private RecyclerView songsView;
     private SongAdapter songAdapter;
@@ -63,13 +58,10 @@ public class UserPlaylistFragment extends BaseFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if(getArguments() != null)
-        {
+        if (getArguments() != null) {
             id = getArguments().getString(ARG_ID);
         }
-
         playlist = PlaylistRepository.getInstance().getItemById(id).getValue();
-
     }
 
     @Override
@@ -77,46 +69,38 @@ public class UserPlaylistFragment extends BaseFragment {
         super.onViewCreated(view, savedInstanceState);
 
         playlistsCoverImage = view.findViewById(R.id.playlists_cover_image);
-        Glide.with(this.getContext())
+        Glide.with(requireContext())
                 .load(playlist.getThumbnailUrl())
                 .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(15))))
                 .into(playlistsCoverImage);
+
         playlistsTitle = view.findViewById(R.id.playlists_title);
         playlistsTitle.setText(playlist.getName());
-        playlistsCount = view.findViewById(R.id.playlists_count);
-        playlistsCount.setText(String.valueOf(playlist.getSongsList().size()) + " songs");
-        backButton = view.findViewById(R.id.back_button);
-        backButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                callback.onRequestGoBackPreviousFragment();
-            }
-        });
-        songAdapter = new SongAdapter(playlist.getSongsList(), new SongAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(int position) {
-                MediaPlayerManager mediaPlayerManager = MediaPlayerManager.getInstance(null);
-                mediaPlayerManager.setCurrentSong(position);
-                mediaPlayerManager.play();
-                callback.onRequestLoadMiniPlayer();
 
-            }
+        playlistsCount = view.findViewById(R.id.playlists_count);
+        playlistsCount.setText(playlist.getSongsList().size() + " songs");
+
+        backButton = view.findViewById(R.id.back_button);
+        backButton.setOnClickListener(v -> callback.onRequestGoBackPreviousFragment());
+
+        // Khởi tạo adapter với context và danh sách songIds
+        songAdapter = new SongAdapter(requireContext(), playlist.getSongsList(), position -> {
+            MediaPlayerManager mediaPlayerManager = MediaPlayerManager.getInstance(null);
+            mediaPlayerManager.setCurrentSong(position);
+            mediaPlayerManager.play();
+            callback.onRequestLoadMiniPlayer();
         });
+
         songsView = view.findViewById(R.id.songs_view);
         songsView.setAdapter(songAdapter);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this.getContext());
-        songsView.setLayoutManager(linearLayoutManager);
-        songsView.addItemDecoration(new VerticalLinearSpacingItemDecoration((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, getResources().getDisplayMetrics())));
-
-
+        songsView.setLayoutManager(new LinearLayoutManager(requireContext()));
+        songsView.addItemDecoration(new VerticalLinearSpacingItemDecoration(
+                (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, getResources().getDisplayMetrics())));
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_user_playlist, container, false);
     }
-
-
 }

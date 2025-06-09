@@ -3,7 +3,7 @@ import java.sql.Date;
 import lombok.Data;
 
 @Data
-public class ArtistRequest extends BaseDocument {
+public class ArtistRequest {
     private String id;
     private String userId;
     private String portfolioUrl;

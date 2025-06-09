@@ -1,5 +1,6 @@
 package com.example.manhinhappmusic.ui.activity;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -29,11 +30,9 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.Frag
 
     BottomSheetDialogFragment bottomSheetDialogFragment;
     BottomNavigationView bottomNavigationView;
-//    AppFragmentFactory appFragmentFactory;
     MiniPlayerFragment miniPlayer;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-//        getSupportFragmentManager().setFragmentFactory(appFragmentFactory);
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
@@ -67,6 +66,10 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.Frag
 
     }
 
+    public String getToken() {
+        SharedPreferences prefs = getSharedPreferences("APP_PREF", MODE_PRIVATE);
+        return prefs.getString("JWT_TOKEN", null);
+    }
     private boolean loadFragment(Fragment fragment){
         if(fragment != null){
             getSupportFragmentManager()

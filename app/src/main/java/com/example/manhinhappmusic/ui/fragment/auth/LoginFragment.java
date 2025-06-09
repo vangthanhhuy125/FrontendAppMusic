@@ -1,5 +1,7 @@
 package com.example.manhinhappmusic.ui.fragment.auth;
 
+import static android.content.ContentValues.TAG;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -8,6 +10,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +24,7 @@ import com.example.manhinhappmusic.api.ApiClient;
 import com.example.manhinhappmusic.api.authentication.AuthApi;
 import com.example.manhinhappmusic.dto.AuthResponse;
 import com.example.manhinhappmusic.dto.LoginRequest;
+import com.example.manhinhappmusic.ui.activity.LoginActivity;
 import com.example.manhinhappmusic.ui.activity.MainActivity;
 
 import retrofit2.Call;
@@ -59,7 +63,7 @@ public class LoginFragment extends Fragment {
         signUpTextView = view.findViewById(R.id.signUpTextView);
         forgetPasswordTextView = view.findViewById(R.id.forgetPasswordTextView);
 
-        authApi = ApiClient.getAuthApi(requireContext());
+        authApi = ApiClient.getAuthApi();
 
         btnLogin.setOnClickListener(v -> loginUser());
 
@@ -92,6 +96,7 @@ public class LoginFragment extends Fragment {
                     // Lưu token vào SharedPreferences
                     SharedPreferences prefs = requireContext().getSharedPreferences("APP_PREF", getContext().MODE_PRIVATE);
                     prefs.edit().putString("JWT_TOKEN", token).apply();
+                    Log.d("LoginFragment", "Token: " + token);
 
                     Toast.makeText(requireContext(), "Đăng nhập thành công", Toast.LENGTH_SHORT).show();
 

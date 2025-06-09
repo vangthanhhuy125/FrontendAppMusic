@@ -42,7 +42,7 @@ public class ChangePasswordFragment extends Fragment {
         newPasswordEditText = view.findViewById(R.id.newpass_edittext);
         confirmButton = view.findViewById(R.id.confirmButton);
 
-        passwordApi = ApiClient.getPasswordApi(requireContext());
+        passwordApi = ApiClient.getPasswordApi();
 
         confirmButton.setOnClickListener(v -> handleChangePassword());
 

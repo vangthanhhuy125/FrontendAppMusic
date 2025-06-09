@@ -7,22 +7,24 @@ import java.util.List;
 import lombok.Data;
 
 @Data
-public class Playlist extends BaseDocument {
+public class Playlist {
     private String id;
     private String name;
     private String description;
-    private List<Song> songs = new ArrayList<>();
+    private List<String> songs = new ArrayList<>();
     private String userId;
     private String thumbnailUrl;
     private String artist;
     private int viewCount;
     private Boolean isPublic;
+    private String createdAt;
+    private String updatedAt;
 
-    public Playlist(String id, String name, String description, List<Song> songs, String userId, String thumbnailUrl, String artist, int viewCount, Boolean isPublic) {
+    public Playlist(String id, String name, String description, List<String> songs, String userId, String thumbnailUrl, String artist, int viewCount, Boolean isPublic, String createdAt, String updatedAt) {
         this.id = id;
         this.name = name;
         this.description = description;
-        this.songs = new ArrayList<Song>();
+        this.songs = new ArrayList<String>();
         if (songs != null)
             this.songs.addAll(songs);
         this.userId = userId;
@@ -30,18 +32,20 @@ public class Playlist extends BaseDocument {
         this.artist = artist;
         this.viewCount = viewCount;
         this.isPublic = isPublic;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
-    public List<Song> getSongsList() {
+    public List<String> getSongsList() {
         return Collections.unmodifiableList(songs);
     }
-    public List<Song> getModifiableSongsList() {
+    public List<String> getModifiableSongsList() {
         return songs;
     }
-    public void setSongs(List<Song> songs) {
+    public void setSongs(List<String> songs) {
         this.songs.clear();
         this.songs.addAll(songs);
     }
-    public void addSong(Song song) {
+    public void addSong(String song) {
         if (song != null)
             songs.add(song);
     }
