@@ -22,6 +22,7 @@ import com.example.manhinhappmusic.adapter.HomePlaylistAdapter;
 import com.example.manhinhappmusic.adapter.HomeSongAdapter;
 import com.example.manhinhappmusic.api.ApiClient;
 import com.example.manhinhappmusic.api.common.CommonPlaylistApi;
+import com.example.manhinhappmusic.api.common.CommonSongApi;
 import com.example.manhinhappmusic.decoration.GridSpacingItemDecoration;
 import com.example.manhinhappmusic.decoration.HorizontalLinearSpacingItemDecoration;
 import com.example.manhinhappmusic.model.Playlist;
@@ -78,7 +79,8 @@ public class UserHomeFragment extends BaseFragment {
 
         // Playlist view
         playlistAdapter = new HomePlaylistAdapter(playlistList, position -> {}, token);
-        playlistView.setLayoutManager(new GridLayoutManager(getContext(), 2));
+        GridLayoutManager playlistLayout = new GridLayoutManager(getContext(),2);
+        playlistView.setLayoutManager(playlistLayout);
         playlistView.setAdapter(playlistAdapter);
         playlistView.addItemDecoration(new GridSpacingItemDecoration(2, dpToPx(12), true));
 
@@ -104,6 +106,7 @@ public class UserHomeFragment extends BaseFragment {
         featureView.addItemDecoration(new HorizontalLinearSpacingItemDecoration(dpToPx(12)));
 
         loadPlaylistsFromApi();
+        loadSongFromApi();
     }
 
     private void loadPlaylistsFromApi() {
@@ -133,6 +136,48 @@ public class UserHomeFragment extends BaseFragment {
         });
     }
 
+    private void loadSongFromApi() {
+        CommonSongApi songApi = ApiClient.getCommonSongApi(requireContext());
+
+//        // Load Recently Played Songs
+//        songApi.getRecentlySongs().enqueue(new Callback<List<Song>>() {
+//            @Override
+//            public void onResponse(Call<List<Song>> call, Response<List<Song>> response) {
+//                if (response.isSuccessful() && response.body() != null) {
+//                    recentlyPlaySongList.clear();
+//                    recentlyPlaySongList.addAll(response.body());
+//                    recentlySongAdapter.notifyDataSetChanged();
+//                } else {
+//                    Toast.makeText(getContext(), "Không thể tải bài hát vừa nghe", Toast.LENGTH_SHORT).show();
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Call<List<Song>> call, Throwable t) {
+//                Toast.makeText(getContext(), "Lỗi kết nối khi tải bài hát vừa nghe", Toast.LENGTH_SHORT).show();
+//            }
+//        });
+
+        // Load New Release Songs
+        songApi.getNewReleaseSongs().enqueue(new Callback<List<Song>>() {
+            @Override
+            public void onResponse(Call<List<Song>> call, Response<List<Song>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    newReleaseSongList.clear();
+                    newReleaseSongList.addAll(response.body());
+                    newReleaseSongAdapter.notifyDataSetChanged();
+                } else {
+                    Toast.makeText(getContext(), "Không thể tải bài hát mới phát hành", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Song>> call, Throwable t) {
+                Toast.makeText(getContext(), "Lỗi kết nối khi tải bài hát mới phát hành", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     private void onClickUserAvatarImage(View view) {
         try {
             callback.onRequestChangeFragment(FragmentTag.USER_PROFILE, null);
@@ -142,10 +187,7 @@ public class UserHomeFragment extends BaseFragment {
     }
 
     private int dpToPx(int dp) {
-        return (int) TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_DIP,
-                dp,
-                getResources().getDisplayMetrics()
-        );
+        float density = getResources().getDisplayMetrics().density;
+        return Math.round(dp * density);
     }
 }
