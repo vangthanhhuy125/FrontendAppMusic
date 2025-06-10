@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +26,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.example.manhinhappmusic.model.MediaPlayerManager;
 import com.example.manhinhappmusic.R;
 import com.example.manhinhappmusic.model.Song;
+import com.example.manhinhappmusic.network.ApiService;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.button.MaterialButton;
@@ -54,10 +56,11 @@ public class NowPlayingSongFragment extends BottomSheetDialogFragment {
     private Runnable updateSeekBar = new Runnable() {
         @Override
         public void run() {
-            if(mediaPlayerManager.getMediaPlayer() != null && mediaPlayerManager.getMediaPlayer().isPlaying()){
+            if(mediaPlayerManager.isPrepared() && mediaPlayerManager.mediaPlayer.isPlaying()){
                 seekBar.setProgress(mediaPlayerManager.getMediaPlayer().getCurrentPosition());
                 handler.postDelayed(this, 200);
                 currentPlayTimeTextView.setText(formatTime(mediaPlayerManager.getMediaPlayer().getCurrentPosition()));
+
             }
         }
     };
@@ -278,16 +281,26 @@ public class NowPlayingSongFragment extends BottomSheetDialogFragment {
 //        });
 
 
-        handler.post(updateSeekBar);
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                if(mediaPlayerManager.isPrepared()){
+                    setSongsInformation();
+                    handler.removeCallbacks(this);
+                    handler.post(updateSeekBar);
+                }
+                handler.postDelayed(this,200);
+            }
+        });
 
     }
 
     private void setSongsInformation()
     {
-//        Glide.with(this.getContext())
-//                .load(mediaPlayerManager.getCurrentSong().getCoverImageResID())
-//                .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(15))))
-//                .into(songsCoverImage);
+        Glide.with(this.getContext())
+                .load(ApiService.BASE_URL + mediaPlayerManager.getCurrentSong().getCoverImageUrl())
+                .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(15))))
+                .into(songsCoverImage);
 
         songsTitleTextView.setText(mediaPlayerManager.getCurrentSong().getTitle());
         //songsArtistsNameTextView.setText(mediaPlayerManager.getCurrentSong().getArtistId());

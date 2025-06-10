@@ -8,6 +8,6 @@
         android:centerColor="#3e3e3e"
         android:gradientRadius="360"
        />
-    <corners
-        android:radius="10dp"/>
+<!--    <corners-->
+<!--        android:radius="10dp"/>-->
 </shape>

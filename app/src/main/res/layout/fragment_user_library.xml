@@ -90,15 +90,27 @@
                     app:iconPadding="10dp"
                     android:paddingHorizontal="0dp"/>
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/playlists_view"
+                <androidx.core.widget.NestedScrollView
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="match_parent">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical">
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/playlists_view"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:nestedScrollingEnabled="true">
 
-                </androidx.recyclerview.widget.RecyclerView>
-                <Space
-                    android:layout_width="match_parent"
-                    android:layout_height="200dp"/>
+                        </androidx.recyclerview.widget.RecyclerView>
+                        <Space
+                            android:layout_width="match_parent"
+                            android:layout_height="200dp"/>
+                    </LinearLayout>
+
+                </androidx.core.widget.NestedScrollView>
+
             </LinearLayout>
 
 

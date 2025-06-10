@@ -64,67 +64,11 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.Frag
             return insets;
         });
 
-//        appFragmentFactory = new AppFragmentFactory(null, null, null, null);
-//        appFragmentFactory.setLibrary(TestData.playlistList);
-       // MediaPlayerManager mediaPlayerManager = MediaPlayerManager.getInstance(this);
-
-//loadFragment(new UserLibraryFragment());
-//        MediaPlayer mediaPlayer = mediaPlayerManager.getMediaPlayer();
-//        AudioAttributes audioAttributes = new AudioAttributes.Builder()
-//                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-//                .setUsage(AudioAttributes.USAGE_MEDIA)
-//                .build();
-
-//        mediaPlayer.setAudioAttributes(audioAttributes);        try
-//        {
-//            mediaPlayer.setDataSource("http://localhost:8081/api/artist/song/stream/683dabc3648d3b3112c873b0");
-//            mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-//                @Override
-//                public void onPrepared(MediaPlayer mp) {
-//                    mp.start();
-//                }
-//            });
-//            mediaPlayer.prepareAsync();
-//        }
-//        catch (Exception ex)
-//        {
-//            Log.println(Log.INFO, "eff", ex.getMessage());
-//        }
+       MediaPlayerManager mediaPlayerManager = MediaPlayerManager.getInstance(this);
 
 
-        //loadFragment(new NowPlayingSongFragment());
+        loadFragment(new UserHomeFragment());
 
-        ApiClient apiClient = ApiClient.getInstance();
-        apiClient.createAuthApi();
-        apiClient.getApiService().login(new LoginRequest("23521766@gm.uit.edu.vn", "333")).enqueue(new Callback<AuthResponse>() {
-            @Override
-            public void onResponse(Call<AuthResponse> call, Response<AuthResponse> response) {
-                Log.d("Login", response.body().getToken());
-                apiClient.createAuthApiWithToken(response.body().getToken());
-                apiClient.getApiService().getAllPlaylists().enqueue(new Callback<List<Playlist>>() {
-                    @Override
-                    public void onResponse(Call<List<Playlist>> call, Response<List<Playlist>> response) {
-                        Log.d("Playlist", Boolean.toString(response.isSuccessful()));
-                        for(Playlist playlist: response.body())
-                        {
-                            Log.d("Playlist", playlist.getId());
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call<List<Playlist>> call, Throwable throwable) {
-                        Log.e("Playlist", throwable.getMessage());
-
-                    }
-                });
-            }
-
-            @Override
-            public void onFailure(Call<AuthResponse> call, Throwable throwable) {
-                Log.e("Login", throwable.getMessage());
-
-            }
-        });
         initializeView();
     }
 
@@ -150,7 +94,7 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.Frag
         if(fragment != null){
             getSupportFragmentManager()
                     .beginTransaction()
-                    .add(R.id.frame_container, fragment)
+                    .replace(R.id.frame_container, fragment)
                     .addToBackStack(null)
                     .commit();
             return true;

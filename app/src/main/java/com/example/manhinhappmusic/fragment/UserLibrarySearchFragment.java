@@ -5,6 +5,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -16,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 
+import com.example.manhinhappmusic.repository.PlaylistRepository;
 import com.example.manhinhappmusic.view.ClearableEditText;
 import com.example.manhinhappmusic.R;
 import com.example.manhinhappmusic.decoration.VerticalLinearSpacingItemDecoration;
@@ -23,6 +25,7 @@ import com.example.manhinhappmusic.adapter.PlaylistAdapter;
 import com.example.manhinhappmusic.model.Playlist;
 import com.example.manhinhappmusic.repository.LibraryRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -78,14 +81,24 @@ public class UserLibrarySearchFragment extends BaseFragment {
         searchResultsView = view.findViewById(R.id.search_result_view);
         backButton = view.findViewById(R.id.back_button);
 
-        sourcePlaylistList = LibraryRepository.getInstance().getItemById("").getValue();
-
+        sourcePlaylistList = new ArrayList<>();
         PlaylistAdapter adapter = new PlaylistAdapter(sourcePlaylistList, new PlaylistAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
-                    callback.onRequestChangeFragment(FragmentTag.USER_PLAYLIST, sourcePlaylistList.get(position).getId());
+                callback.onRequestChangeFragment(FragmentTag.USER_PLAYLIST, sourcePlaylistList.get(position).getId());
             }
         });
+
+         PlaylistRepository.getInstance().getAll().observe(getViewLifecycleOwner(), new Observer<List<Playlist>>() {
+            @Override
+            public void onChanged(List<Playlist> playlists) {
+                sourcePlaylistList = playlists;
+                adapter.setPlaylistList(playlists);
+                adapter.notifyDataSetChanged();
+            }
+        });
+
+
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this.getContext());
         searchResultsView.setAdapter(adapter);

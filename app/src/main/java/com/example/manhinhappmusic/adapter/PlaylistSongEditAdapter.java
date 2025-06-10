@@ -9,14 +9,28 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.MultiTransformation;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.manhinhappmusic.R;
+import com.example.manhinhappmusic.model.Playlist;
 import com.example.manhinhappmusic.model.Song;
+import com.example.manhinhappmusic.network.ApiClient;
+import com.example.manhinhappmusic.network.ApiService;
+import com.example.manhinhappmusic.repository.PlaylistRepository;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class PlaylistSongEditAdapter extends RecyclerView.Adapter<PlaylistSongEditAdapter.ViewHolder> {
     private List<Song> songList;

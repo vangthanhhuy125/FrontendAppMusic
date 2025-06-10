@@ -22,11 +22,8 @@ public class Playlist implements ListItem {
  //Test purpose
  private int thumnailResID;
 private String artistName;
-private List<Song> songList;
+private List<Song> songsList;
 
- public List<Song> getSongsList() {
-  return songList;
- }
 
  public Boolean getPublic() {
   return isPublic;

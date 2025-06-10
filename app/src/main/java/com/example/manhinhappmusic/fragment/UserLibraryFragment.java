@@ -1,30 +1,48 @@
 package com.example.manhinhappmusic.fragment;
 
+import android.content.SharedPreferences;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import com.example.manhinhappmusic.R;
 import com.example.manhinhappmusic.decoration.VerticalLinearSpacingItemDecoration;
 import com.example.manhinhappmusic.adapter.PlaylistAdapter;
+import com.example.manhinhappmusic.dto.PlaylistRequest;
 import com.example.manhinhappmusic.model.Playlist;
+import com.example.manhinhappmusic.network.ApiClient;
 import com.example.manhinhappmusic.repository.LibraryRepository;
 import com.example.manhinhappmusic.repository.PlaylistRepository;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.imageview.ShapeableImageView;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -66,6 +84,20 @@ public class UserLibraryFragment extends BaseFragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        Log.d("frag", "resume");
+        PlaylistRepository.getInstance().getAll().observe(getViewLifecycleOwner(), new Observer<List<Playlist>>() {
+            @Override
+            public void onChanged(List<Playlist> playlists) {
+                playlistAdapter.setPlaylistList(playlists);
+                playlistAdapter.notifyDataSetChanged();
+            }
+        });
+    }
+
+
+    @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         userAvatar = view.findViewById(R.id.user_avatar_image);
@@ -81,15 +113,15 @@ public class UserLibraryFragment extends BaseFragment {
                 callback.onRequestChangeFragment(FragmentTag.LIBRARY_SEARCH);
             }
         });
-
-        playlistList = PlaylistRepository.getInstance().getAll().getValue();
-
-        playlistAdapter = new PlaylistAdapter(playlistList, new PlaylistAdapter.OnItemClickListener() {
+        playlistAdapter = new PlaylistAdapter(new ArrayList<>(), new PlaylistAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
                 currentPlaylistPosition = position;
-                callback.onRequestChangeFragment(FragmentTag.USER_PLAYLIST,
-                        playlistAdapter.getPlaylistList().get(position).getId());
+                Playlist playlist = playlistAdapter.getPlaylistList().get(position);
+                playlist.setSongsList(new ArrayList<>());
+                PlaylistRepository.getInstance().setCurrentPlaylist(playlist);
+                callback.onRequestChangeFragment(FragmentTag.USER_PLAYLIST,playlist.getId());
+
             }
         });
 
@@ -109,18 +141,32 @@ public class UserLibraryFragment extends BaseFragment {
         });
         getParentFragmentManager().setFragmentResultListener("request_add_playlist", getViewLifecycleOwner(), (requestKey, result) ->{
             //playlistList.add(new Playlist("dfd", result.getString("playlist_name"), "Fdfd", new ArrayList<>(),"",0,"",new ArrayList<>()));
-            playlistAdapter.notifyDataSetChanged();
+            String playlistName = result.getString("playlist_name", "null");
+
+            PlaylistRepository.getInstance().getAll().observe(getViewLifecycleOwner(), new Observer<List<Playlist>>() {
+                @Override
+                public void onChanged(List<Playlist> playlists) {
+                    Toast.makeText(getContext(), "Added new playlist", Toast.LENGTH_SHORT).show();
+                    playlistAdapter.setPlaylistList(playlists);
+                    playlistAdapter.notifyDataSetChanged();
+                }
+            });
+
         });
 
-        getParentFragmentManager().setFragmentResultListener("update_library_when_playlist_got_deleted", getViewLifecycleOwner(), (requestKey, result) ->{
-            if(currentPlaylistPosition != -1)
-                playlistAdapter.notifyItemRemoved(currentPlaylistPosition);
-        });
-
-        getParentFragmentManager().setFragmentResultListener("update_library_when_playlist_got_modified", getViewLifecycleOwner(), (requestKey, result) ->{
-            if(currentPlaylistPosition != -1)
-                playlistAdapter.notifyItemChanged(currentPlaylistPosition);
-        });
+//        getParentFragmentManager().setFragmentResultListener("update_library_when_playlist_got_deleted", getViewLifecycleOwner(), (requestKey, result) ->{
+//            if(currentPlaylistPosition != -1)
+//            {
+//                playlistAdapter.getPlaylistList().remove(currentPlaylistPosition);
+//                playlistAdapter.notifyItemRemoved(currentPlaylistPosition);
+//
+//            }
+//        });
+//
+//        getParentFragmentManager().setFragmentResultListener("update_library_when_playlist_got_modified", getViewLifecycleOwner(), (requestKey, result) ->{
+//            if(currentPlaylistPosition != -1)
+//                playlistAdapter.notifyItemChanged(currentPlaylistPosition);
+//        });
 
     }
 

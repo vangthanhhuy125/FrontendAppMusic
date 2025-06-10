@@ -1,5 +1,6 @@
 package com.example.manhinhappmusic.adapter;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,8 +11,10 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.manhinhappmusic.model.Playlist;
 import com.example.manhinhappmusic.R;
+import com.example.manhinhappmusic.network.ApiService;
 
 import java.util.List;
 
@@ -35,9 +38,11 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Playlist playlist = playlistList.get(position);
-        if(playlist.getThumnailResID() != 0)
-            holder.getImageViewSong().setImageResource(playlist.getThumnailResID());
-        holder.getTextViewNumOfSong().setText(String.valueOf(playlist.getSongsList().size()) + " songs");
+       if(playlist.getThumbnailUrl() != null && !playlist.getThumbnailUrl().isEmpty())
+           Glide.with(holder.itemView)
+                   .load(ApiService.BASE_URL + playlist.getThumbnailUrl())
+                   .into(holder.getImageViewSong());
+        holder.getTextViewNumOfSong().setText(String.valueOf(playlist.getSongs().size()) + " songs");
         holder.getTextViewSongTitle().setText(playlist.getName());
 
     }

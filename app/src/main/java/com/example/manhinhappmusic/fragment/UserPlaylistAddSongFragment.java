@@ -138,7 +138,7 @@ public class UserPlaylistAddSongFragment extends BaseFragment {
         adapter.setOnItemCheckBoxClickListener(new SearchResultAdapter.OnItemCheckBoxClickListener() {
             @Override
             public void onItemCheckBoxClick(int position, ListItem item, CheckBox checkBox) {
-               // playlist.getModifiableSongsList().remove((Song) item);
+               //playlist.getModifiableSongsList().remove((Song) item);
                 adapter.notifyItemChanged(position);
                 Snackbar snackbar =  Snackbar.make(view,"Song has been removed to playlist", Snackbar.LENGTH_SHORT);
                 snackbar.setBackgroundTint(Color.WHITE);

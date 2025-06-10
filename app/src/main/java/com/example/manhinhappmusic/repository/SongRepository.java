@@ -11,14 +11,17 @@ import com.example.manhinhappmusic.network.ApiService;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.Data;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+@Data
 public class SongRepository implements AppRepository<Song> {
 
     private static SongRepository instance;
 //    private MutableLiveData<List<Song>> songs = new MutableLiveData<>();
+    private Song currentSong;
     private SongRepository()
     {
 
@@ -76,13 +79,13 @@ public class SongRepository implements AppRepository<Song> {
 
         for(String id: ids)
         {
-            Call call = apiService.getSongById(id);
-            call.enqueue(new Callback<Song>() {
+            apiService.getSongById(id).enqueue(new Callback<Song>() {
                 @Override
                 public void onResponse(Call<Song> call, Response<Song> response) {
                     if(response.isSuccessful() && response.body() != null)
                     {
                         songList.add(response.body());
+                        songs.setValue(songList);
                     }
                     else
                     {
@@ -96,7 +99,6 @@ public class SongRepository implements AppRepository<Song> {
                 }
             });
         }
-        songs.setValue(songList);
         return songs;
     }
 }

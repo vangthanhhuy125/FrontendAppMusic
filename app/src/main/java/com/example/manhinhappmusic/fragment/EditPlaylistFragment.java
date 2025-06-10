@@ -6,11 +6,13 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,8 +21,16 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.MultiTransformation;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.manhinhappmusic.model.Playlist;
+import com.example.manhinhappmusic.network.ApiClient;
+import com.example.manhinhappmusic.network.ApiService;
 import com.example.manhinhappmusic.repository.PlaylistRepository;
 import com.example.manhinhappmusic.R;
 import com.example.manhinhappmusic.model.Song;
@@ -28,7 +38,13 @@ import com.example.manhinhappmusic.decoration.VerticalLinearSpacingItemDecoratio
 import com.example.manhinhappmusic.adapter.PlaylistSongEditAdapter;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -45,7 +61,9 @@ public class EditPlaylistFragment extends BaseFragment {
     private RecyclerView songsView;
     private Playlist playlist;
     PlaylistSongEditAdapter playlistSongEditAdapter;
-    boolean isModified;
+    boolean isModified = false;
+    boolean isSongListModified = false;
+    boolean isTitleModified = false;
     private static final String ARG_ID = "id";
     private static final String ARG_IS_MODIFIED = "is_modified";
 
@@ -73,7 +91,7 @@ public class EditPlaylistFragment extends BaseFragment {
             id = getArguments().getString(ARG_ID);
             isModified = getArguments().getBoolean(ARG_IS_MODIFIED);
         }
-        playlist = PlaylistRepository.getInstance().getItemById(id).getValue();
+        playlist = PlaylistRepository.getInstance().getCurrentPlaylist();
 
     }
 
@@ -100,7 +118,10 @@ public class EditPlaylistFragment extends BaseFragment {
         playlistNameEditText = view.findViewById(R.id.playlist_name_edittext);
         songsView = view.findViewById(R.id.songs_view);
 
-        playlistCoverImage.setImageResource(playlist.getThumnailResID());
+        Glide.with(this.getContext())
+                .load(ApiService.BASE_URL + playlist.getThumbnailUrl())
+                .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(15))))
+                .into(playlistCoverImage);
         changePlaylistCoverButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -119,10 +140,13 @@ public class EditPlaylistFragment extends BaseFragment {
                 if(!s.toString().equals(playlist.getName()))
                 {
                     setModified(true);
+                    isTitleModified = true;
                 }
                 else
                 {
                     setModified(false);
+                    isTitleModified = false;
+
                 }
             }
 
@@ -139,10 +163,14 @@ public class EditPlaylistFragment extends BaseFragment {
                 if(!playlist.getSongsList().equals(playlistSongEditAdapter.getSongList()))
                 {
                     setModified(true);
+                    isSongListModified = true;
+
                 }
                 else
                 {
                     setModified(false);
+                    isSongListModified = false;
+
                 }
             }
         });
@@ -172,10 +200,65 @@ public class EditPlaylistFragment extends BaseFragment {
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                playlist.setName(playlistNameEditText.getText().toString());
+                Bundle result = new Bundle();
+//                result.putString("playlist_name", playlistNameEditText.getText().toString());
                 //playlist.setSongs(playlistSongEditAdapter.getSongList());
-                getParentFragmentManager().setFragmentResult("update_playlist", null);
-                callback.onRequestGoBackPreviousFragment();
+                if(isTitleModified)
+                {
+                    Map<String, Object> changes = new HashMap<>();
+                    changes.put("name", playlistNameEditText.getText().toString());
+                    PlaylistRepository.getInstance().edit(playlist.getId(), changes).observe(getViewLifecycleOwner(), new Observer<Playlist>() {
+                        @Override
+                        public void onChanged(Playlist modifiedPlaylist) {
+                            playlist.setName(modifiedPlaylist.getName());
+                        }
+
+                    });
+                }
+
+
+                if(isSongListModified)
+                {
+
+                    List<String> deletedSongs = new ArrayList<>();
+                    List<Song> original = new ArrayList<>(playlist.getSongsList());
+                    for(Song song: original)
+                    {
+                        boolean isFound = false;
+                        for(Song editSong: playlistSongEditAdapter.getSongList())
+                        {
+
+                            if(song.getId().equals(editSong.getId()))
+                            {
+                                isFound = true;
+                                break;
+                            }
+
+                        }
+                        if(!isFound)
+                        {
+                            playlist.getSongsList().remove(song);
+                            deletedSongs.add(song.getId());
+                        }
+
+                    }
+
+                    PlaylistRepository.getInstance().removeSongs(playlist.getId(), deletedSongs).observe(getViewLifecycleOwner(), new Observer<Playlist>() {
+                        @Override
+                        public void onChanged(Playlist playlist) {
+                            Toast.makeText(getContext(), "Playlist has been changed", Toast.LENGTH_SHORT).show();
+                            getParentFragmentManager().setFragmentResult("update_playlist", result);
+                            callback.onRequestGoBackPreviousFragment();
+                        }
+                    });
+                }
+                else
+                {
+                    Toast.makeText(getContext(), "Playlist has been changed", Toast.LENGTH_SHORT).show();
+                    getParentFragmentManager().setFragmentResult("update_playlist", result);
+                    callback.onRequestGoBackPreviousFragment();
+                }
+
             }
         });
     }

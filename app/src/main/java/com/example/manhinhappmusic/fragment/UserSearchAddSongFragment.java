@@ -5,11 +5,13 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,7 +20,9 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.manhinhappmusic.repository.PlaylistRepository;
 import com.example.manhinhappmusic.view.ClearableEditText;
 import com.example.manhinhappmusic.R;
 import com.example.manhinhappmusic.TestData;
@@ -27,6 +31,7 @@ import com.example.manhinhappmusic.adapter.SearchPlaylistAddSongAdapter;
 import com.example.manhinhappmusic.model.Playlist;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -48,7 +53,7 @@ public class UserSearchAddSongFragment extends BaseFragment {
     private Button saveButton;
     private LinearLayout savedPlaylistContainer;
     private LinearLayout relevantPlaylistContainer;
-    private List<Playlist> sourcePlaylistList;
+    private List<Playlist> sourcePlaylistList = new ArrayList<>();
     private  List<Playlist> savedPlaylistList;
     private List <Playlist> relevantPlaylistList;
 
@@ -129,17 +134,7 @@ public class UserSearchAddSongFragment extends BaseFragment {
 
 
 
-        sourcePlaylistList = TestData.userPlaylistList;
-        savedPlaylistList = new ArrayList<>(sourcePlaylistList
-                .stream()
-                .filter(playlist -> playlist.getSongsList()
-                        .stream()
-                        .anyMatch(song -> song.getId().equals(id))).collect(Collectors.toList())
-        );
-        relevantPlaylistList = new ArrayList<>(sourcePlaylistList);
-        relevantPlaylistList.removeAll(savedPlaylistList);
-
-        SearchPlaylistAddSongAdapter savedPlaylistAdapter = new SearchPlaylistAddSongAdapter(savedPlaylistList, new SearchPlaylistAddSongAdapter.OnItemClickListener() {
+        SearchPlaylistAddSongAdapter savedPlaylistAdapter = new SearchPlaylistAddSongAdapter(new ArrayList<>(), new SearchPlaylistAddSongAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position, Playlist item) {
 
@@ -150,7 +145,7 @@ public class UserSearchAddSongFragment extends BaseFragment {
         savedPlaylistView.setLayoutManager(savedPlaylistLayoutManager);
         savedPlaylistView.addItemDecoration(new VerticalLinearSpacingItemDecoration((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, getResources().getDisplayMetrics())));
 
-        SearchPlaylistAddSongAdapter relevantPlaylistAdapter = new SearchPlaylistAddSongAdapter(relevantPlaylistList, new SearchPlaylistAddSongAdapter.OnItemClickListener() {
+        SearchPlaylistAddSongAdapter relevantPlaylistAdapter = new SearchPlaylistAddSongAdapter(new ArrayList<>(), new SearchPlaylistAddSongAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position, Playlist item) {
 
@@ -165,6 +160,27 @@ public class UserSearchAddSongFragment extends BaseFragment {
 //            relevantPlaylistAdapter.addPlaylist(new Playlist("dfd", result.getString("playlist_name"), "Fdfd", new ArrayList<>(),"",0,"",new ArrayList<>()));
 //            relevantPlaylistAdapter.notifyDataSetChanged();
 //        });
+
+
+        PlaylistRepository.getInstance().getAll().observe(getViewLifecycleOwner(), new Observer<List<Playlist>>() {
+            @Override
+            public void onChanged(List<Playlist> playlists) {
+                sourcePlaylistList = playlists;
+                savedPlaylistList = new ArrayList<>(sourcePlaylistList
+                        .stream()
+                        .filter(playlist -> playlist.getSongs()
+                                .stream()
+                                .anyMatch(song -> song.equals(id))).collect(Collectors.toList())
+                );
+                relevantPlaylistList = new ArrayList<>(sourcePlaylistList);
+                relevantPlaylistList.removeAll(savedPlaylistList);
+                savedPlaylistAdapter.setPlaylistList(savedPlaylistList);
+                savedPlaylistAdapter.checkAll();
+                savedPlaylistAdapter.notifyDataSetChanged();
+                relevantPlaylistAdapter.setPlaylistList(relevantPlaylistList);
+                relevantPlaylistAdapter.notifyDataSetChanged();
+            }
+        });
 
         searchEditText.setHint("Search for your playlist");
         searchEditText.addTextChangedListener(new TextWatcher() {
@@ -251,19 +267,62 @@ public class UserSearchAddSongFragment extends BaseFragment {
                     getParentFragmentManager().setFragmentResult("change",null);
                 }
 
+
+
                 callback.onRequestGoBackPreviousFragment();
             }
+        });
+
+        getParentFragmentManager().setFragmentResultListener("request_add_playlist", getViewLifecycleOwner(), (requestKey, result) ->{
+            //playlistList.add(new Playlist("dfd", result.getString("playlist_name"), "Fdfd", new ArrayList<>(),"",0,"",new ArrayList<>()));
+            String playlistName = result.getString("playlist_name", "null");
+
+            PlaylistRepository.getInstance().getAll().observe(getViewLifecycleOwner(), new Observer<List<Playlist>>() {
+                @Override
+                public void onChanged(List<Playlist> playlists) {
+                    sourcePlaylistList = playlists;
+                    savedPlaylistList = new ArrayList<>(sourcePlaylistList
+                            .stream()
+                            .filter(playlist -> playlist.getSongs()
+                                    .stream()
+                                    .anyMatch(song -> song.equals(id))).collect(Collectors.toList())
+                    );
+                    relevantPlaylistList = new ArrayList<>(sourcePlaylistList);
+                    relevantPlaylistList.removeAll(savedPlaylistList);
+                    savedPlaylistAdapter.setPlaylistList(savedPlaylistList);
+                    savedPlaylistAdapter.checkAll();
+                    savedPlaylistAdapter.notifyDataSetChanged();
+                    relevantPlaylistAdapter.setPlaylistList(relevantPlaylistList);
+                    relevantPlaylistAdapter.notifyDataSetChanged();
+                }
+            });
+
         });
     }
 
     private void addSong(String playlistId, String songId)
     {
-        //TestData.getPlaylistById(playlistId).getModifiableSongsList().add(TestData.getSongById(songId));
+        PlaylistRepository.getInstance().addSongs(playlistId, new ArrayList<>(Arrays.asList(songId))).observe(getViewLifecycleOwner(), new Observer<Playlist>() {
+            @Override
+            public void onChanged(Playlist playlist) {
+
+            }
+        });
 
     }
     private void removeSong(String playlistId, String songId)
     {
-        //TestData.getPlaylistById(playlistId).getModifiableSongsList().removeIf(song -> song.getId().equals(songId));
+        PlaylistRepository.getInstance().removeSongs(playlistId, new ArrayList<>(Arrays.asList(songId))).observe(getViewLifecycleOwner(), new Observer<Playlist>() {
+            @Override
+            public void onChanged(Playlist playlist) {
+
+
+            }
+        });
+        if(PlaylistRepository.getInstance().getCurrentPlaylist().getId().equals(playlistId))
+        {
+            getParentFragmentManager().setFragmentResult("remove_song_from_this_playlist", null);
+        }
     }
 
     private List<Playlist> search(String keyWord, List<Playlist> items)

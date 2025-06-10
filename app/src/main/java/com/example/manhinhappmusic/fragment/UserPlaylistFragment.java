@@ -1,15 +1,18 @@
 package com.example.manhinhappmusic.fragment;
 
+import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,12 +22,16 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.MultiTransformation;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
+import com.example.manhinhappmusic.network.ApiClient;
+import com.example.manhinhappmusic.network.ApiService;
+import com.example.manhinhappmusic.repository.SongRepository;
 import com.example.manhinhappmusic.view.ClearableEditText;
 import com.example.manhinhappmusic.repository.PlaylistRepository;
 import com.example.manhinhappmusic.R;
@@ -34,8 +41,13 @@ import com.example.manhinhappmusic.decoration.VerticalLinearSpacingItemDecoratio
 import com.example.manhinhappmusic.model.MediaPlayerManager;
 import com.example.manhinhappmusic.model.Playlist;
 import com.example.manhinhappmusic.model.Song;
+import com.google.android.material.snackbar.Snackbar;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -100,8 +112,28 @@ public class UserPlaylistFragment extends BaseFragment {
             isPlaying = getArguments().getBoolean(ARG_IS_THIS_PLAYING);
         }
 
-        playlist = PlaylistRepository.getInstance().getItemById(id).getValue();
+        playlist = PlaylistRepository.getInstance().getCurrentPlaylist();
 
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d("frag", "resume");
+        playlistsTitle.setText(playlist.getName());
+        playlistsCount.setText(String.valueOf(playlist.getSongs().size()) + " songs");
+        Glide.with(this.getContext())
+                .load(ApiService.BASE_URL + playlist.getThumbnailUrl())
+                .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(15))))
+                .into(playlistsCoverImage);
+        PlaylistRepository.getInstance().getAllSongs(playlist.getId()).observe(getViewLifecycleOwner(), new Observer<List<Song>>() {
+            @Override
+            public void onChanged(List<Song> songs) {
+                playlist.setSongsList(songs);
+                songAdapter.setSongList(songs);
+                songAdapter.notifyDataSetChanged();
+            }
+        });
     }
 
     @Override
@@ -124,12 +156,8 @@ public class UserPlaylistFragment extends BaseFragment {
         songsView = view.findViewById(R.id.songs_view);
 
 
-        Glide.with(this.getContext())
-                .load(playlist.getThumnailResID())
-                .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(15))))
-                .into(playlistsCoverImage);
-        playlistsTitle.setText(playlist.getName());
-        playlistsCount.setText(String.valueOf(playlist.getSongsList().size()) + " songs");
+
+
         searchEditText.setHint("Search in playlist");
         searchEditText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -149,7 +177,7 @@ public class UserPlaylistFragment extends BaseFragment {
 
             }
         });
-        songAdapter = new SongAdapter(playlist.getSongsList(), new SongAdapter.OnItemClickListener() {
+        songAdapter = new SongAdapter(new ArrayList<>(), new SongAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position, Song song) {
                 MediaPlayerManager mediaPlayerManager = MediaPlayerManager.getInstance(null);
@@ -159,7 +187,6 @@ public class UserPlaylistFragment extends BaseFragment {
                     isPlaying = true;
                 }
                 mediaPlayerManager.setCurrentSong(position);
-                mediaPlayerManager.play();
                 callback.onRequestLoadMiniPlayer();
 
             }
@@ -168,10 +195,12 @@ public class UserPlaylistFragment extends BaseFragment {
             @Override
             public void onItemMoreOptionsCLick(int position, Song song) {
                 modifiedPosition = position;
+                SongRepository.getInstance().setCurrentSong(song);
                 MoreOptionsSongFragment moreOptionsSongFragment = MoreOptionsSongFragment.newInstance(song.getId());
                 moreOptionsSongFragment.show(getParentFragmentManager(), "");
             }
         });
+
         songsView.setAdapter(songAdapter);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this.getContext());
         songsView.setLayoutManager(linearLayoutManager);
@@ -251,24 +280,30 @@ public class UserPlaylistFragment extends BaseFragment {
             @Override
             public void onClick(View v) {
                 MediaPlayerManager mediaPlayerManager = MediaPlayerManager.getInstance(null);
-                isPlaying = true;
-                mediaPlayerManager.setPlaylist(playlist.getSongList());
+                if(!isPlaying)
+                {
+                    mediaPlayerManager.setPlaylist(playlist.getSongsList());
+                    isPlaying = true;
+                }
                 mediaPlayerManager.setCurrentSong(0);
-                mediaPlayerManager.play();
                 callback.onRequestLoadMiniPlayer();
             }
         });
 
 
         getParentFragmentManager().setFragmentResultListener("update_playlist", getViewLifecycleOwner(), (requestKey, result)->{
+
+//            playlist = PlaylistRepository.getInstance().getCurrentPlaylist();
             Glide.with(this.getContext())
-                    .load(playlist.getThumnailResID())
+                    .load(ApiService.BASE_URL + playlist.getThumbnailUrl())
                     .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(15))))
                     .into(playlistsCoverImage);
             playlistsTitle.setText(playlist.getName());
             playlistsCount.setText(String.valueOf(playlist.getSongsList().size()) + " songs");
-            isModified = true;
+            songAdapter.setSongList(playlist.getSongsList());
             songAdapter.notifyDataSetChanged();
+            //            getParentFragmentManager().setFragmentResult("update_library_when_playlist_got_modified", null);
+
         });
 
         getParentFragmentManager().setFragmentResultListener("add_song_to_other_playlist", getViewLifecycleOwner(),(requestKey, result) -> {
@@ -279,8 +314,10 @@ public class UserPlaylistFragment extends BaseFragment {
         getParentFragmentManager().setFragmentResultListener("remove_song_from_this_playlist", getViewLifecycleOwner(),(requestKey, result) -> {
             if(modifiedPosition != -1)
             {
-                //playlist.getModifiableSongsList().remove(modifiedPosition);
+                Toast.makeText(getContext(), "Song has been removed", Toast.LENGTH_SHORT).show();
+                playlist.getSongsList().remove(modifiedPosition);
                 songAdapter.notifyItemRemoved(modifiedPosition);
+
             }
         });
 
@@ -294,10 +331,21 @@ public class UserPlaylistFragment extends BaseFragment {
         });
         getParentFragmentManager().setFragmentResultListener("delete_playlist", getViewLifecycleOwner(),(requestKey, result) -> {
 
-            TestData.playlistList.remove(playlist);
-            getParentFragmentManager().setFragmentResult("update_library_when_playlist_got_deleted", null);
-            callback.onRequestGoBackPreviousFragment();
+            PlaylistRepository.getInstance().delete(playlist.getId()).observe(getViewLifecycleOwner(), new Observer<Boolean>() {
+                @Override
+                public void onChanged(Boolean aBoolean) {
+                    if(aBoolean)
+                    {
+//                        getParentFragmentManager().setFragmentResult("update_library_when_playlist_got_deleted", null);
+                        Toast.makeText(getContext(), "Playlist has been deleted", Toast.LENGTH_SHORT).show();
+                        callback.onRequestGoBackPreviousFragment();
+                    }
+
+                }
+            });
+
         });
+
 
     }
 

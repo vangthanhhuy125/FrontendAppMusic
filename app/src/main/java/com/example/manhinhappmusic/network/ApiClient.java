@@ -11,7 +11,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ApiClient {
 
-    public final String baseUrl = "http://10.0.2.2:8081";
+
     private ApiService apiService;
 
     public static ApiClient instance;
@@ -23,18 +23,20 @@ public class ApiClient {
         }
         return instance;
     }
+    private String token;
 
-    public void createAuthApi()
+    public void createApiService()
     {
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(baseUrl)
+                .baseUrl(ApiService.BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         apiService = retrofit.create(ApiService.class);
     }
-    public void createAuthApiWithToken(String token){
+    public void createApiServiceWithToken(String token){
+        this.token = token;
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(baseUrl)
+                .baseUrl(ApiService.BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(new OkHttpClient.Builder().addInterceptor(new Interceptor() {
             @Override
@@ -52,4 +54,10 @@ public class ApiClient {
     public ApiService getApiService() {
         return apiService;
     }
+
+    public String getToken() {
+        return token;
+    }
+
+
 }

@@ -1,8 +1,10 @@
 package com.example.manhinhappmusic.fragment;
 
 import android.content.res.ColorStateList;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -12,6 +14,7 @@ import androidx.fragment.app.Fragment;
 import androidx.palette.graphics.Palette;
 
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +24,8 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.bumptech.glide.load.MultiTransformation;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
@@ -29,6 +34,7 @@ import com.example.manhinhappmusic.model.MediaPlayerManager;
 import com.example.manhinhappmusic.model.Playlist;
 import com.example.manhinhappmusic.R;
 import com.example.manhinhappmusic.model.Song;
+import com.example.manhinhappmusic.network.ApiService;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -52,7 +58,7 @@ public class MiniPlayerFragment extends BaseFragment {
     private Runnable updateSeekBar = new Runnable() {
         @Override
         public void run() {
-            if(mediaPlayerManager.getMediaPlayer() != null && mediaPlayerManager.getMediaPlayer().isPlaying()){
+            if(mediaPlayerManager.isPrepared() && mediaPlayerManager.mediaPlayer.isPlaying()){
                 seekBar.setProgress(mediaPlayerManager.getMediaPlayer().getCurrentPosition());
                 handler.postDelayed(this, 200);
             }
@@ -137,7 +143,6 @@ public class MiniPlayerFragment extends BaseFragment {
             }
         }, MiniPlayerFragment.class.getName());
 
-        setSongsInformation();
 
         skipPreviousButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -151,13 +156,21 @@ public class MiniPlayerFragment extends BaseFragment {
             public void onClick(View v) {
                 if(!mediaPlayerManager.getMediaPlayer().isPlaying())
                 {
-                    handler.post(updateSeekBar);
-                    mediaPlayerManager.play();
+                    if(mediaPlayerManager.isPrepared())
+                    {
+                        handler.post(updateSeekBar);
+                        mediaPlayerManager.play();
+                    }
+
                 }
                 else
                 {
-                    handler.removeCallbacks(updateSeekBar);
-                    mediaPlayerManager.pause();
+                    if(mediaPlayerManager.isPrepared())
+                    {
+                        handler.removeCallbacks(updateSeekBar);
+                        mediaPlayerManager.pause();
+                    }
+
                 }
 
             }
@@ -180,19 +193,45 @@ public class MiniPlayerFragment extends BaseFragment {
         });
 
 
-        handler.post(updateSeekBar);
-        mediaPlayerManager.play();
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                if(mediaPlayerManager.isPrepared()){
+                    setSongsInformation();
+                    handler.removeCallbacks(this);
+                    handler.post(updateSeekBar);
+                }
+                handler.postDelayed(this,200);
+            }
+        });
+
+
     }
 
     private void setSongsInformation()
     {
-//        Glide.with(this.getContext())
-//                .load(mediaPlayerManager.getCurrentSong().getCoverImageResID())
-//                .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(15))))
-//                .into(songsCoverImage);
-//        songsNameText.setText(mediaPlayerManager.getCurrentSong().getTitle());
-//        artistsNameText.setText(mediaPlayerManager.getCurrentSong().getArtistId());
-//        seekBar.setMax(mediaPlayerManager.getMediaPlayer().getDuration());
+        Glide.with(this.getContext())
+                .asBitmap()
+                .load(ApiService.BASE_URL + mediaPlayerManager.getCurrentSong().getCoverImageUrl())
+                .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(15))))
+                .into(new CustomTarget<Bitmap>() {
+                    @Override
+                    public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                        songsCoverImage.setImageBitmap(resource);
+                        Palette.from(resource).generate(palette -> {
+                            int vibrant = palette.getVibrantColor(Color.GRAY);
+                            miniPlayerBackground.setBackgroundTintList(ColorStateList.valueOf(vibrant));
+                        });
+                    }
+
+                    @Override
+                    public void onLoadCleared(@Nullable Drawable placeholder) {
+
+                    }
+                });
+        songsNameText.setText(mediaPlayerManager.getCurrentSong().getTitle());
+        artistsNameText.setText(mediaPlayerManager.getCurrentSong().getArtistId());
+        seekBar.setMax(mediaPlayerManager.getMediaPlayer().getDuration());
 //        Palette.from(BitmapFactory.decodeStream(this.getContext().getResources().openRawResource(mediaPlayerManager.getCurrentSong().getCoverImageResID()))).generate(palette -> {
 //            int vibrant = palette.getVibrantColor(Color.GRAY);
 //            miniPlayerBackground.setBackgroundTintList(ColorStateList.valueOf(vibrant));

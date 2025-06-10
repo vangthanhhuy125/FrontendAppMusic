@@ -1,9 +1,16 @@
 package com.example.manhinhappmusic.model;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.media.AudioAttributes;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.net.Uri;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
+
+import com.example.manhinhappmusic.network.ApiService;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,6 +41,9 @@ public class MediaPlayerManager {
     private  Song currentSong;
     private boolean isShuffle = false;
     private boolean isPlayingNextSong = true;
+    private boolean isPrepared = false;
+
+    private Map<String, String> headers =  new HashMap<>();
     public static enum RepeatMode{
         NONE,
         REPEAT_ALL,
@@ -55,6 +65,8 @@ public class MediaPlayerManager {
     private MediaPlayerManager(Context context)
     {
         this.context = context;
+        SharedPreferences preferences = context.getSharedPreferences("AppPreferences", context.MODE_PRIVATE);
+        headers.put("Authorization", "Bearer " + preferences.getString("token", ""));
         mediaPlayer = new MediaPlayer();
     }
 
@@ -162,9 +174,27 @@ public class MediaPlayerManager {
             currentSong = playlist.get(++currentPosition);
             //mediaPlayer.pause();
             mediaPlayer.release();
+            mediaPlayer = new MediaPlayer();
+            try{
+                isPrepared = false;
+                mediaPlayer.setAudioAttributes( new AudioAttributes.Builder()
+                        .setUsage(AudioAttributes.USAGE_MEDIA)
+                        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                        .build());
+                mediaPlayer.setDataSource(context, Uri.parse(ApiService.STREAMING_URL + "/" + currentSong.getId()), headers);
+                mediaPlayer.prepareAsync();
+                mediaPlayer.setOnPreparedListener(mp -> {
+                    isPrepared = true;
+                    mediaPlayer.setOnCompletionListener(this::complete);
+                    play();
+                });
+            }
+            catch (Exception ex)
+            {
+                Log.e("Media player", ex.getMessage());
+            }
+
 //            mediaPlayer = MediaPlayer.create(context, currentSong.getAudioResID());
-            mediaPlayer.setOnCompletionListener(this::complete);
-            play();
         }
         else if(repeatMode == RepeatMode.REPEAT_ALL)
         {
@@ -172,9 +202,25 @@ public class MediaPlayerManager {
             currentSong = playlist.get(0);
             //mediaPlayer.pause();
             mediaPlayer.release();
-//            mediaPlayer = MediaPlayer.create(context, currentSong.getAudioResID());
-            mediaPlayer.setOnCompletionListener(this::complete);
-            play();
+            mediaPlayer = new MediaPlayer();
+            try{
+                isPrepared = false;
+                mediaPlayer.setAudioAttributes( new AudioAttributes.Builder()
+                        .setUsage(AudioAttributes.USAGE_MEDIA)
+                        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                        .build());
+                mediaPlayer.setDataSource(context, Uri.parse(ApiService.STREAMING_URL + "/" + currentSong.getId()), headers);
+                mediaPlayer.prepareAsync();
+                mediaPlayer.setOnPreparedListener(mp -> {
+                    isPrepared = true;
+                    mediaPlayer.setOnCompletionListener(this::complete);
+                    play();
+                });
+            }
+            catch (Exception ex)
+            {
+                Log.e("Media player", ex.getMessage());
+            }
         }
         else {
             isPlayingNextSong = false;
@@ -189,9 +235,25 @@ public class MediaPlayerManager {
             currentSong = playlist.get(--currentPosition);
             //mediaPlayer.pause();
             mediaPlayer.release();
-//            mediaPlayer = MediaPlayer.create(context, currentSong.getAudioResID());
-            mediaPlayer.setOnCompletionListener(this::complete);
-            play();
+            mediaPlayer = new MediaPlayer();
+            isPrepared = false;
+            try{
+                mediaPlayer.setAudioAttributes( new AudioAttributes.Builder()
+                        .setUsage(AudioAttributes.USAGE_MEDIA)
+                        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                        .build());
+                mediaPlayer.setDataSource(context, Uri.parse(ApiService.STREAMING_URL + "/" + currentSong.getId()), headers);
+                mediaPlayer.prepareAsync();
+                mediaPlayer.setOnPreparedListener(mp -> {
+                    isPrepared = true;
+                    mediaPlayer.setOnCompletionListener(this::complete);
+                    play();
+                });
+            }
+            catch (Exception ex)
+            {
+                Log.e("Media player", ex.getMessage());
+            }
         }
 
     }
@@ -283,14 +345,39 @@ public class MediaPlayerManager {
         {
             this.currentPosition = currentPosition;
             this.currentSong = playlist.get(currentPosition);
+            Log.d("media", currentSong.getTitle());
             if(mediaPlayer != null)
+            {
                 mediaPlayer.release();
-//            mediaPlayer = MediaPlayer.create(context, currentSong.getAudioResID());
-            mediaPlayer.setOnCompletionListener(this::complete);
+            }
+            try{
+                isPrepared = false;
+                mediaPlayer = new MediaPlayer();
+                mediaPlayer.setAudioAttributes( new AudioAttributes.Builder()
+                        .setUsage(AudioAttributes.USAGE_MEDIA)
+                        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                        .build());
+                mediaPlayer.setDataSource(context, Uri.parse(ApiService.STREAMING_URL + "/" + currentSong.getId()), headers);
+                mediaPlayer.prepareAsync();
+                mediaPlayer.setOnPreparedListener(mp -> {
+                    isPrepared = true;
+                    mediaPlayer.setOnCompletionListener(this::complete);
+                    play();
+                });
+            }
+            catch (Exception ex)
+            {
+               // Log.e("Media player", ex.getMessage());
+            }
             for(OnPlayingSongChangeListener onPlayingSongChangeListener: onPlayingSongChangeListeners.values())
             {
                 onPlayingSongChangeListener.onPlayingSongChange(currentSong);
             }
         }
+
+    }
+
+    public boolean isPrepared() {
+        return isPrepared;
     }
 }

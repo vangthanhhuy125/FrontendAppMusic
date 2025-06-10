@@ -18,6 +18,7 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.manhinhappmusic.model.Playlist;
+import com.example.manhinhappmusic.network.ApiService;
 import com.example.manhinhappmusic.repository.PlaylistRepository;
 import com.example.manhinhappmusic.R;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
@@ -63,7 +64,7 @@ public class MoreOptionsPlaylistFragment extends BottomSheetDialogFragment {
         if (getArguments() != null) {
             id = getArguments().getString(ARG_ID);
         }
-        playlist = PlaylistRepository.getInstance().getItemById(id).getValue();
+        playlist = PlaylistRepository.getInstance().getCurrentPlaylist();
     }
 
     @Override
@@ -85,10 +86,10 @@ public class MoreOptionsPlaylistFragment extends BottomSheetDialogFragment {
         deleteButton = view.findViewById(R.id.delete_playlist_button);
         changePublicityButton = view.findViewById(R.id.change_playlist_publicity_button);
 
-        Glide.with(this.getContext())
-                .load(playlist.getThumnailResID())
-                .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(15))))
-                .into(playlistCoverImage);
+//        Glide.with(this.getContext())
+//                .load(ApiService.BASE_URL + playlist.getThumbnailUrl())
+//                .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(15))))
+//                .into(playlistCoverImage);
 
         playlistTitleText.setText(playlist.getName());
         descriptionText.setText(playlist.getUserId() + "•" + (playlist.getPublic() ? "Public":"Private"));

@@ -17,6 +17,7 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.manhinhappmusic.R;
 import com.example.manhinhappmusic.model.Song;
+import com.example.manhinhappmusic.network.ApiService;
 
 import java.util.List;
 
@@ -43,10 +44,16 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
         Song song = songList.get(position);
         holder.getTextViewArtist().setText(song.getArtistId());
         holder.getTextViewSongTitle().setText(song.getTitle());
-        Glide.with(holder.itemView.getContext())
-                .load(song.getCoverImageResID())
+        if(song.getCoverImageUrl()!= null && !song.getCoverImageUrl().isEmpty())
+            Glide.with(holder.itemView.getContext())
+                .load(ApiService.BASE_URL + song.getCoverImageUrl())
                 .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(15))))
                 .into(holder.getImageViewThumbnail());
+        else
+            Glide.with(holder.itemView.getContext())
+                    .load(R.drawable.music_default_cover)
+                    .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(15))))
+                    .into(holder.getImageViewThumbnail());
         holder.getMoreOptionsButton().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,8 +17,21 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.example.manhinhappmusic.R;
+import com.example.manhinhappmusic.dto.PlaylistRequest;
+import com.example.manhinhappmusic.model.Playlist;
+import com.example.manhinhappmusic.network.ApiClient;
+import com.example.manhinhappmusic.network.ApiService;
+import com.example.manhinhappmusic.repository.PlaylistRepository;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -84,9 +98,16 @@ public class AddPlaylistFragment extends DialogFragment {
     private void onCreateButtonClick(View view)
     {
         Bundle result = new Bundle();
-        result.putString("playlist_name", playlistsNameEditText.getText().toString());
-        getParentFragmentManager().setFragmentResult("request_add_playlist", result);
-        dismiss();
+        String playlistName = playlistsNameEditText.getText().toString();
+        result.putString("playlist_name", playlistName);
+        PlaylistRepository.getInstance().create(playlistName).observe(getViewLifecycleOwner(), new Observer<List<Playlist>>() {
+            @Override
+            public void onChanged(List<Playlist> playlists) {
+                getParentFragmentManager().setFragmentResult("request_add_playlist", result);
+                dismiss();
+            }
+        });
+
     }
 
     private void onCancelButtonClick(View view)

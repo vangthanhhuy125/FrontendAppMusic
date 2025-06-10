@@ -26,71 +26,54 @@
             android:layout_marginBottom="32dp" />
 
         <!-- Trường Username với Icon -->
-        <LinearLayout
+
+        <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:background="@drawable/edittext_background"
-            android:padding="8dp"
-            android:layout_marginBottom="16dp"
-            android:gravity="center">
-
-            <ImageView
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:src="@drawable/white_baseline_email_24"
-                app:tint="#FFFFFF"
-                android:scaleType="centerCrop"
-                android:layout_marginEnd="8dp"/>
-
+            app:cardCornerRadius="10dp"
+            android:layout_marginBottom="20dp">
             <EditText
                 android:id="@+id/email_edittext"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:hint="Email Address"
-                android:background="@null"
+                android:background="#1A3C34"
                 android:textColor="#FFFFFF"
                 android:textColorHint="#AAAAAA"
                 android:textSize="20sp"
                 android:inputType="text"
                 android:paddingStart="8dp"
-                android:paddingVertical="12dp"/>
-        </LinearLayout>
+                android:paddingVertical="12dp"
+                android:drawableStart="@drawable/white_baseline_email_24"
+                android:drawableTint="#FFFFFF"
+                android:drawablePadding="10dp"/>
+        </androidx.cardview.widget.CardView>
+
+
 
         <!-- Trường Password với Icon -->
-        <LinearLayout
+        <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:background="@drawable/edittext_background"
-            android:padding="8dp"
-            android:layout_marginBottom="16dp"
-            android:gravity="center">
-
-            <ImageView
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:src="@drawable/white_baseline_lock_24"
-                app:tint="#FFFFFF"
-                android:scaleType="centerCrop"
-                android:contentDescription="UsernameIcon"
-                android:layout_marginEnd="8dp"/>
-
+            app:cardCornerRadius="10dp"
+            android:layout_marginBottom="10dp">
             <EditText
                 android:id="@+id/password_edittext"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:hint="Password"
-                android:background="@null"
+                android:background="#1A3C34"
                 android:textColor="#FFFFFF"
                 android:textColorHint="#AAAAAA"
                 android:textSize="20sp"
                 android:inputType="textPassword"
                 android:paddingStart="8dp"
-                android:paddingVertical="12dp"/>
-        </LinearLayout>
+                android:paddingVertical="12dp"
+                android:drawableStart="@drawable/white_baseline_lock_24"
+                android:drawableTint="#FFFFFF"
+                android:drawablePadding="10dp"/>
+        </androidx.cardview.widget.CardView>
+
 
         <!-- Checkbox và Forget Password -->
         <LinearLayout
@@ -119,7 +102,7 @@
 
         <!-- Nút Log In -->
         <Button
-            android:id="@+id/loginButton"
+            android:id="@+id/login_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Log In"

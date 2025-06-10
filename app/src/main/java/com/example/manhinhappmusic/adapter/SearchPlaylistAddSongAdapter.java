@@ -18,6 +18,7 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.manhinhappmusic.R;
 import com.example.manhinhappmusic.model.Playlist;
+import com.example.manhinhappmusic.network.ApiService;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -65,7 +66,7 @@ public class SearchPlaylistAddSongAdapter extends RecyclerView.Adapter<SearchPla
         holder.getPlaylistCoverImage().setImageResource(playlist.getThumnailResID());
         if(playlist.getThumnailResID() != 0)
             Glide.with(holder.itemView.getContext())
-                .load(playlist.getThumnailResID())
+                .load(ApiService.BASE_URL + playlist.getThumbnailUrl())
                 .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(15))))
                 .into(holder.getPlaylistCoverImage());
         holder.getPlaylistTitleText().setText(playlist.getName());
@@ -138,5 +139,12 @@ public class SearchPlaylistAddSongAdapter extends RecyclerView.Adapter<SearchPla
 
     public Map<String, Boolean> getCheckStates() {
         return checkStates;
+    }
+    public void checkAll()
+    {
+        for(Playlist playlist: playlistList)
+        {
+                checkStates.put(playlist.getId(), true);
+        }
     }
 }

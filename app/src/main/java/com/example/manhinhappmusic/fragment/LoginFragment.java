@@ -1,21 +1,48 @@
 package com.example.manhinhappmusic.fragment;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
 
 import com.example.manhinhappmusic.R;
+import com.example.manhinhappmusic.activity.MainActivity;
+import com.example.manhinhappmusic.dto.AuthResponse;
+import com.example.manhinhappmusic.dto.LoginRequest;
+import com.example.manhinhappmusic.network.ApiClient;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link LoginFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class LoginFragment extends Fragment {
+public class LoginFragment extends BaseFragment {
+
+    private EditText emailEditText;
+    private EditText passwordEditText;
+    private Button loginButton;
+    private TextView forgotPasswordText;
+    private TextView signUpTextView;
+    private String ARG_PREFERENCES = "AppPreferences";
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -63,4 +90,73 @@ public class LoginFragment extends Fragment {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_login, container, false);
     }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        emailEditText = view.findViewById(R.id.email_edittext);
+        passwordEditText = view.findViewById(R.id.password_edittext);
+        loginButton = view.findViewById(R.id.login_button);
+        forgotPasswordText = view.findViewById(R.id.forgetPasswordTextView);
+        signUpTextView = view.findViewById(R.id.signUpTextView);
+
+        ApiClient apiClient = ApiClient.getInstance();
+        SharedPreferences preferences = getContext().getSharedPreferences(ARG_PREFERENCES, getContext().MODE_PRIVATE);
+
+        if(preferences.getBoolean("isLoggedIn", false))
+        {        String token = preferences.getString("token", "");
+
+            apiClient.createApiServiceWithToken(token);
+            launcher.launch(new Intent(requireActivity(), MainActivity.class));
+
+        }
+        loginButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                apiClient.createApiService();
+                apiClient.getApiService().login(new LoginRequest(emailEditText.getText().toString(), passwordEditText.getText().toString()))
+                        .enqueue(new Callback<AuthResponse>() {
+                            @Override
+                            public void onResponse(Call<AuthResponse> call, Response<AuthResponse> response) {
+                                if(response.isSuccessful() && response.body() != null)
+                                {
+                                    String token = response.body().getToken();
+                                    apiClient.createApiServiceWithToken(token);
+                                    SharedPreferences.Editor editor = preferences.edit();
+                                    editor.putString("token", token);
+                                    editor.putBoolean("isLoggedIn", true);
+                                    editor.apply();
+                                    launcher.launch(new Intent(requireActivity(), MainActivity.class));
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Call<AuthResponse> call, Throwable throwable) {
+                                Log.e("Log in", throwable.getMessage());
+                            }
+                        });
+            }
+        });
+
+        forgotPasswordText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+        signUpTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+    }
+
+    private ActivityResultLauncher launcher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
+        @Override
+        public void onActivityResult(ActivityResult o) {
+
+        }
+    });
 }

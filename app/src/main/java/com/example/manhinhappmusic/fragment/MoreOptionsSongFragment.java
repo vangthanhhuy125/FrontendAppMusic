@@ -8,18 +8,32 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.MultiTransformation;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.manhinhappmusic.R;
+import com.example.manhinhappmusic.model.Playlist;
 import com.example.manhinhappmusic.model.Song;
+import com.example.manhinhappmusic.network.ApiService;
+import com.example.manhinhappmusic.repository.PlaylistRepository;
 import com.example.manhinhappmusic.repository.SongRepository;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.button.MaterialButton;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -65,7 +79,7 @@ public class MoreOptionsSongFragment extends BottomSheetDialogFragment {
         if (getArguments() != null) {
             songId = getArguments().getString(ARG_SONG_ID);
         }
-        song = SongRepository.getInstance().getItemById(songId).getValue();
+        song = SongRepository.getInstance().getCurrentSong();
 
     }
 
@@ -85,7 +99,11 @@ public class MoreOptionsSongFragment extends BottomSheetDialogFragment {
         addButton = view.findViewById(R.id.add_to_other_playlist_button);
         removeButton = view.findViewById(R.id.remove_from_this_playlist_button);
 
-        songCoverImage.setImageResource(song.getCoverImageResID());
+
+//            Glide.with(getContext())
+//                .load(ApiService.BASE_URL + song.getCoverImageUrl())
+//                .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(15))))
+//                .into(songCoverImage);
         songTitleText.setText(song.getTitle());
         artistNameText.setText(song.getArtistId());
 
@@ -100,8 +118,15 @@ public class MoreOptionsSongFragment extends BottomSheetDialogFragment {
         removeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getParentFragmentManager().setFragmentResult("remove_song_from_this_playlist", null);
-                dismiss();
+                PlaylistRepository.getInstance().removeSongs(PlaylistRepository.getInstance().getCurrentPlaylist().getId()
+                , new ArrayList<>(Arrays.asList(songId))).observe(getViewLifecycleOwner(), new Observer<Playlist>() {
+                    @Override
+                    public void onChanged(Playlist playlist) {
+                        getParentFragmentManager().setFragmentResult("remove_song_from_this_playlist", null);
+                        dismiss();
+
+                    }
+                });
 
             }
         });
