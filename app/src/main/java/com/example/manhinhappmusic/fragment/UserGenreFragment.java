@@ -5,7 +5,11 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,10 +19,25 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.manhinhappmusic.R;
+import com.example.manhinhappmusic.TestData;
+import com.example.manhinhappmusic.adapter.MusicDisplayAdapter;
+import com.example.manhinhappmusic.decoration.VerticalLinearSpacingItemDecoration;
 import com.example.manhinhappmusic.model.Genre;
+import com.example.manhinhappmusic.model.ListItem;
+import com.example.manhinhappmusic.model.ListItemType;
+import com.example.manhinhappmusic.model.MediaPlayerManager;
 import com.example.manhinhappmusic.model.MusicDisplayItem;
+import com.example.manhinhappmusic.model.Playlist;
+import com.example.manhinhappmusic.model.Song;
+import com.example.manhinhappmusic.model.User;
 import com.example.manhinhappmusic.repository.GenreRepository;
 import com.example.manhinhappmusic.repository.MusicDisplayRepository;
+import com.example.manhinhappmusic.repository.PlaylistRepository;
+import com.example.manhinhappmusic.repository.SongRepository;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -32,7 +51,8 @@ public class UserGenreFragment extends BaseFragment {
 
     private String id;
     private TextView genreTitleText;
-    private LinearLayout displayLinearContainer;
+    private RecyclerView musicDisplayView;
+    private MusicDisplayAdapter musicDisplayAdapter;
     private ImageButton backButton;
     private Genre genre;
 
@@ -66,10 +86,36 @@ public class UserGenreFragment extends BaseFragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+
+        List<MusicDisplayItem> musicDisplayItems = musicDisplayAdapter.getItems();
+        musicDisplayItems.clear();
+        SongRepository.getInstance().getRecentlySongs().observe(getViewLifecycleOwner(), new Observer<List<Song>>() {
+            @Override
+            public void onChanged(List<Song> songs) {
+                musicDisplayItems.add(new MusicDisplayItem("aaa", "Recently", new ArrayList<>(songs), MusicDisplayItem.HomeDisplayType.SONG));
+                musicDisplayAdapter.notifyDataSetChanged();
+
+            }
+        });
+        PlaylistRepository.getInstance().getAll().observe(getViewLifecycleOwner(), new Observer<List<Playlist>>() {
+            @Override
+            public void onChanged(List<Playlist> playlists) {
+                musicDisplayItems.add(new MusicDisplayItem("aaa", "New release", new ArrayList<>(playlists), MusicDisplayItem.HomeDisplayType.RELEASE_PLAYLIST));
+                musicDisplayItems.add(new MusicDisplayItem("aaa", "Featuring", new ArrayList<>(playlists), MusicDisplayItem.HomeDisplayType.MIX_PLAYLIST));
+                musicDisplayItems.add(new MusicDisplayItem("aaa", "Trending artist", new ArrayList<>(TestData.artistList), MusicDisplayItem.HomeDisplayType.ARTIST));
+                musicDisplayAdapter.notifyDataSetChanged();
+            }
+
+        });
+    }
+
+    @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         genreTitleText = view.findViewById(R.id.genre_title_text);
-        displayLinearContainer = view.findViewById(R.id.display_linear_container);
+        musicDisplayView = view.findViewById(R.id.music_display_view);
         backButton = view.findViewById(R.id.back_button);
         genre = GenreRepository.getInstance().getItemById(id).getValue();
 
@@ -81,20 +127,36 @@ public class UserGenreFragment extends BaseFragment {
             }
         });
 
-        for(MusicDisplayItem musicDisplayItem: MusicDisplayRepository.getInstance().getAll().getValue())
-        {
-            int viewId = View.generateViewId();
-            FrameLayout frameLayout = new FrameLayout(requireContext());
-            frameLayout.setId(viewId);
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            params.setMargins(0,0,0,15);
-            frameLayout.setLayoutParams(params);
-            displayLinearContainer.addView(frameLayout);
-            getChildFragmentManager()
-                    .beginTransaction()
-                    .replace(viewId, MusicDisplayFragment.newInstance(musicDisplayItem.getId()))
-                    .commit();
-        }
+        musicDisplayView = view.findViewById(R.id.music_display_view);
+        musicDisplayAdapter = new MusicDisplayAdapter(new ArrayList<>(), new MusicDisplayAdapter.OnDisplayItemCLickListener() {
+            @Override
+            public void onDisplayItemClick(int position, ListItem item) {
+                if(item.getType() == ListItemType.PLAYLIST)
+                {
+                    Playlist playlist = (Playlist) item;
+                    PlaylistRepository.getInstance().setCurrentPlaylist(playlist);
+                    callback.onRequestChangeFragment(FragmentTag.USER_PLAYLIST, playlist.getId());
+                }
+                else if (item.getType() == ListItemType.SONG)
+                {
+                    MediaPlayerManager mediaPlayerManager = MediaPlayerManager.getInstance(null);
+                    Song song = (Song) item;
+                    mediaPlayerManager.setPlaylist(new ArrayList<>(Arrays.asList(song)));
+                    mediaPlayerManager.setCurrentSong(0);
+                    callback.onRequestLoadMiniPlayer();
+                }
+                else if(item.getType() == ListItemType.ARTIST)
+                {
+                    User artist = (User) item;
+                    callback.onRequestChangeFragment(FragmentTag.USER_ARTIST, artist.getId());
+                }
+            }
+        });
+        musicDisplayView.setAdapter(musicDisplayAdapter);
+
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this.getContext());
+        musicDisplayView.setLayoutManager(layoutManager);
+        musicDisplayView.addItemDecoration(new VerticalLinearSpacingItemDecoration((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 25, getResources().getDisplayMetrics())));
 
     }
 }

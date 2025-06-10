@@ -72,8 +72,8 @@ public class SeacrhExFragment extends BaseFragment {
 
     ImageButton backButton;
     RecyclerView searchResultView;
-    List<ListItem> sourceList = new ArrayList<>();
     ClearableEditText searchEditText;
+    List<Playlist> userPlaylists = new ArrayList<>();
     private int modifiedPosition = -1;
 
     public static SeacrhExFragment newInstance(String param1, String param2) {
@@ -95,6 +95,17 @@ public class SeacrhExFragment extends BaseFragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        PlaylistRepository.getInstance().getAll().observe(getViewLifecycleOwner(), new Observer<List<Playlist>>() {
+            @Override
+            public void onChanged(List<Playlist> playlists) {
+                userPlaylists = playlists;
+            }
+        });
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
@@ -109,10 +120,7 @@ public class SeacrhExFragment extends BaseFragment {
         searchResultView = view.findViewById(R.id.search_result_view);
         searchEditText = view.findViewById(R.id.search_edit_text);
 
-        sourceList.addAll(TestData.songList);
-        sourceList.addAll(TestData.artistList);
-        sourceList.addAll(TestData.userPlaylistList);
-        sourceList.addAll(TestData.nonUserPlaylistList);
+
 
         SearchResultAdapter searchResultAdapter = new SearchResultAdapter(new ArrayList<>(), new SparseBooleanArray(),
         new SearchResultAdapter.OnItemClickListener() {
@@ -213,15 +221,24 @@ public class SeacrhExFragment extends BaseFragment {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                SongRepository.getInstance().searchSongs(s.toString()).observe(getViewLifecycleOwner(), new Observer<List<Song>>() {
-                    @Override
-                    public void onChanged(List<Song> songs) {
-                        List<Song> searchResults = songs;
-                        SparseBooleanArray checkStates = checkItemInLibrary(new ArrayList<>(searchResults));
-                        searchResultAdapter.setNewData(new ArrayList<>(searchResults), checkStates);
-                        searchResultAdapter.notifyDataSetChanged();
-                    }
-                });
+                if(!s.toString().isBlank())
+                {
+                    SongRepository.getInstance().searchSongs(s.toString()).observe(getViewLifecycleOwner(), new Observer<List<Song>>() {
+                        @Override
+                        public void onChanged(List<Song> songs) {
+                            List<Song> searchResults = songs;
+                            SparseBooleanArray checkStates = checkItemInLibrary(new ArrayList<>(searchResults));
+                            searchResultAdapter.setNewData(new ArrayList<>(searchResults), checkStates);
+                            searchResultAdapter.notifyDataSetChanged();
+                        }
+                    });
+                }
+                else
+                {
+                    searchResultAdapter.setNewData(new ArrayList<>(), new SparseBooleanArray());
+                    searchResultAdapter.notifyDataSetChanged();
+                }
+
 
             }
 
@@ -288,7 +305,7 @@ public class SeacrhExFragment extends BaseFragment {
             if(items.get(i).getType() == ListItemType.PLAYLIST)
             {
                 Playlist playlist = (Playlist) items.get(i);
-                for(Playlist userPlaylist: TestData.userPlaylistList){
+                for(Playlist userPlaylist: userPlaylists){
                     if(userPlaylist.getId().equals(playlist.getId())){
                         checkStates.put(i, true);
                         break;
@@ -298,12 +315,12 @@ public class SeacrhExFragment extends BaseFragment {
             else if(items.get(i).getType() == ListItemType.SONG)
             {
                 Song song  = (Song) items.get(i);
-                for(Playlist playlist: TestData.userPlaylistList)
+                for(Playlist playlist: userPlaylists)
                 {
                     boolean isFound = false;
-                    for(Song userSong: playlist.getSongsList())
+                    for(String userSong: playlist.getSongs())
                     {
-                        if(song.getId().equals(userSong.getId()))
+                        if(song.getId().equals(userSong))
                         {
                             checkStates.put(i, true);
                             isFound = true;

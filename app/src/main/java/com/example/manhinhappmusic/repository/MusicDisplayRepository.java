@@ -33,10 +33,10 @@ public class MusicDisplayRepository implements AppRepository<MusicDisplayItem> {
     {
         homeDisplayItems.setValue(new ArrayList<>());
         homeDisplayItems.getValue().addAll(Arrays.asList(
-                new MusicDisplayItem("1","Recently", new ArrayList<>(TestData.songList), MusicDisplayFragment.HomeDisplayType.SONG),
-                new MusicDisplayItem("3","New release", new ArrayList<>(TestData.userPlaylistList), MusicDisplayFragment.HomeDisplayType.RELEASE_PLAYLIST),
-                new MusicDisplayItem("2","Featuring", new ArrayList<>(TestData.mixPlaylistList), MusicDisplayFragment.HomeDisplayType.MIX_PLAYLIST),
-                new MusicDisplayItem("4", "Trending artists", new ArrayList<>(TestData.artistList), MusicDisplayFragment.HomeDisplayType.ARTIST)
+                new MusicDisplayItem("1","Recently", new ArrayList<>(TestData.songList), MusicDisplayItem.HomeDisplayType.SONG),
+                new MusicDisplayItem("3","New release", new ArrayList<>(TestData.userPlaylistList), MusicDisplayItem.HomeDisplayType.RELEASE_PLAYLIST),
+                new MusicDisplayItem("2","Featuring", new ArrayList<>(TestData.mixPlaylistList), MusicDisplayItem.HomeDisplayType.MIX_PLAYLIST),
+                new MusicDisplayItem("4", "Trending artists", new ArrayList<>(TestData.artistList), MusicDisplayItem.HomeDisplayType.ARTIST)
 
                 ));
 

@@ -16,7 +16,7 @@ import android.widget.TextView;
 
 import com.example.manhinhappmusic.decoration.HorizontalLinearSpacingItemDecoration;
 import com.example.manhinhappmusic.model.MediaPlayerManager;
-import com.example.manhinhappmusic.adapter.MusicDisplayAdapter;
+import com.example.manhinhappmusic.adapter.MusicDisplayItemAdapter;
 import com.example.manhinhappmusic.model.MusicDisplayItem;
 import com.example.manhinhappmusic.repository.MusicDisplayRepository;
 import com.example.manhinhappmusic.model.Playlist;
@@ -74,39 +74,39 @@ public class MusicDisplayFragment extends BaseFragment {
         homeDisplayItem = MusicDisplayRepository.getInstance().getItemById(id).getValue();
 
         titleText.setText(homeDisplayItem.getTitle());
-        MusicDisplayAdapter musicDisplayAdapter = new MusicDisplayAdapter(homeDisplayItem.getItems(), new MusicDisplayAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(int position) {
-                MediaPlayerManager mediaPlayerManager = MediaPlayerManager.getInstance(null);
-
-                if(homeDisplayItem.getHomeDisplayType() == HomeDisplayType.MIX_PLAYLIST || homeDisplayItem.getHomeDisplayType() == HomeDisplayType.RELEASE_PLAYLIST)
-                {
-                    Playlist playlist = (Playlist) homeDisplayItem.getItems().get(position);
-                    callback.onRequestChangeFragment(FragmentTag.USER_PLAYLIST, playlist.getId());
-                }
-                else if (homeDisplayItem.getHomeDisplayType() == HomeDisplayType.SONG)
-                {
-                    Song song = (Song) homeDisplayItem.getItems().get(position);
-                    mediaPlayerManager.setPlaylist(new ArrayList<>(Arrays.asList(song)));
-                    mediaPlayerManager.setCurrentSong(0);
-                    callback.onRequestLoadMiniPlayer();
-                    mediaPlayerManager.play();
-                }
-                else if(homeDisplayItem.getHomeDisplayType() == HomeDisplayType.ARTIST)
-                {
-                    User artist = (User) homeDisplayItem.getItems().get(position);
-                    callback.onRequestChangeFragment(FragmentTag.USER_ARTIST, artist.getId());
-                }
-            }
-        }, homeDisplayItem.getHomeDisplayType());
-        itemView.setAdapter(musicDisplayAdapter);
-
-//        if(homeDisplayItem.getHomeDisplayLayout() == HomeDisplayLayout.HORIZONTAL_LINEAR)
-//        {
-            LinearLayoutManager layoutManager = new LinearLayoutManager(this.getContext());
-            layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
-            itemView.setLayoutManager(layoutManager);
-            itemView.addItemDecoration(new HorizontalLinearSpacingItemDecoration((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 15, getResources().getDisplayMetrics())));
+//        MusicDisplayItemAdapter musicDisplayItemAdapter = new MusicDisplayItemAdapter(homeDisplayItem.getItems(), new MusicDisplayItemAdapter.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(int position) {
+//                MediaPlayerManager mediaPlayerManager = MediaPlayerManager.getInstance(null);
+//
+//                if(homeDisplayItem.getHomeDisplayType() == MusicDisplayItem.HomeDisplayType.MIX_PLAYLIST || homeDisplayItem.getHomeDisplayType() == MusicDisplayItem.HomeDisplayType.RELEASE_PLAYLIST)
+//                {
+//                    Playlist playlist = (Playlist) homeDisplayItem.getItems().get(position);
+//                    callback.onRequestChangeFragment(FragmentTag.USER_PLAYLIST, playlist.getId());
+//                }
+//                else if (homeDisplayItem.getHomeDisplayType() == MusicDisplayItem.HomeDisplayType.SONG)
+//                {
+//                    Song song = (Song) homeDisplayItem.getItems().get(position);
+//                    mediaPlayerManager.setPlaylist(new ArrayList<>(Arrays.asList(song)));
+//                    mediaPlayerManager.setCurrentSong(0);
+//                    callback.onRequestLoadMiniPlayer();
+//                    mediaPlayerManager.play();
+//                }
+//                else if(homeDisplayItem.getHomeDisplayType() == MusicDisplayItem.HomeDisplayType.ARTIST)
+//                {
+//                    User artist = (User) homeDisplayItem.getItems().get(position);
+//                    callback.onRequestChangeFragment(FragmentTag.USER_ARTIST, artist.getId());
+//                }
+//            }
+//        }, homeDisplayItem.getHomeDisplayType());
+//        itemView.setAdapter(musicDisplayItemAdapter);
+//
+////        if(homeDisplayItem.getHomeDisplayLayout() == HomeDisplayLayout.HORIZONTAL_LINEAR)
+////        {
+//            LinearLayoutManager layoutManager = new LinearLayoutManager(this.getContext());
+//            layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+//            itemView.setLayoutManager(layoutManager);
+//            itemView.addItemDecoration(new HorizontalLinearSpacingItemDecoration((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 15, getResources().getDisplayMetrics())));
 //        }
 //        else
 //        {
@@ -122,12 +122,6 @@ public class MusicDisplayFragment extends BaseFragment {
 //        GRID;
 //    }
 
-    public enum HomeDisplayType
-    {
-        RELEASE_PLAYLIST,
-        MIX_PLAYLIST,
-        SONG,
-        ARTIST,
-    }
+
 }
 

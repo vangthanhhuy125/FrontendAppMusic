@@ -44,13 +44,13 @@
                    android:textSize="40dp"
                    android:textStyle="bold"
                    android:layout_marginBottom="15dp"/>
-               <LinearLayout
-                   android:id="@+id/display_linear_container"
+               <androidx.recyclerview.widget.RecyclerView
+                   android:id="@+id/music_display_view"
                    android:layout_width="match_parent"
                    android:layout_height="wrap_content"
-                   android:orientation="vertical">
+                   >
 
-               </LinearLayout>
+               </androidx.recyclerview.widget.RecyclerView>
            </LinearLayout>
 
        </androidx.core.widget.NestedScrollView>

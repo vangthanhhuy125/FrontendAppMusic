@@ -120,6 +120,13 @@
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/playlist_view"
                     android:layout_width="match_parent"
+                    android:layout_height="140dp"
+                    android:layout_marginBottom="25dp"
+                    />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/music_display_view"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     />
 

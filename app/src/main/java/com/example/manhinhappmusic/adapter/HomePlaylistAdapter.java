@@ -1,5 +1,6 @@
 package com.example.manhinhappmusic.adapter;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,7 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.manhinhappmusic.model.Playlist;
 import com.example.manhinhappmusic.R;
+import com.example.manhinhappmusic.network.ApiService;
 
 import java.util.List;
 
@@ -23,7 +25,7 @@ public class HomePlaylistAdapter extends RecyclerView.Adapter<HomePlaylistAdapte
 
     private List<Playlist> playlistList;
     public interface OnItemClickListener{
-        void onItemClick(int position);
+        void onItemClick(int position, Playlist playlist);
     }
     private OnItemClickListener onItemClickListener;
 
@@ -44,20 +46,21 @@ public class HomePlaylistAdapter extends RecyclerView.Adapter<HomePlaylistAdapte
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Playlist playlist = playlistList.get(position);
         Glide.with(holder.itemView.getContext())
-                .load(playlist.getThumnailResID())
+                .load(ApiService.BASE_URL + playlist.getThumbnailUrl())
                 .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(15))))
                 .into(holder.getPlaylistsCoverImage());
         holder.getPlaylistsTitleText().setText(playlist.getName());
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onItemClickListener.onItemClick(holder.getAdapterPosition());
+                onItemClickListener.onItemClick(holder.getAdapterPosition(), playlist);
             }
         });
     }
 
     @Override
     public int getItemCount() {
+
         return playlistList.size();
     }
 
@@ -79,5 +82,13 @@ public class HomePlaylistAdapter extends RecyclerView.Adapter<HomePlaylistAdapte
         public TextView getPlaylistsTitleText() {
             return playlistsTitleText;
         }
+    }
+
+    public List<Playlist> getPlaylistList() {
+        return playlistList;
+    }
+
+    public void setPlaylistList(List<Playlist> playlistList) {
+        this.playlistList = playlistList;
     }
 }

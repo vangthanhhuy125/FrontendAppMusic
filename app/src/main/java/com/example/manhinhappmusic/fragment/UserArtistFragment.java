@@ -5,6 +5,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -21,6 +22,7 @@ import com.example.manhinhappmusic.R;
 import com.example.manhinhappmusic.model.User;
 import com.example.manhinhappmusic.decoration.VerticalLinearSpacingItemDecoration;
 import com.example.manhinhappmusic.adapter.SearchResultAdapter;
+import com.example.manhinhappmusic.repository.PlaylistRepository;
 import com.example.manhinhappmusic.repository.SongRepository;
 import com.example.manhinhappmusic.model.ListItem;
 import com.example.manhinhappmusic.model.ListItemType;
@@ -44,6 +46,8 @@ public class UserArtistFragment extends BaseFragment {
     private RecyclerView songsView;
     private ImageButton backButton;
     private User artist;
+
+    private SearchResultAdapter songsAdapter;
 
 
     private static final String ARG_ID = "id";
@@ -78,6 +82,18 @@ public class UserArtistFragment extends BaseFragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        SongRepository.getInstance().getRecentlySongs().observe(getViewLifecycleOwner(), new Observer<List<Song>>() {
+            @Override
+            public void onChanged(List<Song> songs) {
+                songsAdapter.setNewData(new ArrayList<>(songs), new SparseBooleanArray());
+                songsAdapter.notifyDataSetChanged();
+            }
+        });
+    }
+
+    @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         backButton = view.findViewById(R.id.back_button);
@@ -96,26 +112,27 @@ public class UserArtistFragment extends BaseFragment {
 
         artistImage.setImageResource(artist.getAvatarResID());
         artistNameText.setText(artist.getFullName());
-//        List<Song> songs = SongRepository.getInstance().getAll().getValue();
-//
-//        SearchResultAdapter songAdapter = new SearchResultAdapter(new ArrayList<>(songs), new SparseBooleanArray(),new SearchResultAdapter.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(int position, ListItem item) {
-//                if(item.getType() == ListItemType.SONG)
-//                {
-//                    Song song = (Song) item;
-//                    MediaPlayerManager mediaPlayerManager = MediaPlayerManager.getInstance(null);
-//                    mediaPlayerManager.setPlaylist(new ArrayList<>(Arrays.asList(song)));
-//                    mediaPlayerManager.setCurrentSong(0);
-//                    callback.onRequestLoadMiniPlayer();
-//                    mediaPlayerManager.play();
-//                }
-//            }
-//        });
-//        LinearLayoutManager songLayoutManager = new LinearLayoutManager(this.getContext());
-//        songsView.setAdapter(songAdapter);
-//        songsView.setLayoutManager(songLayoutManager);
-//        songsView.addItemDecoration(new VerticalLinearSpacingItemDecoration((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, getResources().getDisplayMetrics())));
+
+
+
+
+        songsAdapter = new SearchResultAdapter(new ArrayList<>(), new SparseBooleanArray(),new SearchResultAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(int position, ListItem item) {
+                if(item.getType() == ListItemType.SONG)
+                {
+                    Song song = (Song) item;
+                    MediaPlayerManager mediaPlayerManager = MediaPlayerManager.getInstance(null);
+                    mediaPlayerManager.setPlaylist(new ArrayList<>(Arrays.asList(song)));
+                    mediaPlayerManager.setCurrentSong(0);
+                    callback.onRequestLoadMiniPlayer();
+                }
+            }
+        });
+        LinearLayoutManager songLayoutManager = new LinearLayoutManager(this.getContext());
+        songsView.setAdapter(songsAdapter);
+        songsView.setLayoutManager(songLayoutManager);
+        songsView.addItemDecoration(new VerticalLinearSpacingItemDecoration((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, getResources().getDisplayMetrics())));
 
     }
 }

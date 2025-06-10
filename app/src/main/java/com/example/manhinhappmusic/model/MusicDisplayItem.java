@@ -8,7 +8,7 @@ public class MusicDisplayItem {
 
     private String id;
     private String title;
-    private MusicDisplayFragment.HomeDisplayType homeDisplayType;
+    private HomeDisplayType homeDisplayType;
 //    private HomeDisplayFragment.HomeDisplayLayout homeDisplayLayout;
     private List<ListItem> items;
 
@@ -20,7 +20,7 @@ public class MusicDisplayItem {
 //        this.homeDisplayLayout = homeDisplayLayout;
 //    }
 
-    public MusicDisplayItem(String id, String title, List<ListItem> items, MusicDisplayFragment.HomeDisplayType homeDisplayType)
+    public MusicDisplayItem(String id, String title, List<ListItem> items, HomeDisplayType homeDisplayType)
     {
         this.id = id;
         this.title = title;
@@ -41,11 +41,19 @@ public class MusicDisplayItem {
 //    }
 
 
-    public MusicDisplayFragment.HomeDisplayType getHomeDisplayType() {
+    public HomeDisplayType getHomeDisplayType() {
         return homeDisplayType;
     }
 
     public List<ListItem> getItems() {
         return items;
+    }
+
+    public enum HomeDisplayType
+    {
+        RELEASE_PLAYLIST,
+        MIX_PLAYLIST,
+        SONG,
+        ARTIST,
     }
 }

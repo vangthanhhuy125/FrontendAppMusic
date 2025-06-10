@@ -66,6 +66,9 @@ public interface ApiService {
 
     @GET("/api/common/song/search")
     Call<List<Song>> searchSongs(@Query("title") String title);
+
+    @GET("/api/common/song/new-release")
+    Call<List<Song>> getNewReleaseSongs();
     String STREAMING_URL = BASE_URL + "/api/common/song/stream";
 
 }
