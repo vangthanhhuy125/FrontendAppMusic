@@ -297,12 +297,19 @@ public class NowPlayingSongFragment extends BottomSheetDialogFragment {
 
     private void setSongsInformation()
     {
-        Glide.with(this.getContext())
+        Song song = mediaPlayerManager.getCurrentSong();
+        if(song.getCoverImageUrl() != null && !song.getCoverImageUrl().isEmpty())
+            Glide.with(this.getContext())
                 .load(ApiService.BASE_URL + mediaPlayerManager.getCurrentSong().getCoverImageUrl())
                 .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(15))))
                 .into(songsCoverImage);
+        else
+            Glide.with(this.getContext())
+                    .load(R.drawable.music_default_cover)
+                    .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(15))))
+                    .into(songsCoverImage);
 
-        songsTitleTextView.setText(mediaPlayerManager.getCurrentSong().getTitle());
+        songsTitleTextView.setText(song.getTitle());
         //songsArtistsNameTextView.setText(mediaPlayerManager.getCurrentSong().getArtistId());
         songDurationTextView.setText(formatTime(mediaPlayerManager.getMediaPlayer().getDuration()));
         seekBar.setMax(mediaPlayerManager.getMediaPlayer().getDuration());

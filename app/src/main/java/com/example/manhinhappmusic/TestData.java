@@ -119,7 +119,7 @@ public class TestData {
         playlistList.addAll(nonUserPlaylistList);
 
 
-        mixPlaylistList.addAll(Arrays.asList(
+//        mixPlaylistList.addAll(Arrays.asList(
 //                new Playlist("0", "Daily Mix 01", "Fdfd", new ArrayList<>(Arrays.asList(
 //                        songList.get(0),
 //                        songList.get(1),
@@ -142,14 +142,14 @@ public class TestData {
 //                )), "Fdf", R.raw.cafune_cover,"2", new ArrayList<>(Arrays.asList("Cafuné", "Hard Life")))
 //        ));
 //
-//        artistList.addAll(Arrays.asList(
-//                new User("0", "","","Benson", "Benson Booner", "", R.raw.benson_boone_artist_image),
-//                new User("1", "","","d4vd", "d4vd", "", R.raw.d4vd_artist_image),
-//                new User("2", "","","Good Kid", "Good Kid", "", R.raw.good_kid_artist_image),
-//                new User("3", "","","Hard Life", "Hard Life", "", R.raw.hard_life_artist_image),
-//                new User("4", "","","Laufey", "Laufey", "", R.raw.laufey_artist_image),
-//                new User("5", "","","Oliver", "Oliver Tree", "", R.raw.oliver_tree_artist_image),
-//                new User("6", "","","Still Woozy", "Still Woozy", "", R.raw.still_woozy_artist_image)
+        artistList.addAll(Arrays.asList(
+                new User("0", "","","Benson", "Benson Booner", "", R.raw.benson_boone_artist_image),
+                new User("1", "","","d4vd", "d4vd", "", R.raw.d4vd_artist_image),
+                new User("2", "","","Good Kid", "Good Kid", "", R.raw.good_kid_artist_image),
+                new User("3", "","","Hard Life", "Hard Life", "", R.raw.hard_life_artist_image),
+                new User("4", "","","Laufey", "Laufey", "", R.raw.laufey_artist_image),
+                new User("5", "","","Oliver", "Oliver Tree", "", R.raw.oliver_tree_artist_image),
+                new User("6", "","","Still Woozy", "Still Woozy", "", R.raw.still_woozy_artist_image)
 
                 ));
         genreList.addAll(Arrays.asList(

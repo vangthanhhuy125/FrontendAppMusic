@@ -210,7 +210,9 @@ public class MiniPlayerFragment extends BaseFragment {
 
     private void setSongsInformation()
     {
-        Glide.with(this.getContext())
+        Song song = mediaPlayerManager.getCurrentSong();
+        if(song.getCoverImageUrl() != null && !song.getCoverImageUrl().isEmpty())
+            Glide.with(this.getContext())
                 .asBitmap()
                 .load(ApiService.BASE_URL + mediaPlayerManager.getCurrentSong().getCoverImageUrl())
                 .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(15))))
@@ -229,13 +231,23 @@ public class MiniPlayerFragment extends BaseFragment {
 
                     }
                 });
-        songsNameText.setText(mediaPlayerManager.getCurrentSong().getTitle());
-        artistsNameText.setText(mediaPlayerManager.getCurrentSong().getArtistId());
-        seekBar.setMax(mediaPlayerManager.getMediaPlayer().getDuration());
-//        Palette.from(BitmapFactory.decodeStream(this.getContext().getResources().openRawResource(mediaPlayerManager.getCurrentSong().getCoverImageResID()))).generate(palette -> {
+        else
+        {
+            Glide.with(this.getContext())
+                    .load(R.drawable.music_default_cover)
+                    .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(15))))
+                    .into(songsCoverImage);
+
+//            Palette.from(BitmapFactory.decodeStream(this.getContext().getResources().openRawResource(R.drawable.music_default_cover))).generate(palette -> {
 //            int vibrant = palette.getVibrantColor(Color.GRAY);
 //            miniPlayerBackground.setBackgroundTintList(ColorStateList.valueOf(vibrant));
 //        });
+        }
+
+        songsNameText.setText(song.getTitle());
+//        artistsNameText.setText(mediaPlayerManager.getCurrentSong().getArtistId());
+        seekBar.setMax(mediaPlayerManager.getMediaPlayer().getDuration());
+
     }
 
     public MediaPlayerManager getMediaPlayerManager() {

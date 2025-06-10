@@ -22,6 +22,7 @@ import retrofit2.http.PATCH;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface ApiService {
 
@@ -62,6 +63,9 @@ public interface ApiService {
 
     @PATCH("/api/common/playlist/{playlistId}/removeSongs")
     Call<Playlist> removeSongs(@Path("playlistId") String id, @Body Map<String, List<String>> changes);
+
+    @GET("/api/common/song/search")
+    Call<List<Song>> searchSongs(@Query("title") String title);
     String STREAMING_URL = BASE_URL + "/api/common/song/stream";
 
 }

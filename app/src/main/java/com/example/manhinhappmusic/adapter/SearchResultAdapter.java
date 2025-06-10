@@ -23,6 +23,7 @@ import com.example.manhinhappmusic.model.ListItem;
 import com.example.manhinhappmusic.model.ListItemType;
 import com.example.manhinhappmusic.model.Playlist;
 import com.example.manhinhappmusic.model.Song;
+import com.example.manhinhappmusic.network.ApiService;
 
 import java.util.List;
 
@@ -79,10 +80,16 @@ public class SearchResultAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         {
             Song song = (Song)listItemList.get(position);
             SongViewHolder songViewHolder = (SongViewHolder) holder;
-            Glide.with(holder.itemView.getContext())
-                    .load(song.getCoverImageResID())
+            if(song.getCoverImageUrl() != null && !song.getCoverImageUrl().isEmpty())
+                Glide.with(holder.itemView.getContext())
+                    .load(ApiService.BASE_URL + song.getCoverImageUrl())
                     .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(15))))
                     .into(songViewHolder.getSongCoverImage());
+            else
+                Glide.with(holder.itemView.getContext())
+                        .load(R.drawable.music_default_cover)
+                        .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(15))))
+                        .into(songViewHolder.getSongCoverImage());
             songViewHolder.getSongTitleText().setText("Song • "+ song.getTitle());
             songViewHolder.getSongArtistText().setText(song.getArtistId());
             CheckBox checkBox = songViewHolder.getCheckBox();
@@ -120,10 +127,10 @@ public class SearchResultAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         {
             User artist = (User) listItemList.get(position);
             ArtistViewHolder artistViewHolder = (ArtistViewHolder)holder;
-            Glide.with(holder.itemView.getContext())
-                    .load(artist.getAvatarResID())
-                    .circleCrop()
-                    .into(artistViewHolder.getArtistImage());
+//            Glide.with(holder.itemView.getContext())
+//                    .load(ApiService.BASE_URL + artistViewHolder.ge())
+//                    .circleCrop()
+//                    .into(artistViewHolder.getArtistImage());
             artistViewHolder.getArtistNameText().setText(artist.getFullName());
             artistViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -134,10 +141,16 @@ public class SearchResultAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         } else if (holder instanceof PlaylistViewHolder) {
             Playlist playlist = (Playlist) listItemList.get(position);
             PlaylistViewHolder playlistViewHolder = (PlaylistViewHolder) holder;
-            Glide.with(holder.itemView.getContext())
-                    .load(playlist.getThumnailResID())
+            if(playlist.getThumbnailUrl() != null && !playlist.getThumbnailUrl().isEmpty())
+                Glide.with(holder.itemView.getContext())
+                    .load(ApiService.BASE_URL + playlist.getThumbnailUrl())
                     .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(15))))
                     .into(playlistViewHolder.getPlaylistCoverImage());
+            else
+                Glide.with(holder.itemView.getContext())
+                        .load(R.drawable.music_default_cover)
+                        .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(15))))
+                        .into(playlistViewHolder.getPlaylistCoverImage());
             playlistViewHolder.getPlaylistTitleText().setText(playlist.getName());
             CheckBox checkBox = playlistViewHolder.getCheckBox();
             checkBox.setChecked(checkStates.get(position));

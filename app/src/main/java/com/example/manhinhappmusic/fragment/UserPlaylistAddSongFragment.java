@@ -6,6 +6,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -32,6 +33,7 @@ import com.example.manhinhappmusic.model.Song;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -74,6 +76,9 @@ public class UserPlaylistAddSongFragment extends BaseFragment {
         if (getArguments() != null) {
             id = getArguments().getString(ARG_ID);
         }
+
+        playlist = PlaylistRepository.getInstance().getCurrentPlaylist();
+
     }
 
     @Override
@@ -90,11 +95,10 @@ public class UserPlaylistAddSongFragment extends BaseFragment {
         searchResultsView = view.findViewById(R.id.search_result_view);
         backButton = view.findViewById(R.id.back_button);
 
-        playlist = PlaylistRepository.getInstance().getItemById(id).getValue();
 
 
 
-        sourceSongList = SongRepository.getInstance().getAll().getValue();
+
 
         adapter = new SearchResultAdapter(new ArrayList<>(),new SparseBooleanArray(), new SearchResultAdapter.OnItemClickListener() {
             @Override
@@ -103,22 +107,38 @@ public class UserPlaylistAddSongFragment extends BaseFragment {
                 {
                     if(!adapter.getCheckStates().get(position))
                     {
-                        playlist.addSong((Song) item);
-                        adapter.getCheckStates().put(position, true);
-                        adapter.notifyItemChanged(position);
-                        Snackbar snackbar =  Snackbar.make(view,"Song has been added to playlist", Snackbar.LENGTH_SHORT);
-                        snackbar.setBackgroundTint(Color.WHITE);
-                        snackbar.setTextColor(Color.BLACK);
-                        snackbar.show();
+                        PlaylistRepository.getInstance().addSongs(playlist.getId(), new ArrayList<>(Arrays.asList(((Song)item).getId()))).observe(getViewLifecycleOwner(), new Observer<Playlist>() {
+                            @Override
+                            public void onChanged(Playlist modifiedPlaylist) {
+                                Song song = (Song) item;
+                                playlist.getSongsList().add(song);
+                                playlist.getSongs().add(song.getId());
+                                adapter.getCheckStates().put(position, true);
+                                adapter.notifyItemChanged(position);
+                                Snackbar snackbar =  Snackbar.make(view,"Song has been added to playlist", Snackbar.LENGTH_SHORT);
+                                snackbar.setBackgroundTint(Color.WHITE);
+                                snackbar.setTextColor(Color.BLACK);
+                                snackbar.show();
+                            }
+                        });
+
                     }
                     else {
-                        playlist.getSongs().remove((Song) item);
-                        adapter.getCheckStates().put(position, false);
-                        adapter.notifyItemChanged(position);
-                        Snackbar snackbar =  Snackbar.make(view,"Song has been removed to playlist", Snackbar.LENGTH_SHORT);
-                        snackbar.setBackgroundTint(Color.WHITE);
-                        snackbar.setTextColor(Color.BLACK);
-                        snackbar.show();
+                        PlaylistRepository.getInstance().removeSongs(playlist.getId(), new ArrayList<>(Arrays.asList(((Song)item).getId()))).observe(getViewLifecycleOwner(), new Observer<Playlist>() {
+                            @Override
+                            public void onChanged(Playlist modifiedPlaylist) {
+                                Song song = (Song) item;
+                                playlist.getSongsList().remove(song);
+                                playlist.getSongs().remove(song.getId());
+                                adapter.getCheckStates().put(position, false);
+                                adapter.notifyItemChanged(position);
+                                Snackbar snackbar =  Snackbar.make(view,"Song has been removed to playlist", Snackbar.LENGTH_SHORT);
+                                snackbar.setBackgroundTint(Color.WHITE);
+                                snackbar.setTextColor(Color.BLACK);
+                                snackbar.show();
+                            }
+                        });
+
                     }
 
                 }
@@ -127,23 +147,39 @@ public class UserPlaylistAddSongFragment extends BaseFragment {
         adapter.setOnItemCheckBoxClickListener(new SearchResultAdapter.OnItemCheckBoxClickListener() {
             @Override
             public void onItemCheckBoxClick(int position, ListItem item, CheckBox checkBox) {
-                playlist.addSong((Song) item);
-                adapter.notifyItemChanged(position);
-                Snackbar snackbar =  Snackbar.make(view,"Song has been added to playlist", Snackbar.LENGTH_SHORT);
-                snackbar.setBackgroundTint(Color.WHITE);
-                snackbar.setTextColor(Color.BLACK);
-                snackbar.show();
+                PlaylistRepository.getInstance().addSongs(playlist.getId(), new ArrayList<>(Arrays.asList(((Song)item).getId()))).observe(getViewLifecycleOwner(), new Observer<Playlist>() {
+                    @Override
+                    public void onChanged(Playlist modifiedPlaylist) {
+                        Song song = (Song) item;
+                        playlist.getSongsList().add(song);
+                        playlist.getSongs().add(song.getId());
+                        adapter.getCheckStates().put(position, true);
+                        adapter.notifyItemChanged(position);
+                        Snackbar snackbar =  Snackbar.make(view,"Song has been added to playlist", Snackbar.LENGTH_SHORT);
+                        snackbar.setBackgroundTint(Color.WHITE);
+                        snackbar.setTextColor(Color.BLACK);
+                        snackbar.show();
+                    }
+                });
             }
         }, true);
         adapter.setOnItemCheckBoxClickListener(new SearchResultAdapter.OnItemCheckBoxClickListener() {
             @Override
             public void onItemCheckBoxClick(int position, ListItem item, CheckBox checkBox) {
-               //playlist.getModifiableSongsList().remove((Song) item);
-                adapter.notifyItemChanged(position);
-                Snackbar snackbar =  Snackbar.make(view,"Song has been removed to playlist", Snackbar.LENGTH_SHORT);
-                snackbar.setBackgroundTint(Color.WHITE);
-                snackbar.setTextColor(Color.BLACK);
-                snackbar.show();
+                PlaylistRepository.getInstance().removeSongs(playlist.getId(), new ArrayList<>(Arrays.asList(((Song)item).getId()))).observe(getViewLifecycleOwner(), new Observer<Playlist>() {
+                    @Override
+                    public void onChanged(Playlist modifiedPlaylist) {
+                        Song song = (Song) item;
+                        playlist.getSongsList().remove(song);
+                        playlist.getSongs().remove(song.getId());
+                        adapter.getCheckStates().put(position, false);
+                        adapter.notifyItemChanged(position);
+                        Snackbar snackbar =  Snackbar.make(view,"Song has been removed to playlist", Snackbar.LENGTH_SHORT);
+                        snackbar.setBackgroundTint(Color.WHITE);
+                        snackbar.setTextColor(Color.BLACK);
+                        snackbar.show();
+                    }
+                });
             }
         }, false);
 
@@ -167,10 +203,17 @@ public class UserPlaylistAddSongFragment extends BaseFragment {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                List<Song> searchResults =  search(s.toString(), sourceSongList);
-                SparseBooleanArray checkStates = checkSongInPlaylist(searchResults);
-                adapter.setNewData(new ArrayList<>(searchResults), checkStates);
-                adapter.notifyDataSetChanged();
+
+                SongRepository.getInstance().searchSongs(s.toString()).observe(getViewLifecycleOwner(), new Observer<List<Song>>() {
+                    @Override
+                    public void onChanged(List<Song> songs) {
+                        List<Song> searchResults = songs;
+                        SparseBooleanArray checkStates = checkSongInPlaylist(searchResults);
+                        adapter.setNewData(new ArrayList<>(searchResults), checkStates);
+                        adapter.notifyDataSetChanged();
+                    }
+                });
+
             }
 
             @Override

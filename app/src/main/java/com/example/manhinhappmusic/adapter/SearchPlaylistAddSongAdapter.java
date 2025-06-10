@@ -64,11 +64,16 @@ public class SearchPlaylistAddSongAdapter extends RecyclerView.Adapter<SearchPla
     public void onBindViewHolder(@NonNull PlaylistViewHolder holder, int position) {
         Playlist playlist = playlistList.get(position);
         holder.getPlaylistCoverImage().setImageResource(playlist.getThumnailResID());
-        if(playlist.getThumnailResID() != 0)
+        if(playlist.getThumbnailUrl() != null && !playlist.getThumbnailUrl().isEmpty())
             Glide.with(holder.itemView.getContext())
                 .load(ApiService.BASE_URL + playlist.getThumbnailUrl())
                 .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(15))))
                 .into(holder.getPlaylistCoverImage());
+        else
+            Glide.with(holder.itemView.getContext())
+                    .load(R.drawable.music_default_cover)
+                    .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(15))))
+                    .into(holder.getPlaylistCoverImage());
         holder.getPlaylistTitleText().setText(playlist.getName());
         CheckBox checkBox = holder.getCheckBox();
         checkBox.setChecked(checkStates.get(playlist.getId()));

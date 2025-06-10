@@ -6,6 +6,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -19,6 +20,7 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
 
+import com.example.manhinhappmusic.repository.SongRepository;
 import com.example.manhinhappmusic.view.ClearableEditText;
 import com.example.manhinhappmusic.model.MediaPlayerManager;
 import com.example.manhinhappmusic.repository.PlaylistRepository;
@@ -158,24 +160,29 @@ public class SeacrhExFragment extends BaseFragment {
             public void onItemCheckBoxClick(int position, ListItem item, CheckBox checkBox) {
                 if(item.getType() == ListItemType.SONG)
                 {
-                    PlaylistRepository.getInstance().getItemById("-1").getValue().addSong((Song)item);
-                    Snackbar snackbar = Snackbar.make(view,"", Snackbar.LENGTH_LONG);
-                    View snackBarCustomLayout = LayoutInflater
-                            .from(view.getContext())
-                            .inflate(R.layout.snackbar_add_song_to_favorites, null);
-                    snackBarCustomLayout.setOnClickListener(new View.OnClickListener() {
+                    PlaylistRepository.getInstance().addSongs("684594f8ee9e612d30043517", new ArrayList<>(Arrays.asList(((Song)item).getId()))).observe(getViewLifecycleOwner(), new Observer<Playlist>() {
                         @Override
-                        public void onClick(View v) {
-                            modifiedPosition = position;
-                            callback.onRequestChangeFrontFragment(FragmentTag.USER_SEARCH_ADD_SONG, ((Song)item).getId());
-                            snackbar.dismiss();
+                        public void onChanged(Playlist playlist) {
+                            Snackbar snackbar = Snackbar.make(view,"", Snackbar.LENGTH_LONG);
+                            View snackBarCustomLayout = LayoutInflater
+                                    .from(view.getContext())
+                                    .inflate(R.layout.snackbar_add_song_to_favorites, null);
+                            snackBarCustomLayout.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    modifiedPosition = position;
+                                    callback.onRequestChangeFrontFragment(FragmentTag.USER_SEARCH_ADD_SONG, ((Song)item).getId());
+                                    snackbar.dismiss();
+                                }
+                            });
+
+                            ViewGroup snackBarLayout = (ViewGroup) snackbar.getView();
+                            snackBarLayout.removeAllViews();
+                            snackBarLayout.addView(snackBarCustomLayout);
+                            snackbar.show();
                         }
                     });
 
-                    ViewGroup snackBarLayout = (ViewGroup) snackbar.getView();
-                    snackBarLayout.removeAllViews();
-                    snackBarLayout.addView(snackBarCustomLayout);
-                    snackbar.show();
                 }
                 else if(item.getType() == ListItemType.PLAYLIST)
                 {
@@ -206,10 +213,16 @@ public class SeacrhExFragment extends BaseFragment {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                List<ListItem> searchResultList = search(s.toString(), sourceList);
-                SparseBooleanArray checkStates = checkItemInLibrary(searchResultList);
-                searchResultAdapter.setNewData(searchResultList, checkStates);
-                searchResultAdapter.notifyDataSetChanged();
+                SongRepository.getInstance().searchSongs(s.toString()).observe(getViewLifecycleOwner(), new Observer<List<Song>>() {
+                    @Override
+                    public void onChanged(List<Song> songs) {
+                        List<Song> searchResults = songs;
+                        SparseBooleanArray checkStates = checkItemInLibrary(new ArrayList<>(searchResults));
+                        searchResultAdapter.setNewData(new ArrayList<>(searchResults), checkStates);
+                        searchResultAdapter.notifyDataSetChanged();
+                    }
+                });
+
             }
 
             @Override

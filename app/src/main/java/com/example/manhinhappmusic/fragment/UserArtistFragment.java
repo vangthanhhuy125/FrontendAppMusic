@@ -96,26 +96,26 @@ public class UserArtistFragment extends BaseFragment {
 
         artistImage.setImageResource(artist.getAvatarResID());
         artistNameText.setText(artist.getFullName());
-        List<Song> songs = SongRepository.getInstance().getAll().getValue();
-
-        SearchResultAdapter songAdapter = new SearchResultAdapter(new ArrayList<>(songs), new SparseBooleanArray(),new SearchResultAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(int position, ListItem item) {
-                if(item.getType() == ListItemType.SONG)
-                {
-                    Song song = (Song) item;
-                    MediaPlayerManager mediaPlayerManager = MediaPlayerManager.getInstance(null);
-                    mediaPlayerManager.setPlaylist(new ArrayList<>(Arrays.asList(song)));
-                    mediaPlayerManager.setCurrentSong(0);
-                    callback.onRequestLoadMiniPlayer();
-                    mediaPlayerManager.play();
-                }
-            }
-        });
-        LinearLayoutManager songLayoutManager = new LinearLayoutManager(this.getContext());
-        songsView.setAdapter(songAdapter);
-        songsView.setLayoutManager(songLayoutManager);
-        songsView.addItemDecoration(new VerticalLinearSpacingItemDecoration((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, getResources().getDisplayMetrics())));
+//        List<Song> songs = SongRepository.getInstance().getAll().getValue();
+//
+//        SearchResultAdapter songAdapter = new SearchResultAdapter(new ArrayList<>(songs), new SparseBooleanArray(),new SearchResultAdapter.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(int position, ListItem item) {
+//                if(item.getType() == ListItemType.SONG)
+//                {
+//                    Song song = (Song) item;
+//                    MediaPlayerManager mediaPlayerManager = MediaPlayerManager.getInstance(null);
+//                    mediaPlayerManager.setPlaylist(new ArrayList<>(Arrays.asList(song)));
+//                    mediaPlayerManager.setCurrentSong(0);
+//                    callback.onRequestLoadMiniPlayer();
+//                    mediaPlayerManager.play();
+//                }
+//            }
+//        });
+//        LinearLayoutManager songLayoutManager = new LinearLayoutManager(this.getContext());
+//        songsView.setAdapter(songAdapter);
+//        songsView.setLayoutManager(songLayoutManager);
+//        songsView.addItemDecoration(new VerticalLinearSpacingItemDecoration((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, getResources().getDisplayMetrics())));
 
     }
 }

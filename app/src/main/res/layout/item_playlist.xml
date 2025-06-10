@@ -28,7 +28,9 @@
             android:text="Song's title"
             android:textColor="#FFFFFF"
             android:textSize="18sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:maxLines="1"
+            android:ellipsize="end"/>
 
         <TextView
             android:id="@+id/num_of_song_text"
@@ -36,7 +38,9 @@
             android:layout_height="wrap_content"
             android:text="100 songs"
             android:textColor="#AAAAAA"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            android:maxLines="1"
+            android:ellipsize="end"/>
     </LinearLayout>
 
 </LinearLayout>

@@ -14,8 +14,9 @@
         android:src="@drawable/baseline_person_24"
         />
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_weight="1"
         android:orientation="vertical"
         android:layout_marginStart="10dp"
         android:layout_gravity="center_vertical">
@@ -26,17 +27,18 @@
             android:text="Artist's name"
             android:textStyle="bold"
             android:textColor="#FFFFFF"
-            android:textSize="18dp"/>
+            android:textSize="18dp"
+            android:maxLines="1"
+            android:ellipsize="end"/>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Artist"
             android:textStyle="bold"
             android:textColor="#AAAAAA"
-            android:textSize="16dp"/>
+            android:textSize="16dp"
+            android:maxLines="1"
+            android:ellipsize="end"/>
     </LinearLayout>
-    <Space
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"/>
+
 </LinearLayout>

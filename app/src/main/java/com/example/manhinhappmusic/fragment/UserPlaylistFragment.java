@@ -122,10 +122,16 @@ public class UserPlaylistFragment extends BaseFragment {
         Log.d("frag", "resume");
         playlistsTitle.setText(playlist.getName());
         playlistsCount.setText(String.valueOf(playlist.getSongs().size()) + " songs");
-        Glide.with(this.getContext())
+        if(playlist.getThumbnailUrl() != null && !playlist.getThumbnailUrl().isEmpty())
+            Glide.with(this.getContext())
                 .load(ApiService.BASE_URL + playlist.getThumbnailUrl())
                 .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(15))))
                 .into(playlistsCoverImage);
+        else
+            Glide.with(this.getContext())
+                    .load(R.drawable.music_default_cover)
+                    .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(15))))
+                    .into(playlistsCoverImage);
         PlaylistRepository.getInstance().getAllSongs(playlist.getId()).observe(getViewLifecycleOwner(), new Observer<List<Song>>() {
             @Override
             public void onChanged(List<Song> songs) {
@@ -360,20 +366,27 @@ public class UserPlaylistFragment extends BaseFragment {
     {
         if(!keyWord.isBlank())
         {
+//            return items.stream()
+//                    .filter(song -> {
+//                        for(String itemKeyWord: song.getSearchKeyWord())
+//                        {
+//                            if(Pattern.compile("\\b" + keyWord + ".*", Pattern.CASE_INSENSITIVE)
+//                                    .matcher(itemKeyWord)
+//                                    .find())
+//                            {
+//                                return true;
+//                            }
+//                        }
+//                        return false;
+//                    })
+//                    .collect(Collectors.toList());
+
             return items.stream()
-                    .filter(listItem -> {
-                        for(String itemKeyWord: listItem.getSearchKeyWord())
-                        {
-                            if(Pattern.compile("\\b" + keyWord + ".*", Pattern.CASE_INSENSITIVE)
-                                    .matcher(itemKeyWord)
+                    .filter(song -> Pattern.compile("\\b" + keyWord + ".*", Pattern.CASE_INSENSITIVE)
+                                    .matcher(song.getTitle())
                                     .find())
-                            {
-                                return true;
-                            }
-                        }
-                        return false;
-                    })
                     .collect(Collectors.toList());
+
         }
         return items;
     }

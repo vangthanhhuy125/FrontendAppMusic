@@ -101,4 +101,26 @@ public class SongRepository implements AppRepository<Song> {
         }
         return songs;
     }
+
+    public LiveData<List<Song>> searchSongs(String title)
+    {
+        MutableLiveData<List<Song>> songs = new MutableLiveData<>();
+
+        apiClient.getInstance().getApiService().searchSongs(title).enqueue(new Callback<List<Song>>() {
+            @Override
+            public void onResponse(Call<List<Song>> call, Response<List<Song>> response) {
+                if(response.isSuccessful() && response.body() != null)
+                {
+                    songs.setValue(response.body());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Song>> call, Throwable throwable) {
+
+            }
+        });
+
+        return songs;
+    }
 }

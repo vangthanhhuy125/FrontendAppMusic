@@ -39,6 +39,6 @@ public class Song implements ListItem {
     public List<String> getSearchKeyWord() {
         List<String> keyWords = new ArrayList<>();
         keyWords.add(title);
-        keyWords.add(artist_id);
+        //keyWords.add(artist_id);
         return keyWords;    }
 }
