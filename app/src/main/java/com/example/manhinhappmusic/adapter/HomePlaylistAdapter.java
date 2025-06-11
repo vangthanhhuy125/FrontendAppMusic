@@ -68,6 +68,7 @@ public class HomePlaylistAdapter extends RecyclerView.Adapter<HomePlaylistAdapte
                 thumbnailUrl = thumbnailUrl.substring(1); // bỏ dấu / đầu tiên
             }
             String fullUrl = baseUrl + thumbnailUrl;
+            Log.d("HomePlaylistAdapter", "Full URL: " + fullUrl);
 
             Glide.with(holder.itemView.getContext())
                     .load(new GlideUrl(fullUrl, new LazyHeaders.Builder()

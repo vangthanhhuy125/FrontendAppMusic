@@ -20,4 +20,7 @@ public interface CommonSongApi {
 
     @GET("/api/common/song/new-release")
     Call<List<Song>> getNewReleaseSongs();
+
+    @GET("/api/common/song/search")
+    Call<List<Song>> searchSongByTitle();
 }
