@@ -1,4 +1,4 @@
-package com.example.manhinhappmusic.fragment;
+package com.example.manhinhappmusic.fragment.user;
 
 import android.graphics.Color;
 import android.os.Bundle;
@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,8 +27,9 @@ import com.bumptech.glide.load.MultiTransformation;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
+import com.example.manhinhappmusic.fragment.BaseFragment;
+import com.example.manhinhappmusic.fragment.ConfirmDiscardingChangesFragment;
 import com.example.manhinhappmusic.model.Playlist;
-import com.example.manhinhappmusic.network.ApiClient;
 import com.example.manhinhappmusic.network.ApiService;
 import com.example.manhinhappmusic.repository.PlaylistRepository;
 import com.example.manhinhappmusic.R;
@@ -41,10 +41,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 /**
  * A simple {@link Fragment} subclass.

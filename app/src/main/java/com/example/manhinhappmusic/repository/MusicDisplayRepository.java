@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.manhinhappmusic.TestData;
-import com.example.manhinhappmusic.fragment.MusicDisplayFragment;
 import com.example.manhinhappmusic.model.MusicDisplayItem;
 
 import java.util.ArrayList;

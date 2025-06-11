@@ -1,4 +1,4 @@
-package com.example.manhinhappmusic.fragment;
+package com.example.manhinhappmusic.fragment.user;
 
 import android.os.Bundle;
 
@@ -17,13 +17,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 
+import com.example.manhinhappmusic.fragment.BaseFragment;
 import com.example.manhinhappmusic.repository.PlaylistRepository;
 import com.example.manhinhappmusic.view.ClearableEditText;
 import com.example.manhinhappmusic.R;
 import com.example.manhinhappmusic.decoration.VerticalLinearSpacingItemDecoration;
 import com.example.manhinhappmusic.adapter.PlaylistAdapter;
 import com.example.manhinhappmusic.model.Playlist;
-import com.example.manhinhappmusic.repository.LibraryRepository;
 
 import java.util.ArrayList;
 import java.util.List;

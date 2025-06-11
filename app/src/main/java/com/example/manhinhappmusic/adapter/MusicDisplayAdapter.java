@@ -12,17 +12,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.manhinhappmusic.R;
 import com.example.manhinhappmusic.decoration.HorizontalLinearSpacingItemDecoration;
-import com.example.manhinhappmusic.fragment.BaseFragment;
-import com.example.manhinhappmusic.fragment.MusicDisplayFragment;
 import com.example.manhinhappmusic.model.ListItem;
-import com.example.manhinhappmusic.model.MediaPlayerManager;
 import com.example.manhinhappmusic.model.MusicDisplayItem;
-import com.example.manhinhappmusic.model.Playlist;
-import com.example.manhinhappmusic.model.Song;
-import com.example.manhinhappmusic.model.User;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class MusicDisplayAdapter extends RecyclerView.Adapter<MusicDisplayAdapter.ViewHolder> {

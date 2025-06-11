@@ -1,31 +1,21 @@
-package com.example.manhinhappmusic.fragment;
+package com.example.manhinhappmusic.fragment.user;
 
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.example.manhinhappmusic.decoration.HorizontalLinearSpacingItemDecoration;
-import com.example.manhinhappmusic.model.MediaPlayerManager;
-import com.example.manhinhappmusic.adapter.MusicDisplayItemAdapter;
+import com.example.manhinhappmusic.fragment.BaseFragment;
 import com.example.manhinhappmusic.model.MusicDisplayItem;
 import com.example.manhinhappmusic.repository.MusicDisplayRepository;
-import com.example.manhinhappmusic.model.Playlist;
 import com.example.manhinhappmusic.R;
-import com.example.manhinhappmusic.model.Song;
-import com.example.manhinhappmusic.model.User;
-
-import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * A simple {@link Fragment} subclass.

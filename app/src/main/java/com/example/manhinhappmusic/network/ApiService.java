@@ -2,8 +2,14 @@ package com.example.manhinhappmusic.network;
 
 
 import com.example.manhinhappmusic.dto.AuthResponse;
+import com.example.manhinhappmusic.dto.ChangePasswordRequest;
+import com.example.manhinhappmusic.dto.ForgotPasswordRequest;
 import com.example.manhinhappmusic.dto.LoginRequest;
+import com.example.manhinhappmusic.dto.MessageResponse;
 import com.example.manhinhappmusic.dto.PlaylistRequest;
+import com.example.manhinhappmusic.dto.RegisterRequest;
+import com.example.manhinhappmusic.dto.ResetPasswordRequest;
+import com.example.manhinhappmusic.dto.VerifyRequest;
 import com.example.manhinhappmusic.model.Playlist;
 import com.example.manhinhappmusic.model.Song;
 
@@ -39,8 +45,31 @@ public interface ApiService {
     @GET("/api/common/song/{songId}")
     Call<Song> getSongById(@Path("songId") String id);
 
+    @POST("/api/register")
+    Call<MessageResponse> register(@Body RegisterRequest request);
+
+    // Xác thực OTP và hoàn tất đăng ký
+    @POST("/api/verify-email")
+    Call<AuthResponse> verifyEmail(@Body VerifyRequest request);
+
+    // Gửi lại mã OTP (resend)
+    @POST("/api/resend-otp")
+    Call<String> resendOtp(@Body Map<String, String> emailBody);
+
+    // Đăng nhập
     @POST("/api/login")
-    Call<AuthResponse> login(@Body LoginRequest loginRequest);
+    Call<AuthResponse> login(@Body LoginRequest request);
+
+    @POST("/api/password/forgot")
+    Call<MessageResponse> forgotPassword(@Body ForgotPasswordRequest request);
+
+    @POST("/api/password/change")
+    Call<String> changePassword(@Body ChangePasswordRequest request);
+
+    @POST("/api/password/reset-request")
+    Call<String> sendOtp(@Query("email") String email);
+    @POST("/api/password/reset")
+    Call<MessageResponse> resetPassword(@Body ResetPasswordRequest request);
 
 
     @Multipart

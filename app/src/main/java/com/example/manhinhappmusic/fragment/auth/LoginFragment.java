@@ -1,4 +1,4 @@
-package com.example.manhinhappmusic.fragment;
+package com.example.manhinhappmusic.fragment.auth;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -19,11 +19,13 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.manhinhappmusic.R;
 import com.example.manhinhappmusic.activity.MainActivity;
 import com.example.manhinhappmusic.dto.AuthResponse;
 import com.example.manhinhappmusic.dto.LoginRequest;
+import com.example.manhinhappmusic.fragment.BaseFragment;
 import com.example.manhinhappmusic.network.ApiClient;
 
 import retrofit2.Call;
@@ -75,6 +77,8 @@ public class LoginFragment extends BaseFragment {
         return fragment;
     }
 
+    ApiClient apiClient;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,6 +86,9 @@ public class LoginFragment extends BaseFragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+        apiClient = ApiClient.getInstance();
+        apiClient.createApiService();
+
     }
 
     @Override
@@ -100,7 +107,6 @@ public class LoginFragment extends BaseFragment {
         forgotPasswordText = view.findViewById(R.id.forgetPasswordTextView);
         signUpTextView = view.findViewById(R.id.signUpTextView);
 
-        ApiClient apiClient = ApiClient.getInstance();
         SharedPreferences preferences = getContext().getSharedPreferences(ARG_PREFERENCES, getContext().MODE_PRIVATE);
 
         if(preferences.getBoolean("isLoggedIn", false))
@@ -113,8 +119,13 @@ public class LoginFragment extends BaseFragment {
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                apiClient.createApiService();
-                apiClient.getApiService().login(new LoginRequest(emailEditText.getText().toString(), passwordEditText.getText().toString()))
+                String email = emailEditText.getText().toString().trim();
+                String password = passwordEditText.getText().toString().trim();
+                if (email.isBlank()|| password.isBlank()) {
+                    Toast.makeText(requireContext(), "Vui lòng nhập đầy đủ thông tin", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                apiClient.getApiService().login(new LoginRequest(email,password ))
                         .enqueue(new Callback<AuthResponse>() {
                             @Override
                             public void onResponse(Call<AuthResponse> call, Response<AuthResponse> response) {
@@ -126,13 +137,22 @@ public class LoginFragment extends BaseFragment {
                                     editor.putString("token", token);
                                     editor.putBoolean("isLoggedIn", true);
                                     editor.apply();
+                                    Toast.makeText(requireContext(), "Đăng nhập thành công", Toast.LENGTH_SHORT).show();
+
                                     launcher.launch(new Intent(requireActivity(), MainActivity.class));
+                                    requireActivity().finish();
+                                }
+                                else
+                                {
+                                    Toast.makeText(requireContext(), "Sai email hoặc mật khẩu", Toast.LENGTH_SHORT).show();
+
                                 }
                             }
 
                             @Override
                             public void onFailure(Call<AuthResponse> call, Throwable throwable) {
-                                Log.e("Log in", throwable.getMessage());
+                                Toast.makeText(requireContext(), "Lỗi kết nối: " + throwable.getMessage(), Toast.LENGTH_SHORT).show();
+
                             }
                         });
             }
@@ -141,14 +161,15 @@ public class LoginFragment extends BaseFragment {
         forgotPasswordText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+            callback.onRequestChangeFragment(FragmentTag.FORGOT_PASSWORD);
             }
+
         });
 
         signUpTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                callback.onRequestChangeFragment(FragmentTag.REGISTER);
             }
         });
     }

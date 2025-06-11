@@ -1,10 +1,6 @@
 package com.example.manhinhappmusic.activity;
 
-import android.media.AudioAttributes;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -16,35 +12,25 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.manhinhappmusic.R;
-import com.example.manhinhappmusic.dto.AuthResponse;
-import com.example.manhinhappmusic.dto.LoginRequest;
 import com.example.manhinhappmusic.fragment.BaseFragment;
-import com.example.manhinhappmusic.fragment.EditPlaylistFragment;
-import com.example.manhinhappmusic.fragment.EditProfileFragment;
-import com.example.manhinhappmusic.fragment.MiniPlayerFragment;
-import com.example.manhinhappmusic.fragment.NowPlayingSongFragment;
-import com.example.manhinhappmusic.fragment.SeacrhExFragment;
-import com.example.manhinhappmusic.fragment.UserArtistFragment;
-import com.example.manhinhappmusic.fragment.UserGenreFragment;
-import com.example.manhinhappmusic.fragment.UserHomeFragment;
-import com.example.manhinhappmusic.fragment.UserLibraryFragment;
-import com.example.manhinhappmusic.fragment.UserLibrarySearchFragment;
-import com.example.manhinhappmusic.fragment.UserPlaylistAddSongFragment;
-import com.example.manhinhappmusic.fragment.UserPlaylistFragment;
-import com.example.manhinhappmusic.fragment.UserProfileFragment;
-import com.example.manhinhappmusic.fragment.UserSearchAddSongFragment;
-import com.example.manhinhappmusic.fragment.UserSearchFragment;
+import com.example.manhinhappmusic.fragment.user.EditPlaylistFragment;
+import com.example.manhinhappmusic.fragment.user.EditProfileFragment;
+import com.example.manhinhappmusic.fragment.user.MiniPlayerFragment;
+import com.example.manhinhappmusic.fragment.user.NowPlayingSongFragment;
+import com.example.manhinhappmusic.fragment.user.SeacrhExFragment;
+import com.example.manhinhappmusic.fragment.user.UserArtistFragment;
+import com.example.manhinhappmusic.fragment.user.UserGenreFragment;
+import com.example.manhinhappmusic.fragment.user.UserHomeFragment;
+import com.example.manhinhappmusic.fragment.user.UserLibraryFragment;
+import com.example.manhinhappmusic.fragment.user.UserLibrarySearchFragment;
+import com.example.manhinhappmusic.fragment.user.UserPlaylistAddSongFragment;
+import com.example.manhinhappmusic.fragment.user.UserPlaylistFragment;
+import com.example.manhinhappmusic.fragment.user.UserProfileFragment;
+import com.example.manhinhappmusic.fragment.user.UserSearchAddSongFragment;
+import com.example.manhinhappmusic.fragment.user.UserSearchFragment;
 import com.example.manhinhappmusic.model.MediaPlayerManager;
-import com.example.manhinhappmusic.model.Playlist;
-import com.example.manhinhappmusic.network.ApiClient;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
-
-import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity implements BaseFragment.FragmentInteractionListener {
 

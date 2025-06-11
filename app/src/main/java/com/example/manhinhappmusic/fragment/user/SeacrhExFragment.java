@@ -1,4 +1,4 @@
-package com.example.manhinhappmusic.fragment;
+package com.example.manhinhappmusic.fragment.user;
 
 import android.graphics.Color;
 import android.os.Bundle;
@@ -20,6 +20,7 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
 
+import com.example.manhinhappmusic.fragment.BaseFragment;
 import com.example.manhinhappmusic.repository.SongRepository;
 import com.example.manhinhappmusic.view.ClearableEditText;
 import com.example.manhinhappmusic.model.MediaPlayerManager;

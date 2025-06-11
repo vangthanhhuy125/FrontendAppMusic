@@ -8,7 +8,7 @@
     android:clickable="true"
     android:focusable="true"
     android:background="#000000"
-    tools:context=".fragment.SeacrhExFragment">
+    tools:context=".fragment.user.SeacrhExFragment">
 
     <LinearLayout
         android:layout_width="match_parent"

@@ -1,13 +1,20 @@
 package com.example.manhinhappmusic.fragment;
 
+import android.app.Dialog;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.Button;
 
 import com.example.manhinhappmusic.R;
 
@@ -49,6 +56,23 @@ public class ConfirmLoggingOutFragment extends DialogFragment {
         return fragment;
     }
 
+    private Button cancelButton;
+    private Button logOutButton;
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Dialog dialog = getDialog();
+        if (dialog != null && dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        }
+
+        Window window = dialog.getWindow();
+        window.setLayout(
+                (int)(getResources().getDisplayMetrics().widthPixels * 0.9),
+                ViewGroup.LayoutParams.WRAP_CONTENT
+        );
+    }
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,5 +87,28 @@ public class ConfirmLoggingOutFragment extends DialogFragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_confirm_logging_out, container, false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        cancelButton = view.findViewById(R.id.cancel_button);
+        logOutButton = view.findViewById(R.id.log_out_button);
+
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dismiss();
+            }
+        });
+
+        logOutButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getParentFragmentManager().setFragmentResult("request_log_out", null);
+                dismiss();
+            }
+        });
     }
 }

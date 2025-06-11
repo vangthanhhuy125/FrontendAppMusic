@@ -30,11 +30,13 @@ public class BaseFragment extends Fragment {
         NOW_PLAYING_SONG,
         MINI_PLAYER,
         LOGIN,
+        FORGOT_PASSWORD,
         EDIT_PROFILE,
         CONFIRM_DELETING_GENRE,
         CONFIRM_DELETING_SONG,
         CONFIRM_LOGGING_OUT,
         CHANGE_PASSWORD,
+        OTP_VERIFICATION,
         ADD_PLAYLIST,
         LIBRARY_SEARCH,
         PLAYLIST_ADD_SONG,
@@ -42,6 +44,7 @@ public class BaseFragment extends Fragment {
         USER_ARTIST,
         USER_SEARCH_ADD_SONG,
         PLAYLIST_EDIT,
+
 
     }
 

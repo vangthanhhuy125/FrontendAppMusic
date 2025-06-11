@@ -1,6 +1,5 @@
-package com.example.manhinhappmusic.fragment;
+package com.example.manhinhappmusic.fragment.user;
 
-import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -29,25 +28,20 @@ import com.bumptech.glide.load.MultiTransformation;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
-import com.example.manhinhappmusic.network.ApiClient;
+import com.example.manhinhappmusic.fragment.BaseFragment;
 import com.example.manhinhappmusic.network.ApiService;
 import com.example.manhinhappmusic.repository.SongRepository;
 import com.example.manhinhappmusic.view.ClearableEditText;
 import com.example.manhinhappmusic.repository.PlaylistRepository;
 import com.example.manhinhappmusic.R;
 import com.example.manhinhappmusic.adapter.SongAdapter;
-import com.example.manhinhappmusic.TestData;
 import com.example.manhinhappmusic.decoration.VerticalLinearSpacingItemDecoration;
 import com.example.manhinhappmusic.model.MediaPlayerManager;
 import com.example.manhinhappmusic.model.Playlist;
 import com.example.manhinhappmusic.model.Song;
-import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 

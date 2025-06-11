@@ -1,4 +1,4 @@
-package com.example.manhinhappmusic.fragment;
+package com.example.manhinhappmusic.fragment.user;
 
 import android.app.Dialog;
 import android.graphics.Color;
@@ -17,21 +17,12 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.example.manhinhappmusic.R;
-import com.example.manhinhappmusic.dto.PlaylistRequest;
 import com.example.manhinhappmusic.model.Playlist;
-import com.example.manhinhappmusic.network.ApiClient;
-import com.example.manhinhappmusic.network.ApiService;
 import com.example.manhinhappmusic.repository.PlaylistRepository;
 
-import java.util.ArrayList;
 import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 /**
  * A simple {@link Fragment} subclass.

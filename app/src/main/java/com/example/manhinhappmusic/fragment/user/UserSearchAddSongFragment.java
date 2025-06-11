@@ -1,4 +1,4 @@
-package com.example.manhinhappmusic.fragment;
+package com.example.manhinhappmusic.fragment.user;
 
 import android.os.Bundle;
 
@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,12 +19,11 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.example.manhinhappmusic.fragment.BaseFragment;
 import com.example.manhinhappmusic.repository.PlaylistRepository;
 import com.example.manhinhappmusic.view.ClearableEditText;
 import com.example.manhinhappmusic.R;
-import com.example.manhinhappmusic.TestData;
 import com.example.manhinhappmusic.decoration.VerticalLinearSpacingItemDecoration;
 import com.example.manhinhappmusic.adapter.SearchPlaylistAddSongAdapter;
 import com.example.manhinhappmusic.model.Playlist;

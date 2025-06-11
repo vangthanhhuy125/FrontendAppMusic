@@ -1,8 +1,7 @@
-package com.example.manhinhappmusic.fragment;
+package com.example.manhinhappmusic.fragment.user;
 
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -14,7 +13,6 @@ import androidx.fragment.app.Fragment;
 import androidx.palette.graphics.Palette;
 
 import android.os.Handler;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,6 +28,7 @@ import com.bumptech.glide.load.MultiTransformation;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
+import com.example.manhinhappmusic.fragment.BaseFragment;
 import com.example.manhinhappmusic.model.MediaPlayerManager;
 import com.example.manhinhappmusic.model.Playlist;
 import com.example.manhinhappmusic.R;

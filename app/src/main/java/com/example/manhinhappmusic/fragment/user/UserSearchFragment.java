@@ -1,4 +1,4 @@
-package com.example.manhinhappmusic.fragment;
+package com.example.manhinhappmusic.fragment.user;
 
 import android.os.Bundle;
 
@@ -18,6 +18,7 @@ import android.widget.ImageView;
 
 import com.example.manhinhappmusic.R;
 import com.example.manhinhappmusic.TestData;
+import com.example.manhinhappmusic.fragment.BaseFragment;
 import com.example.manhinhappmusic.model.User;
 import com.example.manhinhappmusic.adapter.ArtistAdapter;
 import com.example.manhinhappmusic.adapter.BrowseAdapter;

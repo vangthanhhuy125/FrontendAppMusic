@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@drawable/gray_gradient_background"
-    tools:context=".fragment.AddPlaylistFragment">
+    tools:context=".fragment.user.AddPlaylistFragment">
 
     <LinearLayout
         android:layout_width="match_parent"

@@ -1,7 +1,5 @@
 package com.example.manhinhappmusic.model;
 
-import com.example.manhinhappmusic.fragment.MusicDisplayFragment;
-
 import java.util.List;
 
 public class MusicDisplayItem {

@@ -11,7 +11,11 @@ import androidx.fragment.app.Fragment;
 
 import com.example.manhinhappmusic.R;
 import com.example.manhinhappmusic.fragment.BaseFragment;
-import com.example.manhinhappmusic.fragment.LoginFragment;
+import com.example.manhinhappmusic.fragment.auth.ChangePasswordFragment;
+import com.example.manhinhappmusic.fragment.auth.ForgotPasswordFragment;
+import com.example.manhinhappmusic.fragment.auth.LoginFragment;
+import com.example.manhinhappmusic.fragment.auth.OtpVerificationFragment;
+import com.example.manhinhappmusic.fragment.auth.RegisterFragment;
 
 public class LoginActivity extends AppCompatActivity implements BaseFragment.FragmentInteractionListener {
 
@@ -33,7 +37,7 @@ public class LoginActivity extends AppCompatActivity implements BaseFragment.Fra
         if(fragment != null){
             getSupportFragmentManager()
                     .beginTransaction()
-                    .add(R.id.main, fragment)
+                    .replace(R.id.main, fragment)
                     .addToBackStack(null)
                     .commit();
             return true;
@@ -44,6 +48,31 @@ public class LoginActivity extends AppCompatActivity implements BaseFragment.Fra
     @Override
     public void onRequestChangeFragment(BaseFragment.FragmentTag destinationTag, Object... params) {
 
+        Fragment destinationFragment = null;
+        if(destinationTag == BaseFragment.FragmentTag.LOGIN)
+        {
+            destinationFragment = new LoginFragment();
+        }
+        else if(destinationTag == BaseFragment.FragmentTag.REGISTER)
+        {
+            destinationFragment = new RegisterFragment();
+        }
+        else if(destinationTag == BaseFragment.FragmentTag.FORGOT_PASSWORD)
+        {
+            destinationFragment = new ForgotPasswordFragment();
+        }
+        else if(destinationTag == BaseFragment.FragmentTag.CHANGE_PASSWORD)
+        {
+            destinationFragment = new ChangePasswordFragment();
+        }
+        else if(destinationTag == BaseFragment.FragmentTag.OTP_VERIFICATION)
+        {
+            destinationFragment = new OtpVerificationFragment();
+        }
+
+
+        if(destinationFragment != null)
+            loadFragment(destinationFragment);
     }
 
     @Override
@@ -63,7 +92,7 @@ public class LoginActivity extends AppCompatActivity implements BaseFragment.Fra
 
     @Override
     public void onRequestGoBackPreviousFragment() {
-
+        getSupportFragmentManager().popBackStack();
     }
 
     @Override

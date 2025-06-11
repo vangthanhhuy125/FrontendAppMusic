@@ -1,9 +1,5 @@
-package com.example.manhinhappmusic.fragment;
+package com.example.manhinhappmusic.fragment.user;
 
-import android.content.SharedPreferences;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -24,25 +20,14 @@ import android.widget.Toast;
 import com.example.manhinhappmusic.R;
 import com.example.manhinhappmusic.decoration.VerticalLinearSpacingItemDecoration;
 import com.example.manhinhappmusic.adapter.PlaylistAdapter;
-import com.example.manhinhappmusic.dto.PlaylistRequest;
+import com.example.manhinhappmusic.fragment.BaseFragment;
 import com.example.manhinhappmusic.model.Playlist;
-import com.example.manhinhappmusic.network.ApiClient;
-import com.example.manhinhappmusic.repository.LibraryRepository;
 import com.example.manhinhappmusic.repository.PlaylistRepository;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.imageview.ShapeableImageView;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import okhttp3.MediaType;
-import okhttp3.RequestBody;
-import okhttp3.ResponseBody;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 /**
  * A simple {@link Fragment} subclass.

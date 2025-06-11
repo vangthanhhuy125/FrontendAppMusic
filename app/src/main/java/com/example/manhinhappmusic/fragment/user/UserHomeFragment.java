@@ -1,4 +1,4 @@
-package com.example.manhinhappmusic.fragment;
+package com.example.manhinhappmusic.fragment.user;
 
 import android.os.Bundle;
 
@@ -14,8 +14,6 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.example.manhinhappmusic.R;
@@ -24,6 +22,7 @@ import com.example.manhinhappmusic.adapter.HomePlaylistAdapter;
 import com.example.manhinhappmusic.adapter.MusicDisplayAdapter;
 import com.example.manhinhappmusic.decoration.GridSpacingItemDecoration;
 import com.example.manhinhappmusic.decoration.VerticalLinearSpacingItemDecoration;
+import com.example.manhinhappmusic.fragment.BaseFragment;
 import com.example.manhinhappmusic.model.ListItem;
 import com.example.manhinhappmusic.model.ListItemType;
 import com.example.manhinhappmusic.model.MediaPlayerManager;
@@ -31,8 +30,6 @@ import com.example.manhinhappmusic.model.MusicDisplayItem;
 import com.example.manhinhappmusic.model.Playlist;
 import com.example.manhinhappmusic.model.Song;
 import com.example.manhinhappmusic.model.User;
-import com.example.manhinhappmusic.network.ApiClient;
-import com.example.manhinhappmusic.repository.MusicDisplayRepository;
 import com.example.manhinhappmusic.repository.PlaylistRepository;
 import com.example.manhinhappmusic.repository.SongRepository;
 import com.google.android.material.imageview.ShapeableImageView;
