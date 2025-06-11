@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -59,7 +60,6 @@ public class NowPlayingSongFragment extends BottomSheetDialogFragment {
                 seekBar.setProgress(mediaPlayerManager.getMediaPlayer().getCurrentPosition());
                 handler.postDelayed(this, 200);
                 currentPlayTimeTextView.setText(formatTime(mediaPlayerManager.getMediaPlayer().getCurrentPosition()));
-
             }
         }
     };
@@ -119,13 +119,23 @@ public class NowPlayingSongFragment extends BottomSheetDialogFragment {
             @Override
             public void onCompletion() {
                 playButton.setIconResource(R.drawable.baseline_play_circle_24);
-                handler.removeCallbacks(updateSeekBar);
 
                 if(mediaPlayerManager.isPlayingNextSong())
                 {
-                    handler.post(updateSeekBar);
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            if(mediaPlayerManager.isPrepared()){
+                                handler.removeCallbacks(this);
+                                handler.post(updateSeekBar);
+                                setSongsInformation();
+
+                            }
+                            else
+                                handler.postDelayed(this,200);
+                        }
+                    });
                     playButton.setIconResource(R.drawable.baseline_pause_circle_24);
-                    setSongsInformation();
                 }
             }
         }, NowPlayingSongFragment.class.getName());
@@ -145,7 +155,18 @@ public class NowPlayingSongFragment extends BottomSheetDialogFragment {
         mediaPlayerManager.addOnPlayingSongChangeListener(new MediaPlayerManager.OnPlayingSongChangeListener() {
             @Override
             public void onPlayingSongChange(Song song) {
-                setSongsInformation();
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(mediaPlayerManager.isPrepared()){
+                            setSongsInformation();
+                            handler.removeCallbacks(this);
+                            handler.post(updateSeekBar);
+                        }
+                        else
+                            handler.postDelayed(this,200);
+                    }
+                });
             }
         }, NowPlayingSongFragment.class.getName());
 
@@ -182,16 +203,15 @@ public class NowPlayingSongFragment extends BottomSheetDialogFragment {
             public void onClick(View v) {
                 if(mediaPlayerManager != null && mediaPlayerManager.getMediaPlayer() != null)
                 {
-                    if(!mediaPlayerManager.getMediaPlayer().isPlaying()){
+                    if(mediaPlayerManager.isPrepared() && !mediaPlayerManager.getMediaPlayer().isPlaying()){
 
                         mediaPlayerManager.play();
                         handler.post(updateSeekBar);
 
                     }
 
-                    else {
+                    else if(mediaPlayerManager.isPrepared()){
                         mediaPlayerManager.pause();
-                        handler.removeCallbacks(updateSeekBar);
 
                     }
                 }
@@ -226,6 +246,7 @@ public class NowPlayingSongFragment extends BottomSheetDialogFragment {
                 repeatButton.setIconTint(ColorStateList.valueOf(Color.parseColor("#FFFFFF")));
                 break;
             case REPEAT_ONE:
+                repeatButton.setIconTint(ColorStateList.valueOf(Color.parseColor("#FFFFFF")));
                 repeatButton.setIconResource(R.drawable.baseline_repeat_one_24);
                 break;
         }
@@ -268,6 +289,10 @@ public class NowPlayingSongFragment extends BottomSheetDialogFragment {
         minimizeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mediaPlayerManager.removeOnCompletionListener(NowPlayingSongFragment.class.getName());
+                mediaPlayerManager.removeOnPlayingStateChangeListener(NowPlayingSongFragment.class.getName());
+                mediaPlayerManager.removeOnPlayingSongChangeListener(NowPlayingSongFragment.class.getName());
+                handler.removeCallbacks(updateSeekBar);
                 dismiss();
             }
         });
@@ -288,7 +313,8 @@ public class NowPlayingSongFragment extends BottomSheetDialogFragment {
                     handler.removeCallbacks(this);
                     handler.post(updateSeekBar);
                 }
-                handler.postDelayed(this,200);
+                else
+                    handler.postDelayed(this,200);
             }
         });
 

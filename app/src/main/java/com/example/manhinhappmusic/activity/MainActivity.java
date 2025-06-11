@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.Frag
         if(fragment != null){
             getSupportFragmentManager()
                     .beginTransaction()
-                    .add(R.id.front_frame_container, fragment)
+                    .replace(R.id.front_frame_container, fragment)
                     .addToBackStack(null)
                     .commit();
             return true;

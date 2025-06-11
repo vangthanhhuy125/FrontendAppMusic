@@ -111,13 +111,22 @@ public class MiniPlayerFragment extends BaseFragment {
             @Override
             public void onCompletion() {
                 playButton.setImageResource(R.drawable.baseline_play_circle_24);
-                handler.removeCallbacks(updateSeekBar);
 
                 if(mediaPlayerManager.isPlayingNextSong())
                 {
-                    handler.post(updateSeekBar);
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            if(mediaPlayerManager.isPrepared()){
+                                setSongsInformation();
+                                handler.removeCallbacks(this);
+                                handler.post(updateSeekBar);
+                            }
+                            else
+                                handler.postDelayed(this,200);
+                        }
+                    });
                     playButton.setImageResource(R.drawable.baseline_pause_circle_24);
-                    setSongsInformation();
                 }
             }
         }, MiniPlayerFragment.class.getName());
@@ -138,7 +147,18 @@ public class MiniPlayerFragment extends BaseFragment {
         mediaPlayerManager.addOnPlayingSongChangeListener(new MediaPlayerManager.OnPlayingSongChangeListener() {
             @Override
             public void onPlayingSongChange(Song song) {
-                setSongsInformation();
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(mediaPlayerManager.isPrepared()){
+                            setSongsInformation();
+                            handler.removeCallbacks(this);
+                            handler.post(updateSeekBar);
+                        }
+                        else
+                            handler.postDelayed(this,200);
+                    }
+                });
             }
         }, MiniPlayerFragment.class.getName());
 
@@ -153,22 +173,15 @@ public class MiniPlayerFragment extends BaseFragment {
         playButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!mediaPlayerManager.getMediaPlayer().isPlaying())
-                {
-                    if(mediaPlayerManager.isPrepared())
-                    {
-                        handler.post(updateSeekBar);
-                        mediaPlayerManager.play();
-                    }
+                if(mediaPlayerManager.isPrepared() && !mediaPlayerManager.getMediaPlayer().isPlaying()){
+
+                    mediaPlayerManager.play();
+                    handler.post(updateSeekBar);
 
                 }
-                else
-                {
-                    if(mediaPlayerManager.isPrepared())
-                    {
-                        handler.removeCallbacks(updateSeekBar);
-                        mediaPlayerManager.pause();
-                    }
+
+                else if(mediaPlayerManager.isPrepared()){
+                    mediaPlayerManager.pause();
 
                 }
 
@@ -200,7 +213,8 @@ public class MiniPlayerFragment extends BaseFragment {
                     handler.removeCallbacks(this);
                     handler.post(updateSeekBar);
                 }
-                handler.postDelayed(this,200);
+                else
+                    handler.postDelayed(this,200);
             }
         });
 
