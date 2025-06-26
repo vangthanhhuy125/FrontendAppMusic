@@ -1,9 +1,12 @@
 package com.example.manhinhappmusic.model;
 
+import com.example.manhinhappmusic.dto.MultiResponse;
+import com.example.manhinhappmusic.dto.MultiResponseImp;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class Artist implements ListItem {
+public class Artist extends MultiResponseImp implements ListItem {
 
     private String id;
     private String name;
@@ -54,7 +57,7 @@ public class Artist implements ListItem {
     }
 
     @Override
-    public ListItemType getType() {
+    public ListItemType getItemType() {
         return ListItemType.ARTIST;
     }
 
@@ -63,5 +66,10 @@ public class Artist implements ListItem {
         List<String> keyWords = new ArrayList<>();
         keyWords.add(name);
         return keyWords;
+    }
+
+    @Override
+    public String getType() {
+        return "artist";
     }
 }

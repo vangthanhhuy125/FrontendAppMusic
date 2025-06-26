@@ -1,5 +1,8 @@
 package com.example.manhinhappmusic.model;
 
+import com.example.manhinhappmusic.dto.MultiResponse;
+import com.example.manhinhappmusic.dto.MultiResponseImp;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -9,7 +12,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class Playlist implements ListItem {
+public class Playlist extends MultiResponseImp implements ListItem{
 
  private String id;
  private String name;
@@ -19,9 +22,6 @@ public class Playlist implements ListItem {
  private String thumbnailUrl;
  private Boolean isPublic;
 
- //Test purpose
- private int thumnailResID;
-private String artistName;
 private List<Song> songsList;
 
 
@@ -34,7 +34,7 @@ private List<Song> songsList;
  }
 
  @Override
- public ListItemType getType() {
+ public ListItemType getItemType() {
   return ListItemType.PLAYLIST;
  }
 
@@ -47,7 +47,9 @@ private List<Song> songsList;
  }
 
 
-
-
+ @Override
+ public String getType() {
+  return "playlist";
+ }
 }
 

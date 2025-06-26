@@ -6,6 +6,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -18,6 +20,8 @@ import android.widget.ImageView;
 
 import com.example.manhinhappmusic.R;
 import com.example.manhinhappmusic.TestData;
+import com.example.manhinhappmusic.databinding.FragmentUserSearchBinding;
+import com.example.manhinhappmusic.decoration.AppItemDecoration;
 import com.example.manhinhappmusic.fragment.BaseFragment;
 import com.example.manhinhappmusic.model.User;
 import com.example.manhinhappmusic.adapter.ArtistAdapter;
@@ -58,6 +62,8 @@ public class UserSearchFragment extends BaseFragment {
      */
     // TODO: Rename and change types and number of parameters
 
+    private NavController navController;
+    private FragmentUserSearchBinding binding;
     private ImageView userAvatar;
     private AppCompatButton searchButton;
     private RecyclerView browseView;
@@ -89,17 +95,18 @@ public class UserSearchFragment extends BaseFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_user_search, container, false);
+        binding = FragmentUserSearchBinding.inflate(inflater, container, false);
+        return  binding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        userAvatar = view.findViewById(R.id.user_avatar_image);
+        navController = Navigation.findNavController(view);
+        userAvatar = binding.userAvatarImage;
         userAvatar.setOnClickListener(this::onUserAvatarClick);
 
-        searchButton = view.findViewById(R.id.search_button);
+        searchButton = binding.searchButton;
         searchButton.setOnClickListener(this::onSearchButtonClick);
 
         genreList = TestData.genreList;
@@ -107,21 +114,25 @@ public class UserSearchFragment extends BaseFragment {
         browseAdapter = new BrowseAdapter(genreList, new BrowseAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
-                callback.onRequestChangeFragment(FragmentTag.USER_GENRE, genreList.get(position).getId());
+                Bundle bundle = new Bundle();
+                bundle.putString("genreId", genreList.get(position).getId());
+                navController.navigate(R.id.userGenreFragment, bundle);
             }
         });
         browseView = view.findViewById(R.id.browse_view);
         browseView.setAdapter(browseAdapter);
         GridLayoutManager browseLayoutManager = new GridLayoutManager(this.getContext(), 2);
         browseView.setLayoutManager(browseLayoutManager);
-        browseView.addItemDecoration(new GridSpacingItemDecoration(2, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, getResources().getDisplayMetrics()), true));
+        browseView.addItemDecoration(new GridSpacingItemDecoration(2, AppItemDecoration.convertDpToPx(10, getResources()), true));
 
         artistList = TestData.artistList;
 
         artistAdapter = new ArtistAdapter(artistList, new ArtistAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
-                callback.onRequestChangeFragment(FragmentTag.USER_ARTIST, artistList.get(position).getId());
+                Bundle bundle = new Bundle();
+                bundle.putString("artistId", artistList.get(position).getId());
+                navController.navigate(R.id.userArtistFragment, bundle);
             }
         });
         artistView = view.findViewById(R.id.artist_view);
@@ -133,10 +144,16 @@ public class UserSearchFragment extends BaseFragment {
     }
 
     private void onUserAvatarClick(View view){
-        callback.onRequestChangeFragment(FragmentTag.USER_PROFILE);
+        navController.navigate(R.id.userProfileFragment);
     }
 
     private void onSearchButtonClick(View view){
-        callback.onRequestChangeFragment(FragmentTag.SEARCH_EX);
+       navController.navigate(R.id.seacrhExFragment);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
     }
 }

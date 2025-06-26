@@ -1,5 +1,10 @@
 package com.example.manhinhappmusic.network;
 
+import android.util.Log;
+
+import com.example.manhinhappmusic.dto.MultiResponse;
+import com.google.gson.GsonBuilder;
+
 import java.io.IOException;
 
 import okhttp3.Interceptor;
@@ -29,15 +34,20 @@ public class ApiClient {
     {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(ApiService.BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create(new GsonBuilder()
+                        .registerTypeAdapter(MultiResponse.class, new MultiResponseDeserializer())
+                        .create()))
                 .build();
         apiService = retrofit.create(ApiService.class);
     }
     public void createApiServiceWithToken(String token){
         this.token = token;
+        Log.d("token", token);
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(ApiService.BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create(new GsonBuilder()
+                        .registerTypeAdapter(MultiResponse.class, new MultiResponseDeserializer())
+                        .create()))
                 .client(new OkHttpClient.Builder().addInterceptor(new Interceptor() {
             @Override
             public Response intercept(Chain chain) throws IOException {

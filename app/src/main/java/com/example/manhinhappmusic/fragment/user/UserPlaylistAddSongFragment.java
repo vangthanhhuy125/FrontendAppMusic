@@ -20,6 +20,7 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
 
+import com.example.manhinhappmusic.dto.SongResponse;
 import com.example.manhinhappmusic.fragment.BaseFragment;
 import com.example.manhinhappmusic.view.ClearableEditText;
 import com.example.manhinhappmusic.repository.PlaylistRepository;
@@ -52,7 +53,7 @@ public class UserPlaylistAddSongFragment extends BaseFragment {
     private List<Song> sourceSongList;
     private SearchResultAdapter adapter;
 
-    private static final String ARG_ID = "id";
+    private static final String ARG_ID = "playlistId";
 
     private String id;
 
@@ -95,16 +96,10 @@ public class UserPlaylistAddSongFragment extends BaseFragment {
         searchText = view.findViewById(R.id.search_text);
         searchResultsView = view.findViewById(R.id.search_result_view);
         backButton = view.findViewById(R.id.back_button);
-
-
-
-
-
-
         adapter = new SearchResultAdapter(new ArrayList<>(),new SparseBooleanArray(), new SearchResultAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position, ListItem item) {
-                if(adapter.getListItemList().get(position).getType() == ListItemType.SONG)
+                if(adapter.getListItemList().get(position).getItemType() == ListItemType.SONG)
                 {
                     if(!adapter.getCheckStates().get(position))
                     {
@@ -205,15 +200,20 @@ public class UserPlaylistAddSongFragment extends BaseFragment {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
 
-                SongRepository.getInstance().searchSongs(s.toString()).observe(getViewLifecycleOwner(), new Observer<List<Song>>() {
-                    @Override
-                    public void onChanged(List<Song> songs) {
-                        List<Song> searchResults = songs;
-                        SparseBooleanArray checkStates = checkSongInPlaylist(searchResults);
-                        adapter.setNewData(new ArrayList<>(searchResults), checkStates);
-                        adapter.notifyDataSetChanged();
-                    }
-                });
+                if(!s.toString().isBlank())
+                {
+                    SongRepository.getInstance().searchSongsWithStatus(s.toString()).observe(getViewLifecycleOwner(), new Observer<List<SongResponse>>() {
+                        @Override
+                        public void onChanged(List<SongResponse> songResponses) {
+                            adapter.setListItemList(new ArrayList<>(songResponses));
+                            adapter.notifyDataSetChanged();
+                        }
+                    });
+                }
+                else {
+                    adapter.getListItemList().clear();
+                    adapter.notifyDataSetChanged();
+                }
 
             }
 

@@ -1,11 +1,28 @@
 package com.example.manhinhappmusic.fragment;
 
 import android.content.Context;
+import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.example.manhinhappmusic.activity.MainActivity;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
 public class BaseFragment extends Fragment {
+
+    protected int bottomNavVisibility = BottomNavigationView.VISIBLE;
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(getActivity() instanceof MainActivity )
+        {
+            MainActivity mainActivity = (MainActivity) getActivity();
+            mainActivity.setBottomNavigationViewVisibility(bottomNavVisibility);
+        }
+
+    }
 
     public interface FragmentInteractionListener{
         void onRequestChangeFragment(FragmentTag destinationTag, Object... params);

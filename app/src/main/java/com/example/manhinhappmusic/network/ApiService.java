@@ -6,9 +6,12 @@ import com.example.manhinhappmusic.dto.ChangePasswordRequest;
 import com.example.manhinhappmusic.dto.ForgotPasswordRequest;
 import com.example.manhinhappmusic.dto.LoginRequest;
 import com.example.manhinhappmusic.dto.MessageResponse;
+import com.example.manhinhappmusic.dto.MultiResponse;
+import com.example.manhinhappmusic.dto.MultiResponseImp;
 import com.example.manhinhappmusic.dto.PlaylistRequest;
 import com.example.manhinhappmusic.dto.RegisterRequest;
 import com.example.manhinhappmusic.dto.ResetPasswordRequest;
+import com.example.manhinhappmusic.dto.SongResponse;
 import com.example.manhinhappmusic.dto.VerifyRequest;
 import com.example.manhinhappmusic.model.Playlist;
 import com.example.manhinhappmusic.model.Song;
@@ -94,7 +97,10 @@ public interface ApiService {
     Call<Playlist> removeSongs(@Path("playlistId") String id, @Body Map<String, List<String>> changes);
 
     @GET("/api/common/song/search")
-    Call<List<Song>> searchSongs(@Query("title") String title);
+    Call<List<SongResponse>> searchSongs(@Query("keyword") String keyword);
+
+    @GET("/api/common/song/search/multi")
+    Call<List<MultiResponse>> search(@Query("keyword") String keyword);
 
     @GET("/api/common/song/new-release")
     Call<List<Song>> getNewReleaseSongs();

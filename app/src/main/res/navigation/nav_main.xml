@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_main"
+    app:startDestination="@id/userHomeFragment">
+    <fragment
+        android:id="@+id/userHomeFragment"
+        android:name="com.example.manhinhappmusic.fragment.user.UserHomeFragment"
+        android:label="fragment_user_home"
+        tools:layout="@layout/fragment_user_home" />
+    <fragment
+        android:id="@+id/userSearchFragment"
+        android:name="com.example.manhinhappmusic.fragment.user.UserSearchFragment"
+        android:label="fragment_user_search"
+        tools:layout="@layout/fragment_user_search" />
+    <fragment
+        android:id="@+id/userLibraryFragment"
+        android:name="com.example.manhinhappmusic.fragment.user.UserLibraryFragment"
+        android:label="fragment_user_library"
+        tools:layout="@layout/fragment_user_library" />
+    <fragment
+        android:id="@+id/userPlaylistFragment"
+        android:name="com.example.manhinhappmusic.fragment.user.UserPlaylistFragment"
+        android:label="fragment_user_playlist"
+        tools:layout="@layout/fragment_user_playlist" />
+    <fragment
+        android:id="@+id/userProfileFragment"
+        android:name="com.example.manhinhappmusic.fragment.user.UserProfileFragment"
+        android:label="fragment_user_profile"
+        tools:layout="@layout/fragment_user_profile" />
+    <fragment
+        android:id="@+id/userGenreFragment"
+        android:name="com.example.manhinhappmusic.fragment.user.UserGenreFragment"
+        android:label="fragment_user_genre"
+        tools:layout="@layout/fragment_user_genre">
+        <argument android:name="genreId"
+            app:argType="string"/>
+    </fragment>
+    <fragment
+        android:id="@+id/userArtistFragment"
+        android:name="com.example.manhinhappmusic.fragment.user.UserArtistFragment"
+        android:label="fragment_user_artist"
+        tools:layout="@layout/fragment_user_artist">
+        <argument android:name="artistId"
+            app:argType="string"/>
+    </fragment>
+    <fragment
+        android:id="@+id/seacrhExFragment"
+        android:name="com.example.manhinhappmusic.fragment.user.SearchExFragment"
+        android:label="fragment_seacrh_ex"
+        tools:layout="@layout/fragment_seacrh_ex" />
+    <fragment
+        android:id="@+id/userLibrarySearchFragment"
+        android:name="com.example.manhinhappmusic.fragment.user.UserLibrarySearchFragment"
+        android:label="fragment_user_library_search"
+        tools:layout="@layout/fragment_user_library_search" />
+    <fragment
+        android:id="@+id/userPlaylistAddSongFragment"
+        android:name="com.example.manhinhappmusic.fragment.user.UserPlaylistAddSongFragment"
+        android:label="fragment_user_playlist_add_song"
+        tools:layout="@layout/fragment_user_playlist_add_song">
+        <argument android:name="playlistId"
+            app:argType="string"/>
+    </fragment>
+    <fragment
+        android:id="@+id/editPlaylistFragment"
+        android:name="com.example.manhinhappmusic.fragment.user.EditPlaylistFragment"
+        android:label="fragment_edit_playlist"
+        tools:layout="@layout/fragment_edit_playlist">
+        <argument android:name="playlistId"
+            app:argType="string"/>
+    </fragment>
+    <fragment
+        android:id="@+id/editProfileFragment"
+        android:name="com.example.manhinhappmusic.fragment.user.EditProfileFragment"
+        android:label="fragment_edit_profile"
+        tools:layout="@layout/fragment_edit_profile" />
+    <fragment
+        android:id="@+id/userSearchAddSongFragment"
+        android:name="com.example.manhinhappmusic.fragment.user.UserSearchAddSongFragment"
+        android:label="fragment_user_search_add_song"
+        tools:layout="@layout/fragment_user_search_add_song"/>
+
+ /
+
+</navigation>

@@ -97,7 +97,7 @@ public class MoreOptionsSongFragment extends BottomSheetDialogFragment {
 //                .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(15))))
 //                .into(songCoverImage);
         songTitleText.setText(song.getTitle());
-        artistNameText.setText(song.getArtistId());
+        artistNameText.setText(song.getArtist_id());
 
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override

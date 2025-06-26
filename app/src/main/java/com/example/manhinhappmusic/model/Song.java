@@ -1,5 +1,8 @@
 package com.example.manhinhappmusic.model;
 
+
+import com.example.manhinhappmusic.dto.MultiResponseImp;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +14,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class Song implements ListItem {
+public class Song extends MultiResponseImp implements ListItem{
     private String id;
     private String artist_id;
     private String description;
@@ -25,13 +28,9 @@ public class Song implements ListItem {
     private Double duration;
     private Double views;
 
-    //Test purpose
 
-    private int audioResID;
-    private int coverImageResID;
-    private String artistId;
     @Override
-    public ListItemType getType() {
+    public ListItemType getItemType() {
         return ListItemType.SONG;
     }
 
@@ -41,4 +40,9 @@ public class Song implements ListItem {
         keyWords.add(title);
         //keyWords.add(artist_id);
         return keyWords;    }
+
+    @Override
+    public String getType() {
+        return "song";
+    }
 }

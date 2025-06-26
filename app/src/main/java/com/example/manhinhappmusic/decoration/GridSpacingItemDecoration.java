@@ -1,12 +1,13 @@
 package com.example.manhinhappmusic.decoration;
 
 import android.graphics.Rect;
+import android.util.TypedValue;
 import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class GridSpacingItemDecoration extends RecyclerView.ItemDecoration {
+public class GridSpacingItemDecoration extends AppItemDecoration {
     private final int spanCount;
     private final int spacing;        // (px)
     private final boolean includeEdge;
@@ -39,5 +40,7 @@ public class GridSpacingItemDecoration extends RecyclerView.ItemDecoration {
             }
         }
     }
+
+
 
 }

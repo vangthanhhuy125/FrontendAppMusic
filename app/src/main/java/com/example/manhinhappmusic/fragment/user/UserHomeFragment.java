@@ -6,6 +6,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -20,6 +22,7 @@ import com.example.manhinhappmusic.R;
 import com.example.manhinhappmusic.TestData;
 import com.example.manhinhappmusic.adapter.HomePlaylistAdapter;
 import com.example.manhinhappmusic.adapter.MusicDisplayAdapter;
+import com.example.manhinhappmusic.databinding.FragmentUserHomeBinding;
 import com.example.manhinhappmusic.decoration.GridSpacingItemDecoration;
 import com.example.manhinhappmusic.decoration.VerticalLinearSpacingItemDecoration;
 import com.example.manhinhappmusic.fragment.BaseFragment;
@@ -38,49 +41,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link UserHomeFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+
 public class UserHomeFragment extends BaseFragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    public UserHomeFragment() {
-        // Required empty public constructor
-
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment UserHomeFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static UserHomeFragment newInstance(String param1, String param2) {
-        UserHomeFragment fragment = new UserHomeFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
+    private FragmentUserHomeBinding binding;
     private ShapeableImageView userAvatarImage;
-
-//    private LinearLayout linearContainer;
-
+    private NavController navController;
     private RecyclerView playlistView;
     private RecyclerView musicDisplayView;
 
@@ -90,17 +56,15 @@ public class UserHomeFragment extends BaseFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_user_home, container, false);
+         binding = FragmentUserHomeBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
@@ -136,21 +100,28 @@ public class UserHomeFragment extends BaseFragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        userAvatarImage = view.findViewById(R.id.user_avatar_image);
-        userAvatarImage.setOnClickListener(this::onClickUserAvatarImage);
-//        linearContainer = view.findViewById(R.id.linear_container);
-        musicDisplayView = view.findViewById(R.id.music_display_view);
-        playlistView = view.findViewById(R.id.playlist_view);
+        navController = Navigation.findNavController(view);
+        userAvatarImage = binding.userAvatarImage;
+        musicDisplayView = binding.musicDisplayView;
+        playlistView = binding.playlistView;
+
+        userAvatarImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                navController.navigate(R.id.userProfileFragment);
+            }
+        });
         musicDisplayAdapter = new MusicDisplayAdapter(new ArrayList<>(), new MusicDisplayAdapter.OnDisplayItemCLickListener() {
             @Override
             public void onDisplayItemClick(int position, ListItem item) {
-                if(item.getType() == ListItemType.PLAYLIST)
+                if(item.getItemType() == ListItemType.PLAYLIST)
                 {
                     Playlist playlist = (Playlist) item;
                     PlaylistRepository.getInstance().setCurrentPlaylist(playlist);
-                    callback.onRequestChangeFragment(FragmentTag.USER_PLAYLIST, playlist.getId());
+                    navController.navigate(R.id.userPlaylistFragment);
+
                 }
-                else if (item.getType() == ListItemType.SONG)
+                else if (item.getItemType() == ListItemType.SONG)
                 {
                     MediaPlayerManager mediaPlayerManager = MediaPlayerManager.getInstance(null);
                     Song song = (Song) item;
@@ -158,10 +129,10 @@ public class UserHomeFragment extends BaseFragment {
                     mediaPlayerManager.setCurrentSong(0);
                     callback.onRequestLoadMiniPlayer();
                 }
-                else if(item.getType() == ListItemType.ARTIST)
+                else if(item.getItemType() == ListItemType.ARTIST)
                 {
                     User artist = (User) item;
-                    callback.onRequestChangeFragment(FragmentTag.USER_ARTIST, artist.getId());
+                    navController.navigate(R.id.userArtistFragment);
                 }
             }
         });
@@ -177,85 +148,20 @@ public class UserHomeFragment extends BaseFragment {
             @Override
             public void onItemClick(int position, Playlist playlist) {
                 PlaylistRepository.getInstance().setCurrentPlaylist(playlist);
-
-                callback.onRequestChangeFragment(FragmentTag.USER_PLAYLIST, playlist.getId());
+                navController.navigate(R.id.userPlaylistFragment);
             }
         });
         playlistView.setAdapter(playlistAdapter);
         playlistView.setLayoutManager(playlistLayoutManager);
         playlistView.addItemDecoration(new GridSpacingItemDecoration(2, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8, getResources().getDisplayMetrics()), true));
 
+    }
 
-//        for(MusicDisplayItem homeDisplayItem: MusicDisplayRepository.getInstance().getAll().getValue())
-//        {
-//            int viewId = View.generateViewId();
-//            FrameLayout frameLayout = new FrameLayout(requireContext());
-//            frameLayout.setId(viewId);
-//            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-//            params.setMargins(0,0,0,15);
-//            frameLayout.setLayoutParams(params);
-//            linearContainer.addView(frameLayout);
-//            getChildFragmentManager()
-//                    .beginTransaction()
-//                    .replace(viewId, MusicDisplayFragment.newInstance(homeDisplayItem.getId()))
-//                    .commit();
-//        }
-//
-//
-//
-
-//
-//        recentlyPlayView = view.findViewById(R.id.recently_play_view);
-//        LinearLayoutManager recentlyPlayViewLayoutManager = new LinearLayoutManager(this.getContext());
-//        recentlyPlayViewLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
-//        HomeSongAdapter recentlySongAdapter = new HomeSongAdapter(recentlyPlaySongList, new HomeSongAdapter.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(int position) {
-//
-//            }
-//        });
-//        recentlyPlayView.setAdapter(recentlySongAdapter);
-//        recentlyPlayView.setLayoutManager(recentlyPlayViewLayoutManager);
-//        recentlyPlayView.addItemDecoration(new HorizontalLinearSpacingItemDecoration((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, getResources().getDisplayMetrics())));
-//
-//        newReleaseView = view.findViewById(R.id.new_release_view);
-//        LinearLayoutManager newReleaseViewLayoutManager = new LinearLayoutManager(this.getContext());
-//        newReleaseViewLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
-//        HomeSongAdapter newReleaseSongAdapter = new HomeSongAdapter(newReleaseSongList, new HomeSongAdapter.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(int position) {
-//
-//            }
-//        });
-//        newReleaseView.setAdapter(newReleaseSongAdapter);
-//        newReleaseView.setLayoutManager(newReleaseViewLayoutManager);
-//        newReleaseView.addItemDecoration(new HorizontalLinearSpacingItemDecoration((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, getResources().getDisplayMetrics())));
-//
-//        featureView = view.findViewById(R.id.featuring_view);
-//        LinearLayoutManager featureLayoutManager = new LinearLayoutManager(this.getContext());
-//        featureLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
-//        HomeFeatureAdapter homeFeatureAdapter = new HomeFeatureAdapter(featurePlaylistList, new HomeFeatureAdapter.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(int position) {
-//
-//            }
-//        });
-//        featureView.setAdapter(homeFeatureAdapter);
-//        featureView.setLayoutManager(featureLayoutManager);
-//        featureView.addItemDecoration(new HorizontalLinearSpacingItemDecoration((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, getResources().getDisplayMetrics())));
-
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
     }
 
 
-
-    private void onClickUserAvatarImage(View view){
-        try {
-            callback.onRequestChangeFragment(FragmentTag.USER_PROFILE, null);
-        }catch (Exception ex)
-        {
-            Toast.makeText(this.getContext(), ex.getMessage(), Toast.LENGTH_SHORT).show();
-
-        }
-
-    }
 }

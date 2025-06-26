@@ -18,6 +18,7 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.manhinhappmusic.R;
+import com.example.manhinhappmusic.dto.SongResponse;
 import com.example.manhinhappmusic.model.User;
 import com.example.manhinhappmusic.model.ListItem;
 import com.example.manhinhappmusic.model.ListItemType;
@@ -49,7 +50,7 @@ public class SearchResultAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     }
     @Override
     public int getItemViewType(int position) {
-        return listItemList.get(position).getType().ordinal();
+        return listItemList.get(position).getItemType().ordinal();
     }
 
     @NonNull
@@ -78,7 +79,7 @@ public class SearchResultAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if(holder instanceof SongViewHolder)
         {
-            Song song = (Song)listItemList.get(position);
+            SongResponse song = (SongResponse)listItemList.get(position);
             SongViewHolder songViewHolder = (SongViewHolder) holder;
             if(song.getCoverImageUrl() != null && !song.getCoverImageUrl().isEmpty())
                 Glide.with(holder.itemView.getContext())
@@ -93,7 +94,7 @@ public class SearchResultAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             songViewHolder.getSongTitleText().setText("Song • "+ song.getTitle());
             songViewHolder.getSongArtistText().setText(song.getArtistId());
             CheckBox checkBox = songViewHolder.getCheckBox();
-            checkBox.setChecked(checkStates.get(position));
+            checkBox.setChecked(song.getPlaylistIds().size() > 0 ? true : false);
             checkBox.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -152,30 +153,30 @@ public class SearchResultAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                         .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(15))))
                         .into(playlistViewHolder.getPlaylistCoverImage());
             playlistViewHolder.getPlaylistTitleText().setText(playlist.getName());
-            CheckBox checkBox = playlistViewHolder.getCheckBox();
-            checkBox.setChecked(checkStates.get(position));
-            checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    checkStates.put(playlistViewHolder.getAdapterPosition(),checkBox.isChecked() );
-
-                    if(checkBox.isChecked())
-                    {
-                        if(onItemCheckedCheckBoxClickListener != null)
-                        {
-                            onItemCheckedCheckBoxClickListener.onItemCheckBoxClick(playlistViewHolder.getAdapterPosition(), playlist, checkBox);
-                        }
-                    }
-                    else
-                    {
-//                        checkBox.setChecked(true);
-                        if(onItemUncheckedCheckBoxClickListener != null)
-                        {
-                            onItemUncheckedCheckBoxClickListener.onItemCheckBoxClick(playlistViewHolder.getAdapterPosition(), playlist, checkBox);
-                        }
-                    }
-                }
-            });
+//            CheckBox checkBox = playlistViewHolder.getCheckBox();
+//            checkBox.setChecked(checkStates.get(position));
+//            checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//                @Override
+//                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+//                    checkStates.put(playlistViewHolder.getAdapterPosition(),checkBox.isChecked() );
+//
+//                    if(checkBox.isChecked())
+//                    {
+//                        if(onItemCheckedCheckBoxClickListener != null)
+//                        {
+//                            onItemCheckedCheckBoxClickListener.onItemCheckBoxClick(playlistViewHolder.getAdapterPosition(), playlist, checkBox);
+//                        }
+//                    }
+//                    else
+//                    {
+////                        checkBox.setChecked(true);
+//                        if(onItemUncheckedCheckBoxClickListener != null)
+//                        {
+//                            onItemUncheckedCheckBoxClickListener.onItemCheckBoxClick(playlistViewHolder.getAdapterPosition(), playlist, checkBox);
+//                        }
+//                    }
+//                }
+//            });
 
             playlistViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -288,6 +289,10 @@ public class SearchResultAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     public void setNewData(List<ListItem> listItemList, SparseBooleanArray checkStates) {
         this.listItemList = listItemList;
         this.checkStates = checkStates;
+    }
+
+    public void setListItemList(List<ListItem> listItemList) {
+        this.listItemList = listItemList;
     }
 
     public SparseBooleanArray getCheckStates() {

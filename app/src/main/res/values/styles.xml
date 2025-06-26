@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <style name="ExpandedAppBarTitle" parent="TextAppearance.AppCompat.Title">
+        <item name="android:textSize">35sp</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="CollapsedAppBarTitle" parent="TextAppearance.AppCompat.Title">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColor">#FFFFFF</item>
+    </style>
+
     <style name="RoundedImageStyle" parent="">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">50%</item>

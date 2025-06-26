@@ -12,6 +12,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +24,7 @@ import android.widget.ImageButton;
 import com.example.manhinhappmusic.R;
 import com.example.manhinhappmusic.activity.LoginActivity;
 import com.example.manhinhappmusic.activity.MainActivity;
+import com.example.manhinhappmusic.databinding.FragmentUserProfileBinding;
 import com.example.manhinhappmusic.fragment.BaseFragment;
 import com.example.manhinhappmusic.fragment.ConfirmLoggingOutFragment;
 
@@ -55,9 +58,11 @@ public class UserProfileFragment extends BaseFragment {
      */
     // TODO: Rename and change types and number of parameters
 
-    Button editButton;
-    ImageButton backButton;
-    AppCompatButton logOutButton;
+    private NavController navController;
+    private FragmentUserProfileBinding binding;
+    private Button editButton;
+    private ImageButton backButton;
+    private AppCompatButton logOutButton;
     public static UserProfileFragment newInstance(String param1, String param2) {
         UserProfileFragment fragment = new UserProfileFragment();
         Bundle args = new Bundle();
@@ -79,18 +84,32 @@ public class UserProfileFragment extends BaseFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_user_profile, container, false);
+        binding = FragmentUserProfileBinding.inflate(inflater, container, false);
+        return  binding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        editButton = view.findViewById(R.id.edit_button);
-        editButton.setOnClickListener(this::onEditButtonClick);
-        backButton = view.findViewById(R.id.back_button);
-        backButton.setOnClickListener(this::onBackButtonClick);
-        logOutButton = view.findViewById(R.id.log_out_button);
+        navController = Navigation.findNavController(view);
+        editButton = binding.editButton;
+        backButton = binding.backButton;
+        logOutButton = binding.logOutButton;
+
+        editButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                navController.navigate(R.id.editProfileFragment);
+            }
+        });
+
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                navController.popBackStack();
+            }
+        });
+
         logOutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -110,12 +129,7 @@ public class UserProfileFragment extends BaseFragment {
         });
     }
 
-    private void onEditButtonClick(View view){
-        callback.onRequestOpenBottomSheetFragment(FragmentTag.EDIT_PROFILE);
-    }
-    private void onBackButtonClick(View view){
-        callback.onRequestGoBackPreviousFragment();
-    }
+
 
     private ActivityResultLauncher launcher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
         @Override
@@ -123,4 +137,10 @@ public class UserProfileFragment extends BaseFragment {
 
         }
     });
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
+    }
 }

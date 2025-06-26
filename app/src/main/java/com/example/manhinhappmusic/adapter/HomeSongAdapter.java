@@ -43,12 +43,12 @@ public class HomeSongAdapter extends RecyclerView.Adapter<HomeSongAdapter.ViewHo
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Song song = songList.get(position);
-        Glide.with(holder.itemView.getContext())
-                .load(song.getCoverImageResID())
-                .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(15))))
-                .into(holder.getSongsCoverImage());
-        holder.getSongsNameText().setText(song.getTitle());
-        holder.getArtistsNameText().setText(song.getArtistId());
+//        Glide.with(holder.itemView.getContext())
+//                .load(song.getCoverImageResID())
+//                .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(15))))
+//                .into(holder.getSongsCoverImage());
+//        holder.getSongsNameText().setText(song.getTitle());
+//        holder.getArtistsNameText().setText(song.getArtistId());
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

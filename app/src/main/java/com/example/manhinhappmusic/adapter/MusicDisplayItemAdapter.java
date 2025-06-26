@@ -93,7 +93,7 @@ public class MusicDisplayItemAdapter extends RecyclerView.Adapter<RecyclerView.V
                     .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(15))))
                     .into(homeSongViewHolder.getSongCoverImage());
             homeSongViewHolder.getSongTitleText().setText(song.getTitle());
-            homeSongViewHolder.getArtistNameText().setText(song.getArtistId());
+            homeSongViewHolder.getArtistNameText().setText(song.getArtist_id());
             homeSongViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -109,7 +109,7 @@ public class MusicDisplayItemAdapter extends RecyclerView.Adapter<RecyclerView.V
                     .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(15))))
                     .into(homeReleasePlaylistViewHolder.getPlaylistCoverImage());
             homeReleasePlaylistViewHolder.getPlaylistTitleText().setText(playlist.getName());
-            homeReleasePlaylistViewHolder.getArtistNameText().setText(playlist.getArtistName());
+//            homeReleasePlaylistViewHolder.getArtistNameText().setText(playlist.getArtistName());
             homeReleasePlaylistViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

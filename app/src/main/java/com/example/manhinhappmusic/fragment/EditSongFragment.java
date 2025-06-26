@@ -90,16 +90,16 @@ public class EditSongFragment extends Fragment {
         descriptionInput = view.findViewById(R.id.descriptionInput);
         saveButton = view.findViewById(R.id.saveButton);
 
-        if (currentSong != null) {
-            if (currentSong.getCoverImageResID() != 0) {
-                songImage.setImageResource(currentSong.getCoverImageResID());
-            } else if (currentSong.getCoverImageUrl() != null) {
-                songImage.setImageURI(Uri.parse(currentSong.getCoverImageUrl()));
-            }
-            songNameInput.setText(currentSong.getTitle());
-            artistInput.setText(currentSong.getArtistId());
-            descriptionInput.setText(currentSong.getDescription());
-        }
+//        if (currentSong != null) {
+//            if (currentSong.getCoverImageResID() != 0) {
+//                songImage.setImageResource(currentSong.getCoverImageResID());
+//            } else if (currentSong.getCoverImageUrl() != null) {
+//                songImage.setImageURI(Uri.parse(currentSong.getCoverImageUrl()));
+//            }
+//            songNameInput.setText(currentSong.getTitle());
+//            artistInput.setText(currentSong.getArtistId());
+//            descriptionInput.setText(currentSong.getDescription());
+//        }
 
         editImageButton.setOnClickListener(v -> {
             pickImageLauncher.launch("image/*");
@@ -116,7 +116,7 @@ public class EditSongFragment extends Fragment {
             }
 
             currentSong.setTitle(newTitle);
-            currentSong.setArtistId(newArtist);
+//            currentSong.setArtistId(newArtist);
             currentSong.setDescription(newDesc);
 
             if (listener != null) {

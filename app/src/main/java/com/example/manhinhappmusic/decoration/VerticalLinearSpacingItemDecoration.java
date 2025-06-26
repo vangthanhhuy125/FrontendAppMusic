@@ -6,7 +6,7 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class VerticalLinearSpacingItemDecoration extends RecyclerView.ItemDecoration {
+public class VerticalLinearSpacingItemDecoration extends AppItemDecoration{
     private final int linearSpacing;
 
     public VerticalLinearSpacingItemDecoration(int linearSpacing)

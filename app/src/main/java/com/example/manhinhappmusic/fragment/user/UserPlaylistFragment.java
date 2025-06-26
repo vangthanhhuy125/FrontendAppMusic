@@ -1,11 +1,19 @@
 package com.example.manhinhappmusic.fragment.user;
 
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+import androidx.palette.graphics.Palette;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -28,7 +36,11 @@ import com.bumptech.glide.load.MultiTransformation;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
+import com.example.manhinhappmusic.databinding.FragmentUserPlaylistBinding;
 import com.example.manhinhappmusic.fragment.BaseFragment;
+import com.example.manhinhappmusic.helper.CoverImageScrollHelper;
 import com.example.manhinhappmusic.network.ApiService;
 import com.example.manhinhappmusic.repository.SongRepository;
 import com.example.manhinhappmusic.view.ClearableEditText;
@@ -39,6 +51,7 @@ import com.example.manhinhappmusic.decoration.VerticalLinearSpacingItemDecoratio
 import com.example.manhinhappmusic.model.MediaPlayerManager;
 import com.example.manhinhappmusic.model.Playlist;
 import com.example.manhinhappmusic.model.Song;
+import com.google.android.material.appbar.AppBarLayout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,6 +69,8 @@ public class UserPlaylistFragment extends BaseFragment {
     private static final String ARG_IS_THIS_PLAYING = "IS_THIS_PLAYING";
     private String id;
 
+    private FragmentUserPlaylistBinding binding;
+    private NavController navController;
     private ImageView playlistsCoverImage;
     private TextView playlistsTitle;
     private TextView playlistsCount;
@@ -65,6 +80,8 @@ public class UserPlaylistFragment extends BaseFragment {
     private Button editButton;
     private ImageButton addToLibraryButton;
     private ImageButton moreOptionsButton;
+    private AppBarLayout appBarLayout;
+    private NestedScrollView nestedScrollView;
 //    private ImageButton shuffleButton;
     private ImageButton playButton;
     private RecyclerView songsView;
@@ -113,18 +130,38 @@ public class UserPlaylistFragment extends BaseFragment {
     @Override
     public void onResume() {
         super.onResume();
-        Log.d("frag", "resume");
         playlistsTitle.setText(playlist.getName());
         playlistsCount.setText(String.valueOf(playlist.getSongs().size()) + " songs");
         if(playlist.getThumbnailUrl() != null && !playlist.getThumbnailUrl().isEmpty())
             Glide.with(this.getContext())
-                .load(ApiService.BASE_URL + playlist.getThumbnailUrl())
-                .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(15))))
-                .into(playlistsCoverImage);
+                    .asBitmap()
+                    .load(ApiService.BASE_URL + playlist.getThumbnailUrl())
+                .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(20))))
+                .into(new CustomTarget<Bitmap>() {
+                    @Override
+                    public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                        playlistsCoverImage.setImageBitmap(resource);
+                        Palette.from(resource).generate(palette -> {
+                            int vibrant = palette.getVibrantColor(Color.GRAY);
+                            GradientDrawable gradientDrawable = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,
+                                    new int[]{vibrant,
+                                            Color.parseColor("#121212"),
+                                            Color.parseColor("#121212"),
+                                            Color.parseColor("#121212"),
+                                            });
+                            binding.mainLayout.setBackground( gradientDrawable);
+                        });
+                    }
+
+                    @Override
+                    public void onLoadCleared(@Nullable Drawable placeholder) {
+
+                    }
+                });
         else
             Glide.with(this.getContext())
                     .load(R.drawable.music_default_cover)
-                    .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(15))))
+                    .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(20))))
                     .into(playlistsCoverImage);
         PlaylistRepository.getInstance().getAllSongs(playlist.getId()).observe(getViewLifecycleOwner(), new Observer<List<Song>>() {
             @Override
@@ -140,23 +177,25 @@ public class UserPlaylistFragment extends BaseFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        playlistsCoverImage = view.findViewById(R.id.playlists_cover_image);
-        playlistsTitle = view.findViewById(R.id.playlists_title);
-        playlistsCount = view.findViewById(R.id.playlists_count);
-        backButton = view.findViewById(R.id.back_button);
-        searchButton = view.findViewById(R.id.search_button);
-        addButton = view.findViewById(R.id.add_button);
-        editButton = view.findViewById(R.id.edit_button);
-        addToLibraryButton = view.findViewById(R.id.add_to_library_button);
-        moreOptionsButton = view.findViewById(R.id.more_options_button);
+        navController = Navigation.findNavController(view);
+        nestedScrollView = binding.scrollView;
+        playlistsCoverImage = binding.playlistsCoverImage;
+        playlistsTitle = binding.playlistsTitle;
+        playlistsCount = binding.playlistsCount;
+        backButton = binding.backButton;
+        searchButton = binding.searchButton;
+        addButton = binding.addButton;
+        editButton = binding.editButton;
+        addToLibraryButton = binding.addToLibraryButton;
+        moreOptionsButton = binding.moreOptionsButton;
 //        shuffleButton = view.findViewById(R.id.shuffle_button);
-        playButton = view.findViewById(R.id.play_button);
-        searchEditText = view.findViewById(R.id.search_edit_text);
-        inforLinearContainer = view.findViewById(R.id.infor_linear_container);
-        songsView = view.findViewById(R.id.songs_view);
+        playButton = binding.playButton;
+        searchEditText = binding.searchEditText;
+        inforLinearContainer = binding.inforLinearContainer;
+        songsView = binding.songsView;
 
 
-
+       new CoverImageScrollHelper(playlistsCoverImage, nestedScrollView, 300f, 0.5f, 0.5f);
 
         searchEditText.setHint("Search in playlist");
         searchEditText.addTextChangedListener(new TextWatcher() {
@@ -209,7 +248,7 @@ public class UserPlaylistFragment extends BaseFragment {
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                callback.onRequestGoBackPreviousFragment();
+                navController.popBackStack();
             }
         });
         searchButton.setOnClickListener(new View.OnClickListener() {
@@ -233,13 +272,17 @@ public class UserPlaylistFragment extends BaseFragment {
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                callback.onRequestChangeFragment(FragmentTag.PLAYLIST_ADD_SONG, playlist.getId());
+                Bundle bundle = new Bundle();
+                bundle.putString("playlistId", playlist.getId());
+                navController.navigate(R.id.userPlaylistAddSongFragment,bundle );
             }
         });
         editButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                callback.onRequestChangeFrontFragment(FragmentTag.PLAYLIST_EDIT, playlist.getId());
+                Bundle bundle = new Bundle();
+                bundle.putString("playlistId", playlist.getId());
+                navController.navigate(R.id.editPlaylistFragment, bundle);
             }
         });
 
@@ -293,11 +336,32 @@ public class UserPlaylistFragment extends BaseFragment {
 
         getParentFragmentManager().setFragmentResultListener("update_playlist", getViewLifecycleOwner(), (requestKey, result)->{
 
-//            playlist = PlaylistRepository.getInstance().getCurrentPlaylist();
+//           playlist = PlaylistRepository.getInstance().getCurrentPlaylist();
             Glide.with(this.getContext())
+                    .asBitmap()
                     .load(ApiService.BASE_URL + playlist.getThumbnailUrl())
-                    .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(15))))
-                    .into(playlistsCoverImage);
+                    .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(20))))
+                    .into(new CustomTarget<Bitmap>() {
+                        @Override
+                        public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                            playlistsCoverImage.setImageBitmap(resource);
+                            Palette.from(resource).generate(palette -> {
+                                int vibrant = palette.getVibrantColor(Color.GRAY);
+                                GradientDrawable gradientDrawable = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,
+                                        new int[]{vibrant,
+                                                Color.parseColor("#121212"),
+                                                Color.parseColor("#121212"),
+                                                Color.parseColor("#121212"),
+                                        });
+                                binding.mainLayout.setBackground( gradientDrawable);
+                            });
+                        }
+
+                        @Override
+                        public void onLoadCleared(@Nullable Drawable placeholder) {
+
+                        }
+                    });
             playlistsTitle.setText(playlist.getName());
             playlistsCount.setText(String.valueOf(playlist.getSongsList().size()) + " songs");
             songAdapter.setSongList(playlist.getSongsList());
@@ -323,11 +387,15 @@ public class UserPlaylistFragment extends BaseFragment {
 
         getParentFragmentManager().setFragmentResultListener("add_song_to_this_playlist", getViewLifecycleOwner(),(requestKey, result) -> {
 
-            callback.onRequestChangeFragment(FragmentTag.PLAYLIST_ADD_SONG, playlist.getId());
+            Bundle bundle = new Bundle();
+            bundle.putString("playlistId", playlist.getId());
+            navController.navigate(R.id.userPlaylistAddSongFragment,bundle );
         });
         getParentFragmentManager().setFragmentResultListener("edit_playlist", getViewLifecycleOwner(),(requestKey, result) -> {
 
-            callback.onRequestChangeFrontFragment(FragmentTag.PLAYLIST_EDIT, playlist.getId());
+            Bundle bundle = new Bundle();
+            bundle.putString("playlistId", playlist.getId());
+            navController.navigate(R.id.editPlaylistFragment,bundle );
         });
         getParentFragmentManager().setFragmentResultListener("delete_playlist", getViewLifecycleOwner(),(requestKey, result) -> {
 
@@ -353,7 +421,15 @@ public class UserPlaylistFragment extends BaseFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_user_playlist, container, false);
+        binding = FragmentUserPlaylistBinding.inflate(inflater, container, false);
+        return binding.getRoot();
+    }
+
+    @Override
+    public void onDestroyView() {
+
+        super.onDestroyView();
+        binding = null;
     }
 
     private List<Song> search(String keyWord, List<Song> items)

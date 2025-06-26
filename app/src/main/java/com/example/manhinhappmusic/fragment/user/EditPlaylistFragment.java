@@ -87,6 +87,7 @@ public class EditPlaylistFragment extends BaseFragment {
             id = getArguments().getString(ARG_ID);
             isModified = getArguments().getBoolean(ARG_IS_MODIFIED);
         }
+        bottomNavVisibility = View.GONE;
         playlist = PlaylistRepository.getInstance().getCurrentPlaylist();
 
     }
@@ -203,10 +204,11 @@ public class EditPlaylistFragment extends BaseFragment {
                 {
                     Map<String, Object> changes = new HashMap<>();
                     changes.put("name", playlistNameEditText.getText().toString());
+                    playlist.setName(playlistNameEditText.getText().toString());
+
                     PlaylistRepository.getInstance().edit(playlist.getId(), changes).observe(getViewLifecycleOwner(), new Observer<Playlist>() {
                         @Override
                         public void onChanged(Playlist modifiedPlaylist) {
-                            playlist.setName(modifiedPlaylist.getName());
                         }
 
                     });

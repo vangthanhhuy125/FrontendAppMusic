@@ -25,9 +25,14 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+    }
+
+    buildFeatures{
+        viewBinding = true
     }
 }
 
@@ -42,6 +47,14 @@ dependencies {
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
+    implementation ("androidx.lifecycle:lifecycle-common:2.6.2")
+
+    // Your navigation libs
+    implementation ("androidx.navigation:navigation-fragment-ktx:2.7.7")
+    implementation ("androidx.navigation:navigation-ui-ktx:2.7.7")
+
+    // Ensure core-ktx is also aligned with latest
+    implementation ("androidx.core:core-ktx:1.13.0")
     implementation("com.google.android.flexbox:flexbox:3.0.0")
     implementation ("com.github.bumptech.glide:glide:4.16.0")
     annotationProcessor ("com.github.bumptech.glide:compiler:4.16.0")

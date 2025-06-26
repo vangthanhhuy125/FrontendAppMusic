@@ -6,6 +6,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -20,8 +22,12 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.example.manhinhappmusic.databinding.FragmentUserSearchAddSongBinding;
+import com.example.manhinhappmusic.dto.SongResponse;
 import com.example.manhinhappmusic.fragment.BaseFragment;
+import com.example.manhinhappmusic.model.Song;
 import com.example.manhinhappmusic.repository.PlaylistRepository;
+import com.example.manhinhappmusic.repository.SongRepository;
 import com.example.manhinhappmusic.view.ClearableEditText;
 import com.example.manhinhappmusic.R;
 import com.example.manhinhappmusic.decoration.VerticalLinearSpacingItemDecoration;
@@ -42,6 +48,8 @@ import java.util.stream.Collectors;
  */
 public class UserSearchAddSongFragment extends BaseFragment {
 
+    private NavController navController;
+    private FragmentUserSearchAddSongBinding binding;
     private ImageButton backButton;
     private Button newPlaylistButton;
     private ClearableEditText searchEditText;
@@ -51,12 +59,14 @@ public class UserSearchAddSongFragment extends BaseFragment {
     private Button saveButton;
     private LinearLayout savedPlaylistContainer;
     private LinearLayout relevantPlaylistContainer;
-    private List<Playlist> sourcePlaylistList = new ArrayList<>();
-    private  List<Playlist> savedPlaylistList;
-    private List <Playlist> relevantPlaylistList;
+    private  List<Playlist> savedPlaylistList = new ArrayList<>();
+    private List <Playlist> relevantPlaylistList = new ArrayList<>();
+    private SearchPlaylistAddSongAdapter savedPlaylistAdapter;
+    private SearchPlaylistAddSongAdapter relevantPlaylistAdapter;
+    private SongResponse currentSong;
 
 
-    private static final String ARG_ID = "id";
+    private static final String ARG_ID = "songId";
 
 
     private String id;
@@ -93,32 +103,59 @@ public class UserSearchAddSongFragment extends BaseFragment {
         if (getArguments() != null) {
             id = getArguments().getString(ARG_ID);
         }
+        bottomNavVisibility = View.GONE;
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_user_search_add_song, container, false);
+       binding = FragmentUserSearchAddSongBinding.inflate(inflater, container, false);
+       return  binding.getRoot();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        PlaylistRepository.getInstance().getAll().observe(getViewLifecycleOwner(), new Observer<List<Playlist>>() {
+            @Override
+            public void onChanged(List<Playlist> playlists) {
+                currentSong = SongRepository.getInstance().getCurrentSongResponse();
+                for(Playlist playlist : playlists)
+                {
+                    if(currentSong.getPlaylistIds().stream().anyMatch(s -> s.equals(playlist.getId())))
+                        savedPlaylistList.add(playlist);
+                    else
+                        relevantPlaylistList.add(playlist);
+                }
+                savedPlaylistAdapter.setPlaylistList(savedPlaylistList);
+                savedPlaylistAdapter.checkAll();
+                savedPlaylistAdapter.notifyDataSetChanged();
+                relevantPlaylistAdapter.setPlaylistList(relevantPlaylistList);
+                relevantPlaylistAdapter.notifyDataSetChanged();
+            }
+        });
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        backButton = view.findViewById(R.id.back_button);
-        newPlaylistButton = view.findViewById(R.id.new_playlist_button);
-        searchEditText = view.findViewById(R.id.search_edit_text);
-        deleteAllText = view.findViewById(R.id.delete_all_text);
-        savedPlaylistView = view.findViewById(R.id.saved_playlist_view);
-        relativePlaylistView = view.findViewById(R.id.relevant_playlist_view);
-        saveButton = view.findViewById(R.id.save_button);
-        savedPlaylistContainer = view.findViewById(R.id.saved_playlist_container);
-        relevantPlaylistContainer = view.findViewById(R.id.relevant_playlist_container);
+        navController = Navigation.findNavController(view);
+        backButton = binding.backButton;
+        newPlaylistButton = binding.newPlaylistButton;
+        searchEditText = binding.searchEditText;
+        deleteAllText = binding.deleteAllText;
+        savedPlaylistView = binding.savedPlaylistView;
+        relativePlaylistView = binding.relevantPlaylistView;
+        saveButton = binding.saveButton;
+        savedPlaylistContainer = binding.savedPlaylistContainer;
+        relevantPlaylistContainer = binding.relevantPlaylistContainer;
 
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                callback.onRequestGoBackPreviousFragment();
+
+                navController.popBackStack();
             }
         });
         newPlaylistButton.setOnClickListener(new View.OnClickListener() {
@@ -132,7 +169,7 @@ public class UserSearchAddSongFragment extends BaseFragment {
 
 
 
-        SearchPlaylistAddSongAdapter savedPlaylistAdapter = new SearchPlaylistAddSongAdapter(new ArrayList<>(), new SearchPlaylistAddSongAdapter.OnItemClickListener() {
+         savedPlaylistAdapter = new SearchPlaylistAddSongAdapter(new ArrayList<>(), new SearchPlaylistAddSongAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position, Playlist item) {
 
@@ -143,7 +180,7 @@ public class UserSearchAddSongFragment extends BaseFragment {
         savedPlaylistView.setLayoutManager(savedPlaylistLayoutManager);
         savedPlaylistView.addItemDecoration(new VerticalLinearSpacingItemDecoration((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, getResources().getDisplayMetrics())));
 
-        SearchPlaylistAddSongAdapter relevantPlaylistAdapter = new SearchPlaylistAddSongAdapter(new ArrayList<>(), new SearchPlaylistAddSongAdapter.OnItemClickListener() {
+         relevantPlaylistAdapter = new SearchPlaylistAddSongAdapter(new ArrayList<>(), new SearchPlaylistAddSongAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position, Playlist item) {
 
@@ -160,25 +197,7 @@ public class UserSearchAddSongFragment extends BaseFragment {
 //        });
 
 
-        PlaylistRepository.getInstance().getAll().observe(getViewLifecycleOwner(), new Observer<List<Playlist>>() {
-            @Override
-            public void onChanged(List<Playlist> playlists) {
-                sourcePlaylistList = playlists;
-                savedPlaylistList = new ArrayList<>(sourcePlaylistList
-                        .stream()
-                        .filter(playlist -> playlist.getSongs()
-                                .stream()
-                                .anyMatch(song -> song.equals(id))).collect(Collectors.toList())
-                );
-                relevantPlaylistList = new ArrayList<>(sourcePlaylistList);
-                relevantPlaylistList.removeAll(savedPlaylistList);
-                savedPlaylistAdapter.setPlaylistList(savedPlaylistList);
-                savedPlaylistAdapter.checkAll();
-                savedPlaylistAdapter.notifyDataSetChanged();
-                relevantPlaylistAdapter.setPlaylistList(relevantPlaylistList);
-                relevantPlaylistAdapter.notifyDataSetChanged();
-            }
-        });
+
 
         searchEditText.setHint("Search for your playlist");
         searchEditText.addTextChangedListener(new TextWatcher() {
@@ -275,25 +294,7 @@ public class UserSearchAddSongFragment extends BaseFragment {
             //playlistList.add(new Playlist("dfd", result.getString("playlist_name"), "Fdfd", new ArrayList<>(),"",0,"",new ArrayList<>()));
             String playlistName = result.getString("playlist_name", "null");
 
-            PlaylistRepository.getInstance().getAll().observe(getViewLifecycleOwner(), new Observer<List<Playlist>>() {
-                @Override
-                public void onChanged(List<Playlist> playlists) {
-                    sourcePlaylistList = playlists;
-                    savedPlaylistList = new ArrayList<>(sourcePlaylistList
-                            .stream()
-                            .filter(playlist -> playlist.getSongs()
-                                    .stream()
-                                    .anyMatch(song -> song.equals(id))).collect(Collectors.toList())
-                    );
-                    relevantPlaylistList = new ArrayList<>(sourcePlaylistList);
-                    relevantPlaylistList.removeAll(savedPlaylistList);
-                    savedPlaylistAdapter.setPlaylistList(savedPlaylistList);
-                    savedPlaylistAdapter.checkAll();
-                    savedPlaylistAdapter.notifyDataSetChanged();
-                    relevantPlaylistAdapter.setPlaylistList(relevantPlaylistList);
-                    relevantPlaylistAdapter.notifyDataSetChanged();
-                }
-            });
+            onResume();
 
         });
     }
@@ -317,7 +318,7 @@ public class UserSearchAddSongFragment extends BaseFragment {
 
             }
         });
-        if(PlaylistRepository.getInstance().getCurrentPlaylist().getId().equals(playlistId))
+        if(PlaylistRepository.getInstance().getCurrentPlaylist() != null && PlaylistRepository.getInstance().getCurrentPlaylist().getId().equals(playlistId))
         {
             getParentFragmentManager().setFragmentResult("remove_song_from_this_playlist", null);
         }
@@ -338,5 +339,11 @@ public class UserSearchAddSongFragment extends BaseFragment {
         {
             return items;
         }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding =  null;
     }
 }

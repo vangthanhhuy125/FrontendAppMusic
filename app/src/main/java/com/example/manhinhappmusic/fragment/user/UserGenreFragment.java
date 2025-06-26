@@ -6,6 +6,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -19,6 +21,7 @@ import android.widget.TextView;
 import com.example.manhinhappmusic.R;
 import com.example.manhinhappmusic.TestData;
 import com.example.manhinhappmusic.adapter.MusicDisplayAdapter;
+import com.example.manhinhappmusic.databinding.FragmentUserGenreBinding;
 import com.example.manhinhappmusic.decoration.VerticalLinearSpacingItemDecoration;
 import com.example.manhinhappmusic.fragment.BaseFragment;
 import com.example.manhinhappmusic.model.Genre;
@@ -45,8 +48,10 @@ import java.util.List;
 public class UserGenreFragment extends BaseFragment {
 
 
-    private static final String ARG_ID = "id";
+    private static final String ARG_ID = "genreId";
 
+    private NavController navController;
+    private FragmentUserGenreBinding binding;
     private String id;
     private TextView genreTitleText;
     private RecyclerView musicDisplayView;
@@ -79,8 +84,8 @@ public class UserGenreFragment extends BaseFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_user_genre, container, false);
+        binding = FragmentUserGenreBinding.inflate(inflater, container, false);
+        return  binding.getRoot();
     }
 
     @Override
@@ -112,16 +117,18 @@ public class UserGenreFragment extends BaseFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        genreTitleText = view.findViewById(R.id.genre_title_text);
-        musicDisplayView = view.findViewById(R.id.music_display_view);
-        backButton = view.findViewById(R.id.back_button);
+        navController = Navigation.findNavController(view);
+        genreTitleText = binding.genreTitleText;
+        musicDisplayView = binding.musicDisplayView;
+        backButton = binding.backButton;
         genre = GenreRepository.getInstance().getItemById(id).getValue();
 
         genreTitleText.setText(genre.getName());
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                callback.onRequestGoBackPreviousFragment();
+
+                navController.popBackStack();
             }
         });
 
@@ -129,13 +136,13 @@ public class UserGenreFragment extends BaseFragment {
         musicDisplayAdapter = new MusicDisplayAdapter(new ArrayList<>(), new MusicDisplayAdapter.OnDisplayItemCLickListener() {
             @Override
             public void onDisplayItemClick(int position, ListItem item) {
-                if(item.getType() == ListItemType.PLAYLIST)
+                if(item.getItemType() == ListItemType.PLAYLIST)
                 {
                     Playlist playlist = (Playlist) item;
                     PlaylistRepository.getInstance().setCurrentPlaylist(playlist);
-                    callback.onRequestChangeFragment(FragmentTag.USER_PLAYLIST, playlist.getId());
+                    navController.navigate(R.id.userPlaylistFragment);
                 }
-                else if (item.getType() == ListItemType.SONG)
+                else if (item.getItemType() == ListItemType.SONG)
                 {
                     MediaPlayerManager mediaPlayerManager = MediaPlayerManager.getInstance(null);
                     Song song = (Song) item;
@@ -143,10 +150,12 @@ public class UserGenreFragment extends BaseFragment {
                     mediaPlayerManager.setCurrentSong(0);
                     callback.onRequestLoadMiniPlayer();
                 }
-                else if(item.getType() == ListItemType.ARTIST)
+                else if(item.getItemType() == ListItemType.ARTIST)
                 {
                     User artist = (User) item;
-                    callback.onRequestChangeFragment(FragmentTag.USER_ARTIST, artist.getId());
+                    Bundle bundle = new Bundle();
+                    bundle.putString("artistId", artist.getId());
+                    navController.navigate(R.id.userArtistFragment, bundle);
                 }
             }
         });
@@ -156,5 +165,11 @@ public class UserGenreFragment extends BaseFragment {
         musicDisplayView.setLayoutManager(layoutManager);
         musicDisplayView.addItemDecoration(new VerticalLinearSpacingItemDecoration((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 25, getResources().getDisplayMetrics())));
 
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
     }
 }

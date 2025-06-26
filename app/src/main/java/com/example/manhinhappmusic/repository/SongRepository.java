@@ -5,6 +5,7 @@ import android.util.Log;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.example.manhinhappmusic.dto.SongResponse;
 import com.example.manhinhappmusic.model.Song;
 import com.example.manhinhappmusic.network.ApiService;
 
@@ -22,6 +23,7 @@ public class SongRepository implements AppRepository<Song> {
     private static SongRepository instance;
 //    private MutableLiveData<List<Song>> songs = new MutableLiveData<>();
     private Song currentSong;
+    private SongResponse currentSongResponse;
     private SongRepository()
     {
 
@@ -106,17 +108,58 @@ public class SongRepository implements AppRepository<Song> {
     {
         MutableLiveData<List<Song>> songs = new MutableLiveData<>();
 
-        apiClient.getInstance().getApiService().searchSongs(title).enqueue(new Callback<List<Song>>() {
+        apiClient.getInstance().getApiService().searchSongs(title).enqueue(new Callback<List<SongResponse>>() {
             @Override
-            public void onResponse(Call<List<Song>> call, Response<List<Song>> response) {
-                if(response.isSuccessful() && response.body() != null)
-                {
-                    songs.setValue(response.body());
-                }
+            public void onResponse(Call<List<SongResponse>> call, Response<List<SongResponse>> response) {
+               if(response.isSuccessful() && response.body() != null)
+               {
+                   List<Song> responseSongs = new ArrayList<>();
+                   for(SongResponse songResponse: response.body())
+                   {
+                       responseSongs.add(new Song(songResponse.getId(),
+                               songResponse.getArtistId(),
+                               songResponse.getDescription(),
+                               songResponse.getTitle(),
+                               songResponse.getAudioUrl(),
+                               songResponse.getCoverImageUrl(),
+                               null,
+                               true,
+                               false,
+                               "",
+                               0d,
+                               0d));
+                   }
+                   songs.setValue(responseSongs);
+               }
+
             }
 
             @Override
-            public void onFailure(Call<List<Song>> call, Throwable throwable) {
+            public void onFailure(Call<List<SongResponse>> call, Throwable throwable) {
+
+            }
+        });
+
+        return songs;
+    }
+
+    public LiveData<List<SongResponse>> searchSongsWithStatus(String title)
+    {
+        MutableLiveData<List<SongResponse>> songs = new MutableLiveData<>();
+
+        apiClient.getInstance().getApiService().searchSongs(title).enqueue(new Callback<List<SongResponse>>() {
+            @Override
+            public void onResponse(Call<List<SongResponse>> call, Response<List<SongResponse>> response) {
+                if(response.isSuccessful() && response.body() != null)
+                {
+
+                    songs.setValue(response.body());
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<List<SongResponse>> call, Throwable throwable) {
 
             }
         });

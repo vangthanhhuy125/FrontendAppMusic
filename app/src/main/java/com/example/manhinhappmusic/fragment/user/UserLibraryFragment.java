@@ -6,6 +6,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -18,6 +20,7 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.example.manhinhappmusic.R;
+import com.example.manhinhappmusic.databinding.FragmentUserLibraryBinding;
 import com.example.manhinhappmusic.decoration.VerticalLinearSpacingItemDecoration;
 import com.example.manhinhappmusic.adapter.PlaylistAdapter;
 import com.example.manhinhappmusic.fragment.BaseFragment;
@@ -29,11 +32,6 @@ import com.google.android.material.imageview.ShapeableImageView;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link UserLibraryFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class UserLibraryFragment extends BaseFragment {
 
 
@@ -41,6 +39,8 @@ public class UserLibraryFragment extends BaseFragment {
         // Required empty public constructor
     }
 
+    private FragmentUserLibraryBinding binding;
+    private NavController navController;
     private ShapeableImageView userAvatar;
     private ImageButton addButton;
     private ImageButton searchButton;
@@ -65,7 +65,8 @@ public class UserLibraryFragment extends BaseFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_user_library, container, false);
+        binding = FragmentUserLibraryBinding.inflate(inflater, container, false);
+        return  binding.getRoot();
     }
 
     @Override
@@ -85,17 +86,30 @@ public class UserLibraryFragment extends BaseFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        userAvatar = view.findViewById(R.id.user_avatar_image);
-        userAvatar.setOnClickListener(this::onUserAvatarClick);
-        addButton = view.findViewById(R.id.add_playlist_button);
-        addButton.setOnClickListener(this::onAddPlaylistButtonClick);
-        searchButton = view.findViewById(R.id.search_playlist_button);
-        sortButton = view.findViewById(R.id.sort_button);
+        navController = Navigation.findNavController(view);
+        userAvatar = binding.userAvatarImage;
+        addButton = binding.addPlaylistButton;
+        searchButton = binding.searchPlaylistButton;
+        sortButton = binding.sortButton;
 
+        userAvatar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                navController.navigate(R.id.userProfileFragment);
+
+            }
+        });
+        addButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AddPlaylistFragment addPlaylistFragment = new AddPlaylistFragment();
+                addPlaylistFragment.show(getParentFragmentManager(), null);
+            }
+        });
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                callback.onRequestChangeFragment(FragmentTag.LIBRARY_SEARCH);
+                navController.navigate(R.id.userLibrarySearchFragment);
             }
         });
         playlistAdapter = new PlaylistAdapter(new ArrayList<>(), new PlaylistAdapter.OnItemClickListener() {
@@ -105,8 +119,7 @@ public class UserLibraryFragment extends BaseFragment {
                 Playlist playlist = playlistAdapter.getPlaylistList().get(position);
                 playlist.setSongsList(new ArrayList<>());
                 PlaylistRepository.getInstance().setCurrentPlaylist(playlist);
-                callback.onRequestChangeFragment(FragmentTag.USER_PLAYLIST,playlist.getId());
-
+                navController.navigate(R.id.userPlaylistFragment);
             }
         });
 
@@ -155,17 +168,12 @@ public class UserLibraryFragment extends BaseFragment {
 
     }
 
-    private void onUserAvatarClick(View view){
-        callback.onRequestChangeFragment(FragmentTag.USER_PROFILE);
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
     }
 
-    private void onAddPlaylistButtonClick(View view){
-
-        AddPlaylistFragment addPlaylistFragment = new AddPlaylistFragment();
-        addPlaylistFragment.show(getParentFragmentManager(), null);
-
-
-    }
 
 
 

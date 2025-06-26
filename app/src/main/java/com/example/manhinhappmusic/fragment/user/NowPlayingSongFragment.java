@@ -2,11 +2,20 @@ package com.example.manhinhappmusic.fragment.user;
 
 import android.content.DialogInterface;
 import android.content.res.ColorStateList;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.PointF;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.cardview.widget.CardView;
+import androidx.palette.graphics.Palette;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.LinearSmoothScroller;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Handler;
 import android.util.Log;
@@ -17,12 +26,20 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.MultiTransformation;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
+import com.example.manhinhappmusic.adapter.LyricAdapter;
+import com.example.manhinhappmusic.databinding.FragmentNowPlayingSongBinding;
+import com.example.manhinhappmusic.decoration.AppItemDecoration;
+import com.example.manhinhappmusic.decoration.VerticalLinearSpacingItemDecoration;
+import com.example.manhinhappmusic.model.LyricLine;
 import com.example.manhinhappmusic.model.MediaPlayerManager;
 import com.example.manhinhappmusic.R;
 import com.example.manhinhappmusic.model.Song;
@@ -30,6 +47,9 @@ import com.example.manhinhappmusic.network.ApiService;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.button.MaterialButton;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class NowPlayingSongFragment extends BottomSheetDialogFragment {
@@ -39,6 +59,7 @@ public class NowPlayingSongFragment extends BottomSheetDialogFragment {
         // Required empty public constructor
     }
 
+    private FragmentNowPlayingSongBinding binding;
     private TextView currentPlayTimeTextView;
     private TextView songDurationTextView;
     private ImageView songsCoverImage;
@@ -52,14 +73,47 @@ public class NowPlayingSongFragment extends BottomSheetDialogFragment {
 //    private ImageButton moreOptionButton;
     private SeekBar seekBar;
     private MaterialButton playButton;
+    private RecyclerView lyricsText;
+    private LyricAdapter lyricAdapter;
+    private List<LyricLine> lyricLines;
+    private CardView currentLyricLayout;
+    private TextView currentLyricText;
     private Handler handler = new Handler();
+    private int currentLyricPosition;
     private Runnable updateSeekBar = new Runnable() {
         @Override
         public void run() {
             if(mediaPlayerManager.isPrepared() && mediaPlayerManager.mediaPlayer.isPlaying()){
-                seekBar.setProgress(mediaPlayerManager.getMediaPlayer().getCurrentPosition());
-                handler.postDelayed(this, 200);
+                int currentPosition = mediaPlayerManager.getMediaPlayer().getCurrentPosition();
+                seekBar.setProgress(currentPosition);
                 currentPlayTimeTextView.setText(formatTime(mediaPlayerManager.getMediaPlayer().getCurrentPosition()));
+                int newCurrentLyricPosition = getCurrentLyricPosition(currentPosition);
+                lyricAdapter.setCurrentLyricPosition(newCurrentLyricPosition);
+                LinearLayoutManager layoutManager = (LinearLayoutManager) lyricsText.getLayoutManager();
+                if(currentLyricPosition != newCurrentLyricPosition)
+                {
+                    if(layoutManager.findFirstVisibleItemPosition() <= newCurrentLyricPosition && layoutManager.findLastVisibleItemPosition() >= newCurrentLyricPosition)
+                    {
+                        int recyclerViewHeight = lyricsText.getHeight();
+                        View itemView = layoutManager.findViewByPosition(newCurrentLyricPosition);
+                        if (itemView != null) {
+                            int itemHeight = itemView.getHeight();
+                            int offset = (recyclerViewHeight / 2) - (itemHeight / 2);
+                            layoutManager.scrollToPositionWithOffset(newCurrentLyricPosition, offset);
+                        }
+                        currentLyricLayout.setVisibility(View.GONE);
+                    }
+                    else
+                    {
+                        currentLyricText.setText(lyricLines.get(newCurrentLyricPosition).getText());
+                        currentLyricLayout.setVisibility(View.VISIBLE);
+                    }
+
+
+                }
+
+                currentLyricPosition = newCurrentLyricPosition;
+                handler.postDelayed(this, 200);
             }
         }
     };
@@ -91,8 +145,8 @@ public class NowPlayingSongFragment extends BottomSheetDialogFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_now_playing_song, container, false);
+        binding = FragmentNowPlayingSongBinding.inflate(inflater, container, false);
+        return  binding.getRoot();
     }
 
     @Override
@@ -101,19 +155,29 @@ public class NowPlayingSongFragment extends BottomSheetDialogFragment {
 
         mediaPlayerManager = MediaPlayerManager.getInstance(null);
 
-        seekBar = view.findViewById(R.id.seekBar);
-        songsCoverImage = view.findViewById(R.id.songs_cover_image);
-        songsTitleTextView = view.findViewById(R.id.songs_name_text);
-        songsArtistsNameTextView = view.findViewById(R.id.artist_name_text);
-        playButton = view.findViewById(R.id.play_button);
-        songDurationTextView = view.findViewById(R.id.duration_text);
-        currentPlayTimeTextView = view.findViewById(R.id.current_time_text);
-        shuffleButton = view.findViewById(R.id.shuffle_button);
-        repeatButton = view.findViewById(R.id.repeat_button);
-        skipNextButton = view.findViewById(R.id.skip_next_button);
-        skipPreviousButton = view.findViewById(R.id.skip_previous_button);
-        minimizeButton = view.findViewById(R.id.minimize_button);
+        seekBar = binding.seekBar;
+        songsCoverImage = binding.songsCoverImage;
+        songsTitleTextView = binding.songsNameText;
+        songsArtistsNameTextView = binding.artistNameText;
+        playButton = binding.playButton;
+        songDurationTextView = binding.durationText;
+        currentPlayTimeTextView = binding.currentTimeText;
+        shuffleButton = binding.shuffleButton;
+        repeatButton = binding.repeatButton;
+        skipNextButton = binding.skipNextButton;
+        skipPreviousButton = binding.skipPreviousButton;
+        minimizeButton = binding.minimizeButton;
+        lyricsText = binding.lyricsText;
+        currentLyricLayout =  binding.currentLyricLayout;
+        currentLyricText = binding.currentLyricText;
+
 //        moreOptionButton = view.findViewById(R.id.more_options_button);
+
+        lyricAdapter = new LyricAdapter(new ArrayList<>());
+        lyricsText.setAdapter(lyricAdapter);
+        lyricsText.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
+        lyricsText.addItemDecoration(new VerticalLinearSpacingItemDecoration(AppItemDecoration.convertDpToPx(10, getResources())));
+
 
         mediaPlayerManager.addOnCompletionListener(new MediaPlayerManager.OnCompletionListener() {
             @Override
@@ -322,23 +386,93 @@ public class NowPlayingSongFragment extends BottomSheetDialogFragment {
 
     private void setSongsInformation()
     {
-        Song song = mediaPlayerManager.getCurrentSong();
-        if(song.getCoverImageUrl() != null && !song.getCoverImageUrl().isEmpty())
-            Glide.with(this.getContext())
-                .load(ApiService.BASE_URL + mediaPlayerManager.getCurrentSong().getCoverImageUrl())
-                .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(15))))
-                .into(songsCoverImage);
-        else
-            Glide.with(this.getContext())
-                    .load(R.drawable.music_default_cover)
-                    .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(15))))
-                    .into(songsCoverImage);
+        try {
+            Song song = mediaPlayerManager.getCurrentSong();
+            if(song.getCoverImageUrl() != null && !song.getCoverImageUrl().isEmpty())
+                Glide.with(this.getContext())
+                        .asBitmap()
+                        .load(ApiService.BASE_URL + mediaPlayerManager.getCurrentSong().getCoverImageUrl())
+                        .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(15))))
+                        .into(new CustomTarget<Bitmap>() {
+                            @Override
+                            public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                                songsCoverImage.setImageBitmap(resource);
+                                Palette.from(resource).generate(palette -> {
+                                    int vibrant = palette.getVibrantColor(Color.GRAY);
+                                    GradientDrawable gradientDrawable = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,
+                                            new int[]{vibrant,
+                                                    Color.parseColor("#121212"),
+                                                    Color.parseColor("#121212"),
+                                                    Color.parseColor("#121212"),
+                                            });
+                                    binding.mainLayout.setBackground(gradientDrawable);
+                                    binding.lyricsLayout.setBackgroundTintList(ColorStateList.valueOf(vibrant));
 
-        songsTitleTextView.setText(song.getTitle());
-        //songsArtistsNameTextView.setText(mediaPlayerManager.getCurrentSong().getArtistId());
-        songDurationTextView.setText(formatTime(mediaPlayerManager.getMediaPlayer().getDuration()));
-        seekBar.setMax(mediaPlayerManager.getMediaPlayer().getDuration());
+                                });
 
+
+                            }
+
+                            @Override
+                            public void onLoadCleared(@Nullable Drawable placeholder) {
+
+                            }
+                        });
+            else
+                Glide.with(this.getContext())
+                        .load(R.drawable.music_default_cover)
+                        .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(15))))
+                        .into(songsCoverImage);
+
+            songsTitleTextView.setText(song.getTitle());
+            //songsArtistsNameTextView.setText(mediaPlayerManager.getCurrentSong().getArtistId());
+            songDurationTextView.setText(formatTime(mediaPlayerManager.getMediaPlayer().getDuration()));
+            seekBar.setMax(mediaPlayerManager.getMediaPlayer().getDuration());
+            lyricLines = LyricLine.parseLrc(getResources().openRawResource(R.raw.ocean_view_lyrics));
+            lyricAdapter.clearSungLyric();
+            if(mediaPlayerManager.isPrepared())
+            {
+                lyricAdapter.setLyrics(LyricLine.parseToStrings(lyricLines));
+
+            }
+        }
+        catch (Exception ex)
+        {
+            Toast.makeText(getContext(), ex.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+        finally {
+
+        }
+
+
+    }
+
+    private int getCurrentLyricPosition(int position)
+    {
+        for (int i = 0; i < lyricLines.size(); i++) {
+            LyricLine line = lyricLines.get(i);
+            long nextTime = (i + 1 < lyricLines.size()) ? lyricLines.get(i + 1).getTime() : Long.MAX_VALUE;
+
+            if (position >= line.getTime() && position < nextTime) {
+                return  i;
+            }
+        }
+        return 0;
+
+    }
+
+    private List<Integer> getAllSungLyricPosition(int position)
+    {
+        List<Integer> allPosition = new ArrayList<>();
+        for (int i = 0; i < lyricLines.size(); i++) {
+            LyricLine line = lyricLines.get(i);
+            long nextTime = (i + 1 < lyricLines.size()) ? lyricLines.get(i + 1).getTime() : Long.MAX_VALUE;
+
+            if (position >= line.getTime()) {
+                allPosition.add(Integer.valueOf(i));
+            }
+        }
+        return allPosition;
     }
 
     private String formatTime(int milliseconds){

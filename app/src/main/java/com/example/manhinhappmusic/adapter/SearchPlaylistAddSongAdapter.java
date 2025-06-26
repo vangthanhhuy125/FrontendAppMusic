@@ -63,7 +63,7 @@ public class SearchPlaylistAddSongAdapter extends RecyclerView.Adapter<SearchPla
     @Override
     public void onBindViewHolder(@NonNull PlaylistViewHolder holder, int position) {
         Playlist playlist = playlistList.get(position);
-        holder.getPlaylistCoverImage().setImageResource(playlist.getThumnailResID());
+//        holder.getPlaylistCoverImage().setImageResource(playlist.getThumnailResID());
         if(playlist.getThumbnailUrl() != null && !playlist.getThumbnailUrl().isEmpty())
             Glide.with(holder.itemView.getContext())
                 .load(ApiService.BASE_URL + playlist.getThumbnailUrl())

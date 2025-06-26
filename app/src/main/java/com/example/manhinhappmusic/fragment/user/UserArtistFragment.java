@@ -6,6 +6,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -19,6 +21,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.manhinhappmusic.R;
+import com.example.manhinhappmusic.databinding.FragmentUserArtistBinding;
+import com.example.manhinhappmusic.dto.SongResponse;
 import com.example.manhinhappmusic.fragment.BaseFragment;
 import com.example.manhinhappmusic.model.User;
 import com.example.manhinhappmusic.decoration.VerticalLinearSpacingItemDecoration;
@@ -29,6 +33,7 @@ import com.example.manhinhappmusic.model.ListItemType;
 import com.example.manhinhappmusic.model.MediaPlayerManager;
 import com.example.manhinhappmusic.model.Song;
 import com.example.manhinhappmusic.repository.ArtistRepository;
+import com.google.android.material.appbar.CollapsingToolbarLayout;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -41,8 +46,10 @@ import java.util.List;
  */
 public class UserArtistFragment extends BaseFragment {
 
+    private NavController navController;
+    private FragmentUserArtistBinding binding;
     private ImageView artistImage;
-    private TextView artistNameText;
+    private CollapsingToolbarLayout collapsingToolbarLayout;
     private RecyclerView songsView;
     private ImageButton backButton;
     private User artist;
@@ -50,7 +57,7 @@ public class UserArtistFragment extends BaseFragment {
     private SearchResultAdapter songsAdapter;
 
 
-    private static final String ARG_ID = "id";
+    private static final String ARG_ID = "artistId";
 
     private String id;
 
@@ -77,8 +84,8 @@ public class UserArtistFragment extends BaseFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_user_artist, container, false);
+        binding = FragmentUserArtistBinding.inflate(inflater, container, false);
+        return  binding.getRoot();
     }
 
     @Override
@@ -87,7 +94,12 @@ public class UserArtistFragment extends BaseFragment {
         SongRepository.getInstance().getRecentlySongs().observe(getViewLifecycleOwner(), new Observer<List<Song>>() {
             @Override
             public void onChanged(List<Song> songs) {
-                songsAdapter.setNewData(new ArrayList<>(songs), new SparseBooleanArray());
+                List<SongResponse> songResponses = new ArrayList<>();
+                for(Song song : songs)
+                {
+                    songResponses.add(new SongResponse(song.getId(), song.getArtist_id(), song.getAudioUrl(), song.getTitle(), song.getDescription(), song.getCoverImageUrl(), new ArrayList<>(), 0L, 0d));
+                }
+                songsAdapter.setListItemList(new ArrayList<>(songResponses));
                 songsAdapter.notifyDataSetChanged();
             }
         });
@@ -96,22 +108,24 @@ public class UserArtistFragment extends BaseFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        backButton = view.findViewById(R.id.back_button);
-        artistImage = view.findViewById(R.id.artist_image);
-        artistNameText = view.findViewById(R.id.artist_name_text);
-        songsView = view.findViewById(R.id.songs_view);
+        navController = Navigation.findNavController(view);
+        backButton = binding.backButton;
+        artistImage = binding.artistImage;
+        collapsingToolbarLayout =  binding.collapsingLayout;
+//        artistNameText = binding.artistNameText;
+        songsView = binding.songsView;
 
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                callback.onRequestGoBackPreviousFragment();
+                navController.popBackStack();
             }
         });
 
         artist = ArtistRepository.getInstance().getItemById(id).getValue();
 
         artistImage.setImageResource(artist.getAvatarResID());
-        artistNameText.setText(artist.getFullName());
+        collapsingToolbarLayout.setTitle(artist.getFullName());
 
 
 
@@ -119,7 +133,7 @@ public class UserArtistFragment extends BaseFragment {
         songsAdapter = new SearchResultAdapter(new ArrayList<>(), new SparseBooleanArray(),new SearchResultAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position, ListItem item) {
-                if(item.getType() == ListItemType.SONG)
+                if(item.getItemType() == ListItemType.SONG)
                 {
                     Song song = (Song) item;
                     MediaPlayerManager mediaPlayerManager = MediaPlayerManager.getInstance(null);
@@ -134,5 +148,11 @@ public class UserArtistFragment extends BaseFragment {
         songsView.setLayoutManager(songLayoutManager);
         songsView.addItemDecoration(new VerticalLinearSpacingItemDecoration((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, getResources().getDisplayMetrics())));
 
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
     }
 }
