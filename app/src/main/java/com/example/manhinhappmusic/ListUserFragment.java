@@ -3,6 +3,7 @@ package com.example.manhinhappmusic;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -79,11 +80,21 @@ public class ListUserFragment extends BaseFragment {
 
             @Override
             public void onDeleteUser(User user) {
-                allUsers.remove(user);
-                displayedUsers.remove(user);
-                adapter.notifyDataSetChanged();
-                Toast.makeText(getContext(), "Deleted: " + user.getFullName(), Toast.LENGTH_SHORT).show();
+                ConfirmDeletingUserFragment confirmFragment = new ConfirmDeletingUserFragment();
+                Bundle args = new Bundle();
+                args.putParcelable("user_data", user);
+                confirmFragment.setArguments(args);
+
+                View confirmContainer = requireView().findViewById(R.id.confirm_delete_container);
+                confirmContainer.setVisibility(View.VISIBLE);
+
+                getChildFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.confirm_delete_container, confirmFragment)
+                        .commit();
             }
+
+
         });
 
         recyclerViewUsers.setAdapter(adapter);
@@ -133,14 +144,31 @@ public class ListUserFragment extends BaseFragment {
 
 
 
-        getParentFragmentManager().setFragmentResultListener("user_deleted", this, (requestKey, result) -> {
-            User deletedUser = result.getParcelable("deleted_user");
-            if (deletedUser != null) {
-                allUsers.remove(deletedUser);
-                adapter.notifyDataSetChanged();
-                Toast.makeText(getContext(), "Deleted from result: " + deletedUser.getFullName(), Toast.LENGTH_SHORT).show();
+        getChildFragmentManager().setFragmentResultListener("user_deleted", this, (requestKey, result) -> {
+            try {
+                User deletedUser = result.getParcelable("deleted_user");
+                if (deletedUser != null) {
+
+                    Log.d("USER_DELETE", "Xóa user: " + deletedUser.getId());
+
+
+                    allUsers.removeIf(user -> user.getId().equals(deletedUser.getId()));
+                    displayedUsers.removeIf(user -> user.getId().equals(deletedUser.getId()));
+
+
+                    adapter.notifyDataSetChanged();
+
+                    Toast.makeText(getContext(), "Đã xoá: " + deletedUser.getFullName(), Toast.LENGTH_SHORT).show();
+                } else {
+                    Log.w("USER_DELETE", "deletedUser null");
+                }
+            } catch (Exception e) {
+                Log.e("USER_DELETE", "Lỗi xoá user", e);
+                Toast.makeText(getContext(), "Xoá thất bại", Toast.LENGTH_SHORT).show();
             }
         });
+
+
 
         return view;
     }
