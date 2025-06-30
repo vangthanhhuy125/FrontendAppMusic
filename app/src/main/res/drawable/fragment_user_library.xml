@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".UserLibraryFragment">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="#000000"
+        >
+
+        <!-- Header: Avatar + "Library" -->
+        <com.google.android.material.appbar.MaterialToolbar
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/user_avatar_image"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/avatar_app_music"
+                android:layout_marginEnd="12dp"
+                android:scaleType="centerCrop"
+                android:contentDescription="User Avatar"
+                app:shapeAppearanceOverlay="@style/RoundedImageStyle"/>
+
+            <TextView
+                android:id="@+id/textLibraryTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Library"
+                android:textSize="25sp"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF" />
+
+            <ImageButton
+                android:id="@+id/add_playlist_button"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:src="@drawable/baseline_add_36"
+                android:background="@android:color/transparent"
+                android:scaleType="center"
+                app:tint="#FFFFFF"
+                android:contentDescription="AddButton"
+                android:layout_gravity="end"
+                android:layout_marginStart="12dp"
+                />
+            <ImageButton
+                android:id="@+id/search_playlist_button"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:src="@drawable/baseline_search_30"
+                android:background="@android:color/transparent"
+                android:scaleType="center"
+                app:tint="#FFFFFF"
+                android:contentDescription="SearchButton"
+                android:layout_gravity="end"
+                android:layout_marginStart="12dp"
+                />
+
+        </com.google.android.material.appbar.MaterialToolbar>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingHorizontal="14dp"
+                android:paddingTop="10dp">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="10dp">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginEnd="4dp"
+                        android:contentDescription="Arrow icon"
+                        android:src="@drawable/white_baseline_swap_vert_24"
+                        app:tint="#FFFFFF" />
+
+                    <TextView
+                        android:id="@+id/textRecently"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Recently"
+                        android:textColor="#FFFFFF"
+                        android:textSize="20sp" />
+                </LinearLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/playlists_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                </androidx.recyclerview.widget.RecyclerView>
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"/>
+            </LinearLayout>
+
+
+    </LinearLayout>
+
+
+</FrameLayout>

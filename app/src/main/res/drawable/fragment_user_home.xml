@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".UserHomeFragment">
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#000000"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            >
+            <com.google.android.material.appbar.MaterialToolbar
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="👋 Hi Worm"
+                    android:textColor="#FFFFFF"
+                    android:textSize="18sp"
+                    android:layout_weight="1"
+                    android:textStyle="bold"/>
+
+
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/user_avatar_image"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:src="@drawable/avatar_app_music"
+                    android:layout_marginEnd="12dp"
+                    android:background="@drawable/circle_background"
+                    app:shapeAppearanceOverlay="@style/RoundedImageStyle"
+                    android:scaleType="centerCrop"
+                    android:contentDescription="User Avatar"
+                    android:layout_gravity="end"/>
+
+
+            </com.google.android.material.appbar.MaterialToolbar>
+            <!-- Header -->
+
+            <!-- Good Evening -->
+
+            <!-- Buttons (For You, Relax, Pop, Workout) -->
+<!--            <GridLayout-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:orientation="horizontal"-->
+<!--                android:gravity="center"-->
+<!--                android:layout_marginBottom="12dp"-->
+<!--                android:columnCount="4">-->
+
+<!--                <Button-->
+<!--                    android:layout_width="0dp"-->
+<!--                    android:layout_height="48dp"-->
+<!--                    android:layout_columnWeight="1"-->
+<!--                    android:backgroundTint="#444444"-->
+<!--                    android:text="For you"-->
+<!--                    android:textColor="#FFFFFF"-->
+<!--                    android:textSize="10sp"-->
+<!--                    android:layout_margin="4dp"/>-->
+
+<!--                <Button-->
+<!--                    android:layout_width="0dp"-->
+<!--                    android:layout_height="48dp"-->
+<!--                    android:backgroundTint="#444444"-->
+<!--                    android:text="Relax"-->
+<!--                    android:layout_columnWeight="1"-->
+
+<!--                    android:textColor="#FFFFFF"-->
+<!--                    android:textSize="10sp"-->
+<!--                    android:paddingHorizontal="5dp"-->
+<!--                    android:layout_margin="4dp"/>-->
+
+<!--                <Button-->
+<!--                    android:layout_width="0dp"-->
+<!--                    android:layout_height="48dp"-->
+<!--                    android:layout_columnWeight="1"-->
+
+<!--                    android:backgroundTint="#444444"-->
+<!--                    android:text="Pop"-->
+<!--                    android:textColor="#FFFFFF"-->
+<!--                    android:textSize="10sp"-->
+
+<!--                    android:layout_margin="4dp"/>-->
+
+<!--                <Button-->
+<!--                    android:layout_width="0dp"-->
+<!--                    android:layout_height="48dp"-->
+<!--                    android:layout_columnWeight="1"-->
+
+<!--                    android:backgroundTint="#444444"-->
+<!--                    android:text="Workout"-->
+<!--                    android:textColor="#FFFFFF"-->
+<!--                    android:textSize="10sp"-->
+
+<!--                    android:layout_margin="4dp"/>-->
+<!--            </GridLayout>-->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/playlist_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+               />
+
+
+            <!-- Recently Played -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Recently Play"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recently_play_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal" />
+
+
+            <!-- Featuring Today -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Featuring Today"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/featuring_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal" />
+
+            <!-- New Release -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    android:text="New Release"
+                    android:textColor="#FFFFFF"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    android:text="See more"
+                    android:textColor="#FFFFFF"
+                    android:textSize="14sp"
+                    android:layout_gravity="end"/>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/new_release_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal" />
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="200dp"/>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+
+</FrameLayout>

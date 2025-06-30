@@ -1,0 +1,47 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="160dp"
+    android:layout_height="80dp"
+    android:layout_margin="6dp">
+
+    <!-- Ảnh nền -->
+    <ImageView
+        android:id="@+id/genreImage"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/exampleavatar"
+        android:contentDescription="Genre image" />
+
+
+    <!-- Tên thể loại -->
+    <TextView
+        android:id="@+id/genreName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="8dp"
+        android:layout_marginBottom="6dp"
+        android:text="TAMIL"
+        android:textColor="#FFFFFF"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:shadowColor="#AA000000"
+        android:shadowDx="1"
+        android:shadowDy="1"
+        android:shadowRadius="2" />
+
+    <!-- Nút X -->
+    <ImageButton
+        android:id="@+id/removeButton"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:layout_margin="6dp"
+        android:background="@android:color/transparent"
+        android:src="@android:drawable/ic_menu_close_clear_cancel"
+        app:tint="#FFFFFF"
+        android:contentDescription="Remove" />
+
+</RelativeLayout>
