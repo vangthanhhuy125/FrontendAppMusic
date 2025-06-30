@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#000000"
-    tools:context=".CategoryFragment">
+    tools:context=".AddGenreFragment">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -19,7 +19,7 @@
             android:gravity="center_horizontal">
 
             <TextView
-                android:text="Add Category"
+                android:text="Add Genre"
                 android:textColor="#00FFD1"
                 android:textSize="28sp"
                 android:textStyle="bold"

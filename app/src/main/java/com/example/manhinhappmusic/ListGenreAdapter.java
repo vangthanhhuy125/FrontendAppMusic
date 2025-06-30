@@ -1,5 +1,6 @@
 package com.example.manhinhappmusic;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,25 +11,52 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+
 import java.util.List;
 
-public class ListGenreAdapter extends RecyclerView.Adapter<ListGenreAdapter.ViewHolder>{
+public class ListGenreAdapter extends RecyclerView.Adapter<ListGenreAdapter.ViewHolder> {
 
     private List<Genre> genreList;
     private OnItemRemoveListener removeListener;
+    private OnItemClickListener clickListener;
 
     public interface OnItemRemoveListener {
         void onRemove(int position);
     }
+
+    public interface OnItemClickListener {
+        void onItemClick(Genre genre);
+    }
+
+    public interface OnGenreClickListener {
+        void onGenreClick(String genreId);
+    }
+
+    private Context context;
 
     public ListGenreAdapter(List<Genre> genreList, OnItemRemoveListener removeListener) {
         this.genreList = genreList;
         this.removeListener = removeListener;
     }
 
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.clickListener = listener;
+    }
+
+    public void setOnGenreClickListener(OnGenreClickListener listener) {
+        this.clickListener = genre -> {
+            if (listener != null) {
+                listener.onGenreClick(genre.getId());
+            }
+        };
+    }
+
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        Context context = parent.getContext();
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_genre, parent, false);
         return new ViewHolder(view);
@@ -39,43 +67,55 @@ public class ListGenreAdapter extends RecyclerView.Adapter<ListGenreAdapter.View
         Genre genre = genreList.get(position);
         holder.genreName.setText(genre.getName());
 
-//        // Glide không cần context nếu dùng từ view
-//        Glide.with(holder.itemView)
-//                .load(genre.getUrlCoverImage())
-//                .placeholder(R.drawable.placeholder_image)
-//                .error(R.drawable.error_image)
-//                .centerCrop()
-//                .into(holder.genreImage);
+        Glide.with(holder.itemView)
+                .load(genre.getUrlCoverImage())
+                .placeholder(R.drawable.placeholder_image)
+                .error(R.drawable.error_image)
+                .centerCrop()
+                .into(holder.genreImage);
 
         holder.removeButton.setOnClickListener(v -> {
-            if (removeListener != null) {
-                removeListener.onRemove(position);
+            if (context instanceof BaseFragment.FragmentInteractionListener) {
+                ((BaseFragment.FragmentInteractionListener) context).onRequestChangeFragment(
+                        BaseFragment.FragmentTag.CONFIRM_DELETING_GENRE,
+                        genre.getId(),
+                        genre.getName()
+                );
             }
         });
+
+        holder.itemView.setOnClickListener(v -> {
+            if (context instanceof BaseFragment.FragmentInteractionListener) {
+                ((BaseFragment.FragmentInteractionListener) context).onRequestChangeFragment(
+                        BaseFragment.FragmentTag.EDIT_GENRE,
+                        genre.getId(),
+                        genre.getName()
+                );
+            }
+
+            if (clickListener != null) {
+                clickListener.onItemClick(genre);
+            }
+        });
+
+
     }
 
     @Override
     public int getItemCount() {
-        return 0;
+        return genreList != null ? genreList.size() : 0;
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder{
+    public void updateData(List<Genre> newGenreList) {
+        genreList.clear();
+        genreList.addAll(newGenreList);
+        notifyDataSetChanged();
+    }
 
+    public static class ViewHolder extends RecyclerView.ViewHolder {
         private ImageView genreImage;
         private TextView genreName;
         private ImageButton removeButton;
-
-        public ImageButton getRemoveButton() {
-            return removeButton;
-        }
-
-        public ImageView getGenreImage() {
-            return genreImage;
-        }
-
-        public TextView getGenreName() {
-            return genreName;
-        }
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);

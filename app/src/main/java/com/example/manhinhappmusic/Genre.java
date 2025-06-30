@@ -1,9 +1,12 @@
 package com.example.manhinhappmusic;
 
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.Formatter;
 
-public class Genre {
+public class Genre implements Parcelable {
     private String id;
     private String name;
     private String description;
@@ -72,4 +75,40 @@ public class Genre {
     public void setThumbnailResID(int thumbnailResID) {
         this.thumbnailResID = thumbnailResID;
     }
+
+    protected Genre(Parcel in) {
+        id = in.readString();
+        name = in.readString();
+        description = in.readString();
+        urlCoverImage = in.readString();
+        thumbnailResID = in.readInt();
+    }
+
+    public static final Creator<Genre> CREATOR = new Creator<Genre>() {
+        @Override
+        public Genre createFromParcel(Parcel in) {
+            return new Genre(in);
+        }
+
+        @Override
+        public Genre[] newArray(int size) {
+            return new Genre[size];
+        }
+    };
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int flags) {
+        parcel.writeString(id);
+        parcel.writeString(name);
+        parcel.writeString(description);
+        parcel.writeString(urlCoverImage);
+        parcel.writeInt(thumbnailResID);
+    }
+
+
 }

@@ -1,5 +1,8 @@
 package com.example.manhinhappmusic;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -7,7 +10,7 @@ import java.util.List;
 //import android.os.Bundle;
 
 
-public class Song implements Serializable, ListItem {
+public class Song implements Parcelable, ListItem {
     private String id;
     private String artistId;
     private String description;
@@ -136,4 +139,57 @@ public class Song implements Serializable, ListItem {
     public ListItemType getType() {
         return ListItemType.SONG;
     }
+
+    protected Song(Parcel in) {
+        id = in.readString();
+        artistId = in.readString();
+        description = in.readString();
+        title = in.readString();
+        audioUrl = in.readString();
+        coverImageUrl = in.readString();
+        genreId = in.createStringArrayList();
+        isApproved = (Boolean) in.readValue(Boolean.class.getClassLoader());
+        isPublic = (Boolean) in.readValue(Boolean.class.getClassLoader());
+        lyric = in.readString();
+        duration = in.readDouble();
+        views = in.readDouble();
+        audioResID = in.readInt();
+        coverImageResID = in.readInt();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(id);
+        dest.writeString(artistId);
+        dest.writeString(description);
+        dest.writeString(title);
+        dest.writeString(audioUrl);
+        dest.writeString(coverImageUrl);
+        dest.writeStringList(genreId);
+        dest.writeValue(isApproved);
+        dest.writeValue(isPublic);
+        dest.writeString(lyric);
+        dest.writeDouble(duration != null ? duration : 0);
+        dest.writeDouble(views != null ? views : 0);
+        dest.writeInt(audioResID);
+        dest.writeInt(coverImageResID);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<Song> CREATOR = new Creator<Song>() {
+        @Override
+        public Song createFromParcel(Parcel in) {
+            return new Song(in);
+        }
+
+        @Override
+        public Song[] newArray(int size) {
+            return new Song[size];
+        }
+    };
+
 }

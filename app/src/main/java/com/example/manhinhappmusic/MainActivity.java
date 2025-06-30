@@ -26,7 +26,6 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.Frag
     MiniPlayerFragment miniPlayer;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-//        getSupportFragmentManager().setFragmentFactory(appFragmentFactory);
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
@@ -36,13 +35,14 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.Frag
             return insets;
         });
 
-//        appFragmentFactory = new AppFragmentFactory(null, null, null, null);
-//        appFragmentFactory.setLibrary(TestData.playlistList);
         MediaPlayerManager.getInstance(this);
 
-        loadFragment(new UserHomeFragment());
+        // 👇 Thay đổi ở đây: Load AdminHomeFragment thay vì UserHomeFragment
+        loadFragment(new AdminHomeFragment());
+
         initializeView();
     }
+
 
     private void initializeView(){
         bottomNavigationView = findViewById(R.id.bottom_nav_view);
@@ -80,15 +80,18 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.Frag
         try
         {
             if(item.getItemId() == R.id.nav_home)
-                selectedFragment = new UserHomeFragment();
-            else if(item.getItemId() == R.id.nav_search)
-                selectedFragment = new UserSearchFragment();
-            else if(item.getItemId() == R.id.nav_library)
-            {
-                selectedFragment = new UserLibraryFragment();
+                selectedFragment = new AdminHomeFragment();
+            else if(item.getItemId() == R.id.nav_user)
+                selectedFragment = new ListUserFragment();
+            else if(item.getItemId() == R.id.nav_songs)
+                selectedFragment = new AdminPlaylistFragment();
+            else if(item.getItemId() == R.id.nav_genres)
+                selectedFragment = new ListGenreFragment();
+            else if(item.getItemId() == R.id.nav_feedback)
+                selectedFragment = new AdminFeedbackFragment();
 
 
-            }
+
         }
         catch (Exception ex)
         {
@@ -103,23 +106,109 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.Frag
     @Override
     public void onRequestChangeFragment(BaseFragment.FragmentTag destinationTag, Object... params) {
         Fragment destinationFragment = null;
-        if(destinationTag == BaseFragment.FragmentTag.USER_PROFILE)
+
+        if (destinationTag == BaseFragment.FragmentTag.USER_PROFILE) {
             destinationFragment = new UserProfileFragment();
-        else if(destinationTag == BaseFragment.FragmentTag.SEARCH_EX)
+        }
+        else if (destinationTag == BaseFragment.FragmentTag.SEARCH_EX) {
             destinationFragment = new SeacrhExFragment();
-        else if(destinationTag == BaseFragment.FragmentTag.USER_PLAYLIST)
-        {
+        }
+        else if (destinationTag == BaseFragment.FragmentTag.USER_PLAYLIST) {
             String id = null;
-            if(params[0] instanceof String)
-            {
+            if (params[0] instanceof String) {
                 id = (String) params[0];
             }
             destinationFragment = UserPlaylistFragment.newInstance(id);
+        }
+        else if (destinationTag == BaseFragment.FragmentTag.EDIT_GENRE) {
+            Song song = null;
+            if (params.length > 0 && params[0] instanceof Song) {
+                song = (Song) params[0];
+            }
+            destinationFragment = AdminPlaylistFragment.newInstance(song);
+        }
+        else if (destinationTag == BaseFragment.FragmentTag.LIST_GENRE) {
+            destinationFragment = new ListGenreFragment();
+            if (params.length > 0 && params[0] instanceof Genre) {
+                Bundle bundle = new Bundle();
+                bundle.putParcelable("genre_result", (Genre) params[0]);
+                destinationFragment.setArguments(bundle);
+            }
+        }
+        else if (destinationTag == BaseFragment.FragmentTag.CONFIRM_DELETING_GENRE) {
+            Genre genre = null;
+            if (params.length > 0 && params[0] instanceof Genre) {
+                genre = (Genre) params[0];
+            }
+            destinationFragment = ConfirmDeletingGenreFragment.newInstance(genre);
+        }
+        else if (destinationTag == BaseFragment.FragmentTag.ADD_SONG) {
+            destinationFragment = new AddSongFragment();
+        }
+        else if (destinationTag == BaseFragment.FragmentTag.EDIT_SONG) {
+            Song song = null;
+            if (params.length > 0 && params[0] instanceof Song) {
+                song = (Song) params[0];
+            }
 
+            EditSongFragment fragment = EditSongFragment.newInstance(song);
+            fragment.setOnSongEditedListener(updatedSong -> {
+                List<Fragment> fragments = getSupportFragmentManager().getFragments();
+                for (Fragment f : fragments) {
+                    if (f instanceof AdminPlaylistFragment) {
+                        ((AdminPlaylistFragment) f).updateSong(updatedSong);
+                        break;
+                    }
+                }
+            });
+
+            destinationFragment = fragment;
+        }
+        else if (destinationTag == BaseFragment.FragmentTag.CONFIRM_DELETING_SONG) {
+            Song song = null;
+            int position = -1;
+
+            if (params.length > 0 && params[0] instanceof Song) {
+                song = (Song) params[0];
+            }
+
+            if (params.length > 1 && params[1] instanceof Integer) {
+                position = (int) params[1];
+            }
+
+            destinationFragment = ConfirmDeletingSongFragment.newInstance(song, position);
+        }
+
+        else if (destinationTag == BaseFragment.FragmentTag.ADD_GENRE) {
+            destinationFragment = new ListGenreFragment();
+        }
+        else if (destinationTag == BaseFragment.FragmentTag.CONFIRM_DELETING_USER) {
+            Fragment fragment = new ConfirmDeletingUserFragment();
+            if (params.length > 0 && params[0] instanceof Bundle) {
+                fragment.setArguments((Bundle) params[0]);
+            }
+            destinationFragment = fragment;
+        }
+        else if (destinationTag == BaseFragment.FragmentTag.ARTIST_DETAIL) {
+            destinationFragment = new ArtistDetailFragment();
+            if (params.length > 0 && params[0] instanceof User) {
+                Bundle bundle = new Bundle();
+                bundle.putParcelable("user_data", (User) params[0]);
+                destinationFragment.setArguments(bundle);
+            }
+        }
+        else if (destinationTag == BaseFragment.FragmentTag.USER_DETAIL) {
+            destinationFragment = new UserDetailFragment();
+            if (params.length > 0 && params[0] instanceof User) {
+                Bundle bundle = new Bundle();
+                bundle.putParcelable("user_data", (User) params[0]);
+                destinationFragment.setArguments(bundle);
+            }
         }
 
         loadFragment(destinationFragment);
     }
+
 
     @Override
     public void onRequestChangeActivity(BaseFragment.FragmentTag destinationTag, Object... params) {

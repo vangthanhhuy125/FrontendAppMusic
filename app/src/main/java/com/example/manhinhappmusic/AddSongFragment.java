@@ -1,17 +1,33 @@
 package com.example.manhinhappmusic;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
+import android.provider.OpenableColumns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Spinner;
+
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -20,8 +36,19 @@ import android.widget.ImageView;
  */
 public class AddSongFragment extends Fragment {
     private ImageView imgAddImage;
-    private Button btnChooseVoice, btnChooseFile, btnSave;
+    private Button btnChooseFile, btnSave;
     private EditText edtSongName, edtArtist, edtDescription;
+    private Spinner spinnerGenre;
+    private ChipGroup chipGroup;
+
+    private SongViewModel songViewModel;
+
+    private Uri selectedImageUri = null;
+    private Uri selectedAudioUri = null;
+
+    private ActivityResultLauncher<Intent> imagePickerLauncher;
+    private ActivityResultLauncher<Intent> audioPickerLauncher;
+
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -75,31 +102,137 @@ public class AddSongFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         imgAddImage = view.findViewById(R.id.imgAddImage);
-        btnChooseVoice = view.findViewById(R.id.btnChooseVoice);
         btnChooseFile = view.findViewById(R.id.btnChooseFile);
         btnSave = view.findViewById(R.id.btnSave);
         edtSongName = view.findViewById(R.id.edtSongName);
         edtArtist = view.findViewById(R.id.edtArtist);
         edtDescription = view.findViewById(R.id.edtDescription);
+        spinnerGenre = view.findViewById(R.id.spinnerGenre);
+        chipGroup = view.findViewById(R.id.chipGroup);
+        songViewModel = new ViewModelProvider(requireActivity()).get(SongViewModel.class);
+
+        imagePickerLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                        selectedImageUri = result.getData().getData();
+                        imgAddImage.setImageURI(selectedImageUri);
+                    }
+                }
+        );
+
+        audioPickerLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                        selectedAudioUri = result.getData().getData();
+                        String fileName = getFileNameFromUri(selectedAudioUri);
+                        btnChooseFile.setText(fileName);
+                    }
+                }
+        );
+
+
+        String[] genres = {"Pop", "Rock", "Jazz", "EDM", "Ballad", "Hip-Hop"};
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, genres);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerGenre.setAdapter(adapter);
+
+        spinnerGenre.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(android.widget.AdapterView<?> parent, View view, int position, long id) {
+                String selectedGenre = genres[position];
+                addChipIfNotExists(selectedGenre);
+            }
+
+            @Override
+            public void onNothingSelected(android.widget.AdapterView<?> parent) {
+            }
+        });
 
         btnSave.setOnClickListener(v -> {
             String songName = edtSongName.getText().toString().trim();
             String artist = edtArtist.getText().toString().trim();
             String description = edtDescription.getText().toString().trim();
 
-            // TODO: validate dữ liệu và lưu bài hát
-        });
+            // TODO: Có thể validate dữ liệu (kiểm tra trống, định dạng,...)
 
-        btnChooseVoice.setOnClickListener(v -> {
-            // file voice
+            // Lấy danh sách thể loại từ chipGroup
+            List<String> listgenre = new ArrayList<>();
+            for (int i = 0; i < chipGroup.getChildCount(); i++) {
+                Chip chip = (Chip) chipGroup.getChildAt(i);
+                listgenre.add(chip.getText().toString());
+            }
+
+            Song newSong = new Song(
+                    "0",
+                    songName,
+                    artist,
+                    description,
+                    selectedAudioUri != null ? selectedAudioUri.toString() : "",
+                    selectedImageUri != null ? selectedImageUri.toString() : "",
+                    listgenre
+            );
+
+
+            songViewModel.addSong(newSong);
+
+            edtSongName.setText("");
+            edtArtist.setText("");
+            edtDescription.setText("");
+            chipGroup.removeAllViews();
+            imgAddImage.setImageResource(R.drawable.exampleavatar);
+            btnChooseFile.setText("Choose File");
+            selectedAudioUri = null;
+            selectedImageUri = null;
         });
 
         btnChooseFile.setOnClickListener(v -> {
-            // file khác
+            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+            intent.setType("audio/mpeg");
+            audioPickerLauncher.launch(intent);
         });
 
         imgAddImage.setOnClickListener(v -> {
-            // chọn ảnh
+            Intent intent = new Intent(Intent.ACTION_PICK);
+            intent.setType("image/*");
+            imagePickerLauncher.launch(intent);
         });
+
     }
+
+    private void addChipIfNotExists(String text) {
+        for (int i = 0; i < chipGroup.getChildCount(); i++) {
+            Chip chip = (Chip) chipGroup.getChildAt(i);
+            if (chip.getText().toString().equalsIgnoreCase(text)) {
+                return;
+            }
+        }
+
+        Chip chip = new Chip(requireContext());
+        chip.setText(text);
+        chip.setCloseIconVisible(true);
+        chip.setOnCloseIconClickListener(v -> chipGroup.removeView(chip));
+        chipGroup.addView(chip);
+    }
+
+    private String getFileNameFromUri(Uri uri) {
+        String result = null;
+        if (uri.getScheme().equals("content")) {
+            Cursor cursor = requireContext().getContentResolver().query(uri, null, null, null, null);
+            try {
+                if (cursor != null && cursor.moveToFirst()) {
+                    result = cursor.getString(cursor.getColumnIndexOrThrow(OpenableColumns.DISPLAY_NAME));
+                }
+            } finally {
+                if (cursor != null) cursor.close();
+            }
+        }
+        if (result == null) {
+            result = uri.getLastPathSegment();
+        }
+        return result;
+    }
+
+
 }

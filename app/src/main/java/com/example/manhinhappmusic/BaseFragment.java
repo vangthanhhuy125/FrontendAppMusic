@@ -33,7 +33,17 @@ public class BaseFragment extends Fragment {
         CONFIRM_DELETING_SONG,
         CONFIRM_LOGGING_OUT,
         CHANGE_PASSWORD,
-        ADD_PLAYLIST;
+        ADD_PLAYLIST,
+        LIST_GENRE,
+        ADMIN_PLAYLIST,
+        EDIT_GENRE,
+        ADD_SONG,
+        EDIT_SONG,
+        ADD_GENRE,
+        CONFIRM_DELETING_USER,
+        ARTIST_DETAIL,
+        USER_DETAIL,
+        ADMIN_FEEDBACK;
 
     }
 

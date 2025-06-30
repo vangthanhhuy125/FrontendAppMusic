@@ -49,7 +49,7 @@ public class EditSongFragment extends Fragment {
     public static EditSongFragment newInstance(Song song) {
         EditSongFragment fragment = new EditSongFragment();
         Bundle args = new Bundle();
-        args.putSerializable("song", song);
+        args.putParcelable("song", song);
         fragment.setArguments(args);
         return fragment;
     }
