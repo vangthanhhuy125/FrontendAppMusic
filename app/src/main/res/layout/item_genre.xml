@@ -13,7 +13,6 @@
         android:src="@drawable/exampleavatar"
         android:contentDescription="Genre image" />
 
-
     <!-- Tên thể loại -->
     <TextView
         android:id="@+id/genreName"
@@ -29,7 +28,9 @@
         android:shadowColor="#AA000000"
         android:shadowDx="1"
         android:shadowDy="1"
-        android:shadowRadius="2" />
+        android:shadowRadius="2"
+        android:background="#55000000"
+        android:padding="2dp" />
 
     <!-- Nút X -->
     <ImageButton
