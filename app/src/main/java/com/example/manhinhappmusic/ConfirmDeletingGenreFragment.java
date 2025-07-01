@@ -9,25 +9,35 @@ import android.widget.Button;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
+import androidx.lifecycle.ViewModelProvider;
 
 public class ConfirmDeletingGenreFragment extends DialogFragment {
 
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    private String mParam1;
-    private String mParam2;
-
     private static final String ARG_GENRE = "genre";
+    private static final String ARG_POSITION = "position";
 
-    public ConfirmDeletingGenreFragment() {
-        // Required empty public constructor
+    private Genre genre;
+    private int position;
+
+    public interface ConfirmGenreDeleteListener {
+        void onConfirmGenreDelete(String genreId, int position);
     }
 
-    public static ConfirmDeletingGenreFragment newInstance(Genre genre) {
+    private ConfirmGenreDeleteListener listener;
+
+    public void setConfirmGenreDeleteListener(ConfirmGenreDeleteListener listener) {
+        this.listener = listener;
+    }
+
+    public ConfirmDeletingGenreFragment() {
+        // constructor mặc định
+    }
+
+    public static ConfirmDeletingGenreFragment newInstance(Genre genre, int position) {
         ConfirmDeletingGenreFragment fragment = new ConfirmDeletingGenreFragment();
         Bundle args = new Bundle();
-        args.putParcelable(ARG_GENRE, genre); // ✅ dùng Parcelable thay vì String
+        args.putParcelable(ARG_GENRE, genre);
+        args.putInt(ARG_POSITION, position);
         fragment.setArguments(args);
         return fragment;
     }
@@ -35,11 +45,11 @@ public class ConfirmDeletingGenreFragment extends DialogFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setStyle(DialogFragment.STYLE_NORMAL, android.R.style.Theme_Material_Light_Dialog_NoActionBar);
+        setStyle(STYLE_NO_TITLE, android.R.style.Theme_Material_Light_Dialog_NoActionBar);
 
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            genre = getArguments().getParcelable(ARG_GENRE);
+            position = getArguments().getInt(ARG_POSITION);
         }
     }
 
@@ -56,20 +66,27 @@ public class ConfirmDeletingGenreFragment extends DialogFragment {
         Button cancelButton = view.findViewById(R.id.cancel_button);
         Button deleteButton = view.findViewById(R.id.create_button);
 
-        cancelButton.setOnClickListener(v -> dismiss());
+        cancelButton.setOnClickListener(v -> closeSelf());
 
         deleteButton.setOnClickListener(v -> {
-            // TODO: Thực hiện thao tác xóa thể loại tại đây, ví dụ gọi callback hoặc ViewModel
-            // Ví dụ: nếu bạn muốn thông báo lại cho Activity
-            if (getActivity() instanceof OnGenreDeleteListener) {
-                ((OnGenreDeleteListener) getActivity()).onDeleteConfirmed();
+            GenreViewModel viewModel = new ViewModelProvider(requireActivity()).get(GenreViewModel.class);
+            viewModel.deleteGenre(genre);
+
+            if (listener != null) {
+                listener.onConfirmGenreDelete(genre.getId(), position);
             }
-            dismiss();
+
+            closeSelf();
         });
     }
 
-    // Giao tiếp với Activity chứa Fragment này
-    public interface OnGenreDeleteListener {
-        void onDeleteConfirmed();
+    private void closeSelf() {
+        requireActivity().getSupportFragmentManager()
+                .beginTransaction()
+                .remove(this)
+                .commit();
+
+        View container = requireActivity().findViewById(R.id.dialog_container);
+        if (container != null) container.setVisibility(View.GONE);
     }
 }
