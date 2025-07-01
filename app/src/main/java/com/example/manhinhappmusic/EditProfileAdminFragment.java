@@ -1,64 +1,75 @@
 package com.example.manhinhappmusic;
 
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.Toast;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link EditProfileAdminFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class EditProfileAdminFragment extends Fragment {
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+public class EditProfileAdminFragment extends BaseFragment {
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private ImageView imgThumbnail;
+    private ImageButton btnEditImage;
+    private EditText editName, editEmail;
+    private Button btnSave;
 
     public EditProfileAdminFragment() {
-        // Required empty public constructor
+
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment EditProfileAdminFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static EditProfileAdminFragment newInstance(String param1, String param2) {
-        EditProfileAdminFragment fragment = new EditProfileAdminFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
+    public static EditProfileAdminFragment newInstance() {
+        return new EditProfileAdminFragment();
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_edit_profile_admin, container, false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+
+        imgThumbnail = view.findViewById(R.id.img_thumbnail_admin);
+        btnEditImage = view.findViewById(R.id.btn_edit_image_admin);
+        editName = view.findViewById(R.id.edit_name_admin);
+        editEmail = view.findViewById(R.id.edit_email_admin);
+        btnSave = view.findViewById(R.id.btn_save_ad);
+
+
+        btnEditImage.setOnClickListener(v -> {
+            Toast.makeText(getContext(), "Chức năng sửa ảnh chưa được hỗ trợ", Toast.LENGTH_SHORT).show();
+        });
+
+
+        btnSave.setOnClickListener(v -> {
+            String name = editName.getText().toString().trim();
+            String email = editEmail.getText().toString().trim();
+
+            if (name.isEmpty() || email.isEmpty()) {
+                Toast.makeText(getContext(), "Vui lòng nhập đầy đủ thông tin", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+
+            Bundle result = new Bundle();
+            result.putString("name", name);
+            result.putString("email", email);
+            getParentFragmentManager().setFragmentResult("editProfileResult", result);
+
+
+            if (callback != null) {
+                callback.onRequestChangeFragment(FragmentTag.ADMIN_PROFILE);
+            }
+        });
     }
 }
