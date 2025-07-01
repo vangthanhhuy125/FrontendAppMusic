@@ -1,97 +1,88 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="#000000"
+    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:padding="16dp">
 
-    <ScrollView
+   
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="16dp">
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="8dp">
 
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/categoryTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Genres"
+            android:textColor="#FFFFFF"
+            android:textSize="24sp"
+            android:textStyle="bold" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:padding="8dp">
+        <Button
+            android:id="@+id/btnNewGenre"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="New"
+            android:textAllCaps="false"
+            android:backgroundTint="#00C18E"
+            android:textColor="#FFFFFF" />
+    </LinearLayout>
 
-                <!-- Tiêu đề -->
-                <TextView
-                    android:id="@+id/categoryTitle"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Home"
-                    android:textColor="#FFFFFF"
-                    android:textSize="24sp"
-                    android:textStyle="bold" />
+    
+    <EditText
+        android:id="@+id/searchBox"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="10dp"
+        android:hint="Type To Search"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:background="@drawable/box_white_background"
+        android:textColor="#000000"
+        android:textColorHint="#888888"
+        android:drawableStart="@android:drawable/ic_menu_search"
+        android:drawablePadding="8dp" />
 
-                <!-- Nút New -->
-                <Button
-                    android:id="@+id/btnNewGenre"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="New"
-                    android:textAllCaps="false"
-                    android:backgroundTint="#00C18E"
-                    android:textColor="#FFFFFF" />
-            </LinearLayout>
+    
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
 
+        <TextView
+            android:id="@+id/allGenre"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="All genre"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:textStyle="bold" />
 
-            <!-- Ô tìm kiếm -->
-            <EditText
-                android:id="@+id/searchBox"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:layout_marginTop="10dp"
-                android:hint="Type To Search"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:background="@drawable/box_white_background"
-                android:textColor="#000000"
-                android:textColorHint="#888888"
-                android:drawableStart="@android:drawable/ic_menu_search"
-                android:drawablePadding="8dp" />
+        <ImageView
+            android:id="@+id/imgSort"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@android:drawable/ic_menu_sort_by_size"
+            app:tint="#FFFFFF" />
+    </LinearLayout>
 
-            <!-- Chữ "All genre" + icon filter -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
-
-                <TextView
-                    android:id="@+id/allGenre"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="All genre"
-                    android:textColor="#FFFFFF"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
-
-                <ImageView
-                    android:id="@+id/imgSort"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@android:drawable/ic_menu_sort_by_size"
-                    app:tint="#FFFFFF" />
-            </LinearLayout>
-
-            <!-- RecyclerView thay cho GridLayout -->
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/genreRecyclerView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:nestedScrollingEnabled="false" />
-        </LinearLayout>
-    </ScrollView>
-</FrameLayout>
+    
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/genreRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="10dp"
+        android:paddingBottom="16dp"
+        android:clipToPadding="false" />
+</LinearLayout>
