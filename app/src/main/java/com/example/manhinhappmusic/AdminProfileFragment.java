@@ -1,5 +1,6 @@
 package com.example.manhinhappmusic;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +21,8 @@ public class AdminProfileFragment extends BaseFragment {
     private TextView nameText, emailText, roleText, joinedText;
     private ImageButton backButton;
     private Button editButton, logoutButton;
+
+
 
     public static AdminProfileFragment newInstance() {
         return new AdminProfileFragment();
@@ -66,15 +69,24 @@ public class AdminProfileFragment extends BaseFragment {
 
         editButton.setOnClickListener(v -> {
             if (callback != null) {
-                callback.onRequestChangeFragment(FragmentTag.EDIT_PROFILE);
+                callback.onRequestChangeFragment(FragmentTag.EDIT_PROFILE_ADMIN);
             }
         });
 
 
         logoutButton.setOnClickListener(v -> {
-            if (callback != null) {
-                callback.onRequestOpenBottomSheetFragment(FragmentTag.CONFIRM_LOGGING_OUT);
+            requireActivity()
+                    .getSupportFragmentManager()
+                    .beginTransaction()
+                    .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
+                    .replace(R.id.confirm_log_out_container, new ConfirmLoggingOutFragment())
+                    .commit();
+
+            View container = requireActivity().findViewById(R.id.confirm_log_out_container);
+            if (container != null) {
+                container.setVisibility(View.VISIBLE);
             }
         });
+
     }
 }
