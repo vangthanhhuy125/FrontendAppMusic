@@ -12,7 +12,7 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- Dòng chứa "All Songs" và nút "New" -->
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -20,7 +20,7 @@
             android:gravity="center_vertical"
             android:layout_marginBottom="10dp">
 
-            <!-- Title -->
+
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -30,15 +30,7 @@
                 android:textStyle="bold"
                 android:textColor="#FFFFFF" />
 
-            <!-- Nút New -->
-            <Button
-                android:id="@+id/btnNewSong"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="New"
-                android:textAllCaps="false"
-                android:backgroundTint="#00C18E"
-                android:textColor="#FFFFFF" />
+
         </LinearLayout>
 
         <!-- Ô tìm kiếm -->
@@ -93,5 +85,12 @@
             android:paddingBottom="16dp"
             android:scrollbars="vertical" />
     </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/dialog_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+
 
 </FrameLayout>

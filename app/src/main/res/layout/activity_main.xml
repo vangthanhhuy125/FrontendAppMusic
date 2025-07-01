@@ -36,7 +36,7 @@
             app:itemTextColor="@color/bottom_nav_color_selector"
             android:backgroundTint="@color/white"
             app:labelVisibilityMode="labeled"
-            app:menu="@menu/user_bottom_nav_menu">
+            app:menu="@menu/admin_bottom_nav_menu">
 
         </com.google.android.material.bottomnavigation.BottomNavigationView>
     </LinearLayout>

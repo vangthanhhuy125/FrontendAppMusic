@@ -11,7 +11,7 @@
 
 
     <ImageView
-        android:id="@+id/imageView_Song"
+        android:id="@+id/img_artist_song"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:scaleType="centerCrop"
@@ -30,7 +30,7 @@
         android:layout_marginStart="12dp">
 
         <TextView
-            android:id="@+id/txt_Song_Title"
+            android:id="@+id/text_name_song"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Song Title"
@@ -38,7 +38,7 @@
             android:textSize="16sp" />
 
         <TextView
-            android:id="@+id/txt_Artist"
+            android:id="@+id/text_title_song"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Artist"
@@ -46,16 +46,4 @@
             android:textSize="14sp" />
     </LinearLayout>
 
-    <!-- Nút ba chấm -->
-    <ImageButton
-        android:id="@+id/delete_Song_Button"
-        android:layout_width="24dp"
-        android:layout_height="50dp"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentTop="true"
-        android:layout_margin="6dp"
-        android:background="@android:color/transparent"
-        android:src="@android:drawable/ic_menu_close_clear_cancel"
-        app:tint="#FFFFFF"
-        android:contentDescription="Remove"/>
 </LinearLayout>

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginVertical="6dp"
@@ -14,91 +15,75 @@
         android:background="#2E2F4F"
         android:padding="10dp">
 
-        <!-- Thumbnail -->
+        <!-- Avatar -->
         <ImageView
-            android:id="@+id/image_thumbnail"
+            android:id="@+id/img_user"
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:layout_centerVertical="true"
             android:src="@drawable/exampleavatar"
             android:scaleType="centerCrop" />
 
-        <!-- Text: Title & Artist -->
+        <!-- Name & Email -->
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_toRightOf="@id/image_thumbnail"
+            android:layout_toEndOf="@id/img_user"
             android:layout_marginStart="12dp"
             android:layout_centerVertical="true">
 
             <TextView
-                android:id="@+id/text_title"
+                android:id="@+id/tv_ext_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Title title title"
+                android:text="Name user"
                 android:textColor="#FFFFFF"
                 android:textStyle="bold"
                 android:textSize="16sp" />
 
             <TextView
-                android:id="@+id/text_artist"
+                android:id="@+id/tv_email"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="MEO"
+                android:text="email@gmail.com"
                 android:textColor="#CCCCCC"
                 android:textSize="14sp" />
         </LinearLayout>
 
-        <!-- Delete icon  -->
-        <ImageView
-            android:id="@+id/delete_icon"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_alignParentEnd="true"
-            android:layout_marginEnd="12dp"
-            android:layout_marginTop="8dp"
-            android:src="@android:drawable/ic_menu_close_clear_cancel" />
-
-        <!-- Edit icon  -->
-        <ImageView
-            android:id="@+id/icon_edit"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_alignTop="@id/delete_icon"
-            android:layout_toLeftOf="@id/delete_icon"
-            android:layout_marginEnd="8dp"
-            android:src="@android:drawable/ic_menu_edit" />
-
-        <!-- Views count -->
+        <!-- Eye icon + view count -->
         <LinearLayout
-            android:id="@+id/views_container"
+            android:id="@+id/viewscontainer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/icon_edit"
-            android:layout_alignStart="@id/icon_edit"
-            android:layout_marginTop="4dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
             android:orientation="horizontal"
-            android:paddingHorizontal="8dp"
+            android:paddingHorizontal="6dp"
             android:paddingVertical="4dp"
+            android:background="@drawable/button_background02"
+            android:gravity="center_vertical"
+            android:layoutDirection="ltr"
             android:clipToPadding="false"
-            android:gravity="center"
-            android:elevation="4dp">
+            android:elevation="2dp"
+            >
 
             <ImageView
-                android:layout_width="16dp"
-                android:layout_height="16dp"
+                android:id="@+id/ic_view_detail"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
                 android:src="@drawable/iconeye"
-                android:layout_gravity="center_vertical"
-                />
+                android:contentDescription="View Detail" />
 
             <TextView
-                android:id="@+id/text_views"
+                android:id="@+id/text_view_count"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="29"
+                android:layout_marginStart="6dp"
+                android:text="123"
                 android:textColor="#FFFFFF"
-                android:layout_marginStart="4dp"
                 android:textSize="14sp" />
         </LinearLayout>
 
