@@ -180,8 +180,9 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.Frag
         }
 
         else if (destinationTag == BaseFragment.FragmentTag.ADD_GENRE) {
-            destinationFragment = new ListGenreFragment();
+            destinationFragment = new AddGenreFragment();
         }
+            
         else if (destinationTag == BaseFragment.FragmentTag.CONFIRM_DELETING_USER) {
             Fragment fragment = new ConfirmDeletingUserFragment();
             if (params.length > 0 && params[0] instanceof Bundle) {
