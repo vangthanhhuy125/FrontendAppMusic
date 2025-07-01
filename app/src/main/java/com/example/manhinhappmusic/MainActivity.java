@@ -190,8 +190,11 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.Frag
         else if (destinationTag == BaseFragment.FragmentTag.ADD_GENRE) {
             destinationFragment = new AddGenreFragment();
         }
-        else if (destinationTag == BaseFragment.FragmentTag.ADMIN_PROFILE) {
+         else if (destinationTag == BaseFragment.FragmentTag.ADMIN_PROFILE) {
             destinationFragment = new AdminProfileFragment();
+        }
+        else if (destinationTag == BaseFragment.FragmentTag.ADMIN_HOME) {
+            destinationFragment = new AdminHomeFragment();
         }
             
         else if (destinationTag == BaseFragment.FragmentTag.CONFIRM_DELETING_USER) {
