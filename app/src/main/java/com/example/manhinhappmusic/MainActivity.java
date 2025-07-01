@@ -121,14 +121,18 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.Frag
             destinationFragment = UserPlaylistFragment.newInstance(id);
         }
         else if (destinationTag == BaseFragment.FragmentTag.EDIT_GENRE) {
-            if (params.length >= 1 && params[0] instanceof Genre) {
-                Genre genre = (Genre) params[0];
-                destinationFragment = EditGenreFragment.newInstance(
-                        genre.getId(),
-                        genre.getName(),
-                        genre.getDescription(),
-                        genre.getUrlCoverImage()
-                );
+            if (params.length == 4 &&
+                    params[0] instanceof String &&
+                    params[1] instanceof String &&
+                    params[2] instanceof String &&
+                    (params[3] == null || params[3] instanceof String)) {
+
+                String id = (String) params[0];
+                String name = (String) params[1];
+                String description = (String) params[2];
+                String imageUrl = (String) params[3]; 
+
+                destinationFragment = EditGenreFragment.newInstance(id, name, description, imageUrl);
             }
         }
         else if (destinationTag == BaseFragment.FragmentTag.LIST_GENRE) {
