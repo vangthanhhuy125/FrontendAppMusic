@@ -21,4 +21,14 @@ public class GenreViewModel extends ViewModel {
             genreListLiveData.setValue(currentList);
         }
     }
+
+    public void deleteGenre(Genre genre) {
+        List<Genre> currentList = genreListLiveData.getValue();
+        if (currentList != null) {
+            currentList.removeIf(g -> g.getId().equals(genre.getId()));
+            genreListLiveData.setValue(new ArrayList<>(currentList));
+        }
+    }
+
+
 }
