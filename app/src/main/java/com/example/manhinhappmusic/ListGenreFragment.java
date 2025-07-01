@@ -5,6 +5,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -33,7 +34,7 @@ public class ListGenreFragment extends BaseFragment implements ListGenreAdapter.
     private GenreViewModel genreViewModel;
     private boolean isSortAscending = true;
 
-    public ListGenreFragment() { }
+    public ListGenreFragment() {}
 
     public static ListGenreFragment newInstance(String param1, String param2) {
         ListGenreFragment fragment = new ListGenreFragment();
@@ -45,8 +46,7 @@ public class ListGenreFragment extends BaseFragment implements ListGenreAdapter.
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_list_genre, container, false);
     }
 
@@ -69,13 +69,15 @@ public class ListGenreFragment extends BaseFragment implements ListGenreAdapter.
 
         adapter = new ListGenreAdapter(filteredList, this);
 
-        adapter.setOnGenreClickListener(genre -> {
+
+        adapter.setOnItemClickListener(genre -> {
             if (callback != null) {
-                callback.onRequestChangeFragment(FragmentTag.CONFIRM_DELETING_GENRE, genre);
+                callback.onRequestChangeFragment(FragmentTag.EDIT_GENRE, genre.getId(), genre.getName());
             }
         });
 
-        genreRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        genreRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
+
         genreRecyclerView.setAdapter(adapter);
         genreRecyclerView.setVisibility(View.VISIBLE);
 
@@ -89,19 +91,17 @@ public class ListGenreFragment extends BaseFragment implements ListGenreAdapter.
         });
 
         searchBox.addTextChangedListener(new TextWatcher() {
-            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
                 filterGenres(s.toString());
                 genreRecyclerView.setVisibility(View.VISIBLE);
             }
 
-            @Override public void afterTextChanged(Editable s) { }
+            @Override public void afterTextChanged(Editable s) {}
         });
 
-        imgSort.setOnClickListener(v -> {
-            sortGenres();
-        });
+        imgSort.setOnClickListener(v -> sortGenres());
 
         btnNewGenre.setOnClickListener(v -> {
             if (callback != null) {
@@ -110,7 +110,6 @@ public class ListGenreFragment extends BaseFragment implements ListGenreAdapter.
         });
 
         genreViewModel = new ViewModelProvider(requireActivity()).get(GenreViewModel.class);
-
         genreViewModel.getGenreList().observe(getViewLifecycleOwner(), genres -> {
             if (genres != null && !genres.isEmpty()) {
                 genreList.clear();
@@ -141,6 +140,7 @@ public class ListGenreFragment extends BaseFragment implements ListGenreAdapter.
                 break;
             }
         }
+
         if (index != -1) {
             genreList.set(index, genre);
             adapter.notifyItemChanged(index);
@@ -165,20 +165,12 @@ public class ListGenreFragment extends BaseFragment implements ListGenreAdapter.
     }
 
     @Override
-    public void onRemove(int position) {
+    public void onRemove(int position, Genre genre) {
         if (position >= 0 && position < filteredList.size()) {
-            Genre genreToRemove = filteredList.get(position);
-
-            Iterator<Genre> iterator = genreList.iterator();
-            while (iterator.hasNext()) {
-                if (iterator.next().getId().equals(genreToRemove.getId())) {
-                    iterator.remove();
-                    break;
-                }
-            }
-
             filteredList.remove(position);
+            genreList.removeIf(g -> g.getId().equals(genre.getId()));
             adapter.notifyItemRemoved(position);
+            genreViewModel.deleteGenre(genre);
         }
     }
 
