@@ -72,9 +72,11 @@ public class ListGenreFragment extends BaseFragment implements ListGenreAdapter.
 
         adapter.setOnItemClickListener(genre -> {
             if (callback != null) {
-                callback.onRequestChangeFragment(FragmentTag.EDIT_GENRE, genre.getId(), genre.getName());
+                callback.onRequestChangeFragment(FragmentTag.EDIT_GENRE, genre.getId(), genre.getName(), genre.getDescription(), genre.getUrlCoverImage());
             }
         });
+
+
 
         genreRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
 
@@ -185,3 +187,4 @@ public class ListGenreFragment extends BaseFragment implements ListGenreAdapter.
         adapter.notifyDataSetChanged();
     }
 }
+
