@@ -121,11 +121,15 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.Frag
             destinationFragment = UserPlaylistFragment.newInstance(id);
         }
         else if (destinationTag == BaseFragment.FragmentTag.EDIT_GENRE) {
-            Song song = null;
-            if (params.length > 0 && params[0] instanceof Song) {
-                song = (Song) params[0];
+            if (params.length >= 1 && params[0] instanceof Genre) {
+                Genre genre = (Genre) params[0];
+                destinationFragment = EditGenreFragment.newInstance(
+                        genre.getId(),
+                        genre.getName(),
+                        genre.getDescription(),
+                        genre.getUrlCoverImage()
+                );
             }
-            destinationFragment = AdminPlaylistFragment.newInstance(song);
         }
         else if (destinationTag == BaseFragment.FragmentTag.LIST_GENRE) {
             destinationFragment = new ListGenreFragment();
