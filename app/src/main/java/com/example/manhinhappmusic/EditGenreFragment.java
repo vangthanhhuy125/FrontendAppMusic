@@ -26,12 +26,6 @@ import java.util.List;
 
 public class EditGenreFragment extends BaseFragment {
 
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    private String mParam1;
-    private String mParam2;
-
     private ImageView imgThumbnail;
     private ImageButton btnEditImage;
     private EditText editName, editDescription;
@@ -41,6 +35,24 @@ public class EditGenreFragment extends BaseFragment {
     private Genre genre;
     private List<Song> songList = new ArrayList<>();
     private EditSongAdapter songAdapter;
+
+    private String genreId;
+    private String genreName;
+    private String genreDescription;
+    private String genreImageUrl;
+
+    public EditGenreFragment() {}
+
+    public static EditGenreFragment newInstance(String id, String name, String description, String imageUrl) {
+        EditGenreFragment fragment = new EditGenreFragment();
+        Bundle args = new Bundle();
+        args.putString("id", id);
+        args.putString("name", name);
+        args.putString("description", description);
+        args.putString("imageUrl", imageUrl);
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     private final ActivityResultLauncher<Intent> pickImageLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
@@ -52,26 +64,22 @@ public class EditGenreFragment extends BaseFragment {
                         genre.setUrlCoverImage(selectedImageUri.toString());
                     }
                 }
-            });
-
-    public EditGenreFragment() {}
-
-    public static EditGenreFragment createInstance(String param1, String param2) {
-        EditGenreFragment fragment = new EditGenreFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
+            }
+    );
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            genreId = getArguments().getString("id");
+            genreName = getArguments().getString("name");
+            genreDescription = getArguments().getString("description");
+            genreImageUrl = getArguments().getString("imageUrl");
         }
+
+
+        genre = new Genre(genreId, genreName, genreDescription, genreImageUrl);
     }
 
     @Override
@@ -90,11 +98,11 @@ public class EditGenreFragment extends BaseFragment {
         btnSave = view.findViewById(R.id.btn_save);
         recyclerView = view.findViewById(R.id.list_song_view);
 
-        editName.setText(genre.getName());
-        editDescription.setText(genre.getDescription());
+        editName.setText(genreName);
+        editDescription.setText(genreDescription);
 
-        if (genre.getUrlCoverImage() != null) {
-            imgThumbnail.setImageURI(Uri.parse(genre.getUrlCoverImage()));
+        if (genreImageUrl != null && !genreImageUrl.isEmpty()) {
+            imgThumbnail.setImageURI(Uri.parse(genreImageUrl));
         } else {
             imgThumbnail.setImageResource(R.drawable.exampleavatar);
         }
@@ -102,16 +110,13 @@ public class EditGenreFragment extends BaseFragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         songAdapter = new EditSongAdapter(songList, (song, position) -> {
             ConfirmDeletingSongFragment confirmFragment = ConfirmDeletingSongFragment.newInstance(song, position);
-
             confirmFragment.setConfirmDeleteListener((songId, pos) -> {
                 deleteSongFromDatabase(songId);
                 songList.remove(pos);
                 songAdapter.notifyItemRemoved(pos);
             });
-
             confirmFragment.show(getParentFragmentManager(), "CONFIRM_DELETE_SONG");
         });
-
 
         recyclerView.setAdapter(songAdapter);
 
@@ -119,7 +124,6 @@ public class EditGenreFragment extends BaseFragment {
             Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
             pickImageLauncher.launch(intent);
         });
-
 
         btnSave.setOnClickListener(v -> {
             String newName = editName.getText().toString().trim();
@@ -133,7 +137,7 @@ public class EditGenreFragment extends BaseFragment {
 
             genre.setName(newName);
             genre.setDescription(newDescription);
-            // genre.setSongs(songList); // nếu Genre có danh sách bài hát
+
 
             Toast.makeText(getContext(), "Đã lưu thay đổi", Toast.LENGTH_SHORT).show();
 
@@ -143,24 +147,11 @@ public class EditGenreFragment extends BaseFragment {
         });
     }
 
-    public void setGenre(Genre genre) {
-        this.genre = genre;
-    }
-
     public void setSongList(List<Song> songList) {
         this.songList = songList;
     }
 
-    public void onSongDeleteConfirmed(int position) {
-        if (position >= 0 && position < songList.size()) {
-            songList.remove(position);
-            songAdapter.notifyItemRemoved(position);
-        }
-    }
-
     private void deleteSongFromDatabase(String songId) {
-
+        // Xử lý xóa bài hát nếu có database
     }
-
-
 }
