@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -20,9 +21,11 @@ public class ListGenreAdapter extends RecyclerView.Adapter<ListGenreAdapter.View
     private List<Genre> genreList;
     private OnItemRemoveListener removeListener;
     private OnItemClickListener clickListener;
+    private OnGenreClickListener genreClickListener;
+    private Context context;
 
     public interface OnItemRemoveListener {
-        void onRemove(int position);
+        void onRemove(int position, Genre genre);
     }
 
     public interface OnItemClickListener {
@@ -33,32 +36,24 @@ public class ListGenreAdapter extends RecyclerView.Adapter<ListGenreAdapter.View
         void onGenreClick(String genreId);
     }
 
-    private Context context;
-
     public ListGenreAdapter(List<Genre> genreList, OnItemRemoveListener removeListener) {
         this.genreList = genreList;
         this.removeListener = removeListener;
     }
-
 
     public void setOnItemClickListener(OnItemClickListener listener) {
         this.clickListener = listener;
     }
 
     public void setOnGenreClickListener(OnGenreClickListener listener) {
-        this.clickListener = genre -> {
-            if (listener != null) {
-                listener.onGenreClick(genre.getId());
-            }
-        };
+        this.genreClickListener = listener;
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        Context context = parent.getContext();
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_genre, parent, false);
+        context = parent.getContext();
+        View view = LayoutInflater.from(context).inflate(R.layout.item_genre, parent, false);
         return new ViewHolder(view);
     }
 
@@ -67,38 +62,41 @@ public class ListGenreAdapter extends RecyclerView.Adapter<ListGenreAdapter.View
         Genre genre = genreList.get(position);
         holder.genreName.setText(genre.getName());
 
-        Glide.with(holder.itemView)
-                .load(genre.getUrlCoverImage())
-                .placeholder(R.drawable.placeholder_image)
-                .error(R.drawable.error_image)
-                .centerCrop()
-                .into(holder.genreImage);
+        String imageUrl = genre.getUrlCoverImage();
+        if (imageUrl == null || imageUrl.isEmpty()) {
+            holder.genreImage.setImageResource(R.drawable.exampleavatar);
+        } else {
+            Glide.with(holder.itemView.getContext())
+                    .load(imageUrl)
+                    .placeholder(R.drawable.exampleavatar)
+                    .error(R.drawable.error_image)
+                    .centerCrop()
+                    .into(holder.genreImage);
+        }
 
+        // Sự kiện xóa
         holder.removeButton.setOnClickListener(v -> {
-            if (context instanceof BaseFragment.FragmentInteractionListener) {
-                ((BaseFragment.FragmentInteractionListener) context).onRequestChangeFragment(
-                        BaseFragment.FragmentTag.CONFIRM_DELETING_GENRE,
-                        genre.getId(),
-                        genre.getName()
-                );
-            }
+            FragmentActivity activity = (FragmentActivity) v.getContext();
+            ConfirmDeletingGenreFragment dialog = ConfirmDeletingGenreFragment.newInstance(genre, holder.getAdapterPosition());
+
+            dialog.setConfirmGenreDeleteListener((genreId, pos) -> {
+                if (removeListener != null) {
+                    removeListener.onRemove(pos, genre);
+                }
+            });
+
+            dialog.show(activity.getSupportFragmentManager(), "ConfirmDeleteGenreDialog");
         });
 
+        // Sự kiện click vào item
         holder.itemView.setOnClickListener(v -> {
-            if (context instanceof BaseFragment.FragmentInteractionListener) {
-                ((BaseFragment.FragmentInteractionListener) context).onRequestChangeFragment(
-                        BaseFragment.FragmentTag.EDIT_GENRE,
-                        genre.getId(),
-                        genre.getName()
-                );
-            }
-
             if (clickListener != null) {
                 clickListener.onItemClick(genre);
             }
+            if (genreClickListener != null) {
+                genreClickListener.onGenreClick(genre.getId());
+            }
         });
-
-
     }
 
     @Override
@@ -107,6 +105,7 @@ public class ListGenreAdapter extends RecyclerView.Adapter<ListGenreAdapter.View
     }
 
     public void updateData(List<Genre> newGenreList) {
+        if (newGenreList == null) return;
         genreList.clear();
         genreList.addAll(newGenreList);
         notifyDataSetChanged();
