@@ -1,4 +1,4 @@
-package com.example.manhinhappmusic.fragment;
+package com.example.manhinhappmusic.fragment.admin;
 
 import android.os.Bundle;
 
@@ -18,10 +18,10 @@ import com.example.manhinhappmusic.model.Category;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link CategoryFragment#newInstance} factory method to
+ * Use the {@link AddGenreFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class CategoryFragment extends Fragment {
+public class AddGenreFragment extends Fragment {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -32,7 +32,7 @@ public class CategoryFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    public CategoryFragment() {
+    public AddGenreFragment() {
         // Required empty public constructor
     }
 
@@ -51,8 +51,8 @@ public class CategoryFragment extends Fragment {
     private Button btnSave;
     private String selectedImagePath = "";
 
-    public static CategoryFragment newInstance(String param1, String param2) {
-        CategoryFragment fragment = new CategoryFragment();
+    public static AddGenreFragment newInstance(String param1, String param2) {
+        AddGenreFragment fragment = new AddGenreFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -73,7 +73,7 @@ public class CategoryFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_category, container, false);
+        return inflater.inflate(R.layout.fragment_add_genre, container, false);
     }
 
     @Override

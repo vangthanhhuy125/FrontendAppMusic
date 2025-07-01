@@ -1,18 +1,17 @@
 package com.example.manhinhappmusic.model;
 
-
-public class Feedback{
+import lombok.Data;
+@Data
+public class Feedback {
     private String id;
-    private String user_id;
+    private String userId;
     private String content;
     private String status;
-    private String admin_reply;
+    private String adminReply;
+    private int rating;
+    private String date;
 
-    public String getId() {
-        return id;
-    }
+    public Feedback() {
 
-    public void setId(String id) {
-        this.id = id;
     }
 }

@@ -97,7 +97,7 @@ public class UserArtistFragment extends BaseFragment {
                 List<SongResponse> songResponses = new ArrayList<>();
                 for(Song song : songs)
                 {
-                    songResponses.add(new SongResponse(song.getId(), song.getArtist_id(), song.getAudioUrl(), song.getTitle(), song.getDescription(), song.getCoverImageUrl(), new ArrayList<>(), 0L, 0d));
+                    songResponses.add(new SongResponse(song.getId(), song.getArtistId(), song.getAudioUrl(), song.getTitle(), song.getDescription(), song.getCoverImageUrl(), new ArrayList<>(), 0L, 0d));
                 }
                 songsAdapter.setListItemList(new ArrayList<>(songResponses));
                 songsAdapter.notifyDataSetChanged();

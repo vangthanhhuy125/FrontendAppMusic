@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/gray_gradient_background"
-    tools:context=".fragment.ConfirmDeletingGenreFragment">
+    tools:context=".fragment.admin.ConfirmDeletingGenreFragment">
 
     <LinearLayout
         android:layout_width="match_parent"

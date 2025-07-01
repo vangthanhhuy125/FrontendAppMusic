@@ -79,7 +79,7 @@ public class PlaylistSongEditAdapter extends RecyclerView.Adapter<PlaylistSongEd
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Song song = songList.get(position);
         holder.getSongTitleText().setText(song.getTitle());
-        holder.getArtistNameText().setText(song.getArtist_id());
+        holder.getArtistNameText().setText(song.getArtistId());
         holder.getRemoveButton().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

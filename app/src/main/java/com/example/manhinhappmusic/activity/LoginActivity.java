@@ -70,7 +70,6 @@ public class LoginActivity extends AppCompatActivity implements BaseFragment.Fra
             destinationFragment = new OtpVerificationFragment();
         }
 
-
         if(destinationFragment != null)
             loadFragment(destinationFragment);
     }

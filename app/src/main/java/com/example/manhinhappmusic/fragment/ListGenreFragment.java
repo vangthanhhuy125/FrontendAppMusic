@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 
 import com.example.manhinhappmusic.R;
+import com.example.manhinhappmusic.adapter.ListGenreAdapter;
 import com.example.manhinhappmusic.model.Genre;
 
 import java.util.ArrayList;
@@ -115,8 +116,6 @@ public class ListGenreFragment extends Fragment implements ListGenreAdapter.OnIt
             @Override
             public void afterTextChanged(Editable s) {}
         });
-
-
     }
 
     private void filterGenres(String keyword) {
@@ -130,7 +129,7 @@ public class ListGenreFragment extends Fragment implements ListGenreAdapter.OnIt
     }
 
     @Override
-    public void onRemove(int position) {
+    public void onRemove(int position, Genre genre) {
         if (filteredList != null && position >= 0 && position < filteredList.size()) {
             filteredList.remove(position);
             adapter.notifyItemRemoved(position);

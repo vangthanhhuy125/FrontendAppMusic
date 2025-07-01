@@ -22,6 +22,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.manhinhappmusic.R;
+import com.example.manhinhappmusic.activity.AdminActivity;
 import com.example.manhinhappmusic.activity.MainActivity;
 import com.example.manhinhappmusic.dto.AuthResponse;
 import com.example.manhinhappmusic.dto.LoginRequest;
@@ -37,8 +38,7 @@ import retrofit2.Response;
  * Use the {@link LoginFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class LoginFragment extends BaseFragment {
-
+public class LoginFragment extends Fragment {
     private EditText emailEditText;
     private EditText passwordEditText;
     private Button loginButton;
@@ -109,67 +109,73 @@ public class LoginFragment extends BaseFragment {
 
         SharedPreferences preferences = getContext().getSharedPreferences(ARG_PREFERENCES, getContext().MODE_PRIVATE);
 
-        if(preferences.getBoolean("isLoggedIn", false))
-        {        String token = preferences.getString("token", "");
+        // ✅ Tự động điều hướng nếu đã đăng nhập
+        if (preferences.getBoolean("isLoggedIn", false)) {
+            String token = preferences.getString("token", "");
+            String role = preferences.getString("role", "ROLE_USER");
 
             apiClient.createApiServiceWithToken(token);
-            launcher.launch(new Intent(requireActivity(), MainActivity.class));
 
+            Intent intent;
+            if ("ROLE_ADMIN".equalsIgnoreCase(role)) {
+                intent = new Intent(requireActivity(), AdminActivity.class);
+            } else {
+                intent = new Intent(requireActivity(), MainActivity.class);
+            }
+
+            launcher.launch(intent);
+            requireActivity().finish();
+            return;
         }
+
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String email = emailEditText.getText().toString().trim();
                 String password = passwordEditText.getText().toString().trim();
-                if (email.isBlank()|| password.isBlank()) {
+
+                if (email.isBlank() || password.isBlank()) {
                     Toast.makeText(requireContext(), "Vui lòng nhập đầy đủ thông tin", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                apiClient.getApiService().login(new LoginRequest(email,password ))
+
+                apiClient.getApiService().login(new LoginRequest(email, password))
                         .enqueue(new Callback<AuthResponse>() {
                             @Override
                             public void onResponse(Call<AuthResponse> call, Response<AuthResponse> response) {
-                                if(response.isSuccessful() && response.body() != null)
-                                {
+                                if (response.isSuccessful() && response.body() != null) {
                                     String token = response.body().getToken();
+                                    String role = response.body().getRole();
+
                                     apiClient.createApiServiceWithToken(token);
+
                                     SharedPreferences.Editor editor = preferences.edit();
                                     editor.putString("token", token);
+                                    editor.putString("role", role);
                                     editor.putBoolean("isLoggedIn", true);
                                     editor.apply();
+
                                     Toast.makeText(requireContext(), "Đăng nhập thành công", Toast.LENGTH_SHORT).show();
 
-                                    launcher.launch(new Intent(requireActivity(), MainActivity.class));
-                                    requireActivity().finish();
-                                }
-                                else
-                                {
-                                    Toast.makeText(requireContext(), "Sai email hoặc mật khẩu", Toast.LENGTH_SHORT).show();
+                                    Intent intent;
+                                    if ("ROLE_ADMIN".equalsIgnoreCase(role)) {
+                                        intent = new Intent(requireActivity(), AdminActivity.class);
+                                    } else {
+                                        intent = new Intent(requireActivity(), MainActivity.class);
+                                    }
 
+                                    launcher.launch(intent);
+                                    requireActivity().finish();
+                                } else {
+                                    Toast.makeText(requireContext(), "Sai email hoặc mật khẩu", Toast.LENGTH_SHORT).show();
                                 }
                             }
 
                             @Override
                             public void onFailure(Call<AuthResponse> call, Throwable throwable) {
                                 Toast.makeText(requireContext(), "Lỗi kết nối: " + throwable.getMessage(), Toast.LENGTH_SHORT).show();
-
                             }
                         });
-            }
-        });
-
-        forgotPasswordText.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-            callback.onRequestChangeFragment(FragmentTag.FORGOT_PASSWORD);
-            }
-
-        });
-
-        signUpTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                callback.onRequestChangeFragment(FragmentTag.REGISTER);
             }
         });
     }
@@ -177,7 +183,6 @@ public class LoginFragment extends BaseFragment {
     private ActivityResultLauncher launcher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
         @Override
         public void onActivityResult(ActivityResult o) {
-
         }
     });
 }

@@ -25,14 +25,13 @@ import android.widget.TextView;
 import com.example.manhinhappmusic.databinding.FragmentUserSearchAddSongBinding;
 import com.example.manhinhappmusic.dto.SongResponse;
 import com.example.manhinhappmusic.fragment.BaseFragment;
-import com.example.manhinhappmusic.model.Song;
 import com.example.manhinhappmusic.repository.PlaylistRepository;
 import com.example.manhinhappmusic.repository.SongRepository;
 import com.example.manhinhappmusic.view.ClearableEditText;
-import com.example.manhinhappmusic.R;
 import com.example.manhinhappmusic.decoration.VerticalLinearSpacingItemDecoration;
 import com.example.manhinhappmusic.adapter.SearchPlaylistAddSongAdapter;
 import com.example.manhinhappmusic.model.Playlist;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -46,7 +45,7 @@ import java.util.stream.Collectors;
  * Use the {@link UserSearchAddSongFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class UserSearchAddSongFragment extends BaseFragment {
+public class UserSearchAddSongFragment extends BottomSheetDialogFragment {
 
     private NavController navController;
     private FragmentUserSearchAddSongBinding binding;
@@ -103,7 +102,6 @@ public class UserSearchAddSongFragment extends BaseFragment {
         if (getArguments() != null) {
             id = getArguments().getString(ARG_ID);
         }
-        bottomNavVisibility = View.GONE;
     }
 
     @Override
@@ -283,17 +281,11 @@ public class UserSearchAddSongFragment extends BaseFragment {
                 {
                     getParentFragmentManager().setFragmentResult("change",null);
                 }
-
-
-
-                callback.onRequestGoBackPreviousFragment();
             }
         });
 
         getParentFragmentManager().setFragmentResultListener("request_add_playlist", getViewLifecycleOwner(), (requestKey, result) ->{
-            //playlistList.add(new Playlist("dfd", result.getString("playlist_name"), "Fdfd", new ArrayList<>(),"",0,"",new ArrayList<>()));
             String playlistName = result.getString("playlist_name", "null");
-
             onResume();
 
         });

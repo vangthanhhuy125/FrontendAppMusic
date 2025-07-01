@@ -16,7 +16,7 @@ import lombok.Data;
 @AllArgsConstructor
 public class Song extends MultiResponseImp implements ListItem{
     private String id;
-    private String artist_id;
+    private String artistId;
     private String description;
     private String title;
     private String audioUrl;

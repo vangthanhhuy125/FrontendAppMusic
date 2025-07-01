@@ -70,6 +70,7 @@ public class NowPlayingSongFragment extends BottomSheetDialogFragment {
     private ImageButton skipPreviousButton;
     private ImageButton skipNextButton;
     private ImageButton minimizeButton;
+
 //    private ImageButton moreOptionButton;
     private SeekBar seekBar;
     private MaterialButton playButton;

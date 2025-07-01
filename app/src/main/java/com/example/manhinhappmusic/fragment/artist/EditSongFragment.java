@@ -1,23 +1,29 @@
-package com.example.manhinhappmusic.fragment;
+package com.example.manhinhappmusic.fragment.artist;
 
 import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.manhinhappmusic.R;
 import com.example.manhinhappmusic.model.Song;
+
+import java.io.Serializable;
 
 public class EditSongFragment extends Fragment {
 
@@ -28,7 +34,7 @@ public class EditSongFragment extends Fragment {
 
     private OnSongEditedListener listener;
 
-    // Views
+
     private ImageView songImage;
     private ImageButton editImageButton;
     private EditText songNameInput, artistInput, descriptionInput;
@@ -36,21 +42,21 @@ public class EditSongFragment extends Fragment {
 
     private Song currentSong;
 
-    // Nếu muốn mở chọn ảnh, cần ActivityResultLauncher (cái này có thể mở rộng)
+
     private ActivityResultLauncher<String> pickImageLauncher;
 
     public EditSongFragment() {
-        // Required empty public constructor
+
     }
 
-    // Factory method để truyền Song vào fragment
-//    public static EditSongFragment newInstance(Song song) {
-//        EditSongFragment fragment = new EditSongFragment();
-//        Bundle args = new Bundle();
-//        args.putSerializable("song", song);
-//        fragment.setArguments(args);
-//        return fragment;
-//    }
+
+    public static EditSongFragment newInstance(Song song) {
+        EditSongFragment fragment = new EditSongFragment();
+        Bundle args = new Bundle();
+        args.putParcelable("song", (Parcelable) song);
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     public void setOnSongEditedListener(OnSongEditedListener listener) {
         this.listener = listener;
@@ -61,17 +67,17 @@ public class EditSongFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         if (getArguments() != null) {
-            // Lấy Song được truyền vào
-            currentSong = (Song) getArguments().getSerializable("song");
+            currentSong = getArguments().getParcelable("song");
+
         }
 
-        // Khởi tạo launcher nếu muốn chọn ảnh (nếu bạn muốn mở rộng chức năng chọn ảnh)
+
         pickImageLauncher = registerForActivityResult(
                 new ActivityResultContracts.GetContent(),
                 uri -> {
                     if (uri != null) {
                         songImage.setImageURI(uri);
-                        // Cập nhật đường dẫn ảnh cho Song, bạn cần lưu ý xử lý thật sự nếu cần upload, lưu file,...
+
                         currentSong.setCoverImageUrl(uri.toString());
                     }
                 }
@@ -90,16 +96,16 @@ public class EditSongFragment extends Fragment {
         descriptionInput = view.findViewById(R.id.descriptionInput);
         saveButton = view.findViewById(R.id.saveButton);
 
-//        if (currentSong != null) {
-//            if (currentSong.getCoverImageResID() != 0) {
-//                songImage.setImageResource(currentSong.getCoverImageResID());
-//            } else if (currentSong.getCoverImageUrl() != null) {
-//                songImage.setImageURI(Uri.parse(currentSong.getCoverImageUrl()));
-//            }
-//            songNameInput.setText(currentSong.getTitle());
-//            artistInput.setText(currentSong.getArtistId());
-//            descriptionInput.setText(currentSong.getDescription());
-//        }
+        if (currentSong != null) {
+            if (currentSong.getCoverImageUrl() != null) {
+                songImage.setImageResource(Integer.parseInt(currentSong.getCoverImageUrl()));
+            } else if (currentSong.getCoverImageUrl() != null) {
+                songImage.setImageURI(Uri.parse(currentSong.getCoverImageUrl()));
+            }
+            songNameInput.setText(currentSong.getTitle());
+            artistInput.setText(currentSong.getArtistId());
+            descriptionInput.setText(currentSong.getDescription());
+        }
 
         editImageButton.setOnClickListener(v -> {
             pickImageLauncher.launch("image/*");
@@ -116,7 +122,7 @@ public class EditSongFragment extends Fragment {
             }
 
             currentSong.setTitle(newTitle);
-//            currentSong.setArtistId(newArtist);
+            currentSong.setArtistId(newArtist);
             currentSong.setDescription(newDesc);
 
             if (listener != null) {

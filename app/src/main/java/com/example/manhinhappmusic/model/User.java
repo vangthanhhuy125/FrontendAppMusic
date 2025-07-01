@@ -7,7 +7,9 @@ import com.example.manhinhappmusic.dto.MultiResponseImp;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.Data;
 
+@Data
 public class User extends MultiResponseImp implements ListItem {
 
     private String id;
@@ -21,11 +23,13 @@ public class User extends MultiResponseImp implements ListItem {
     private Boolean isVerifiedArtist;
     private Boolean isVerified;
     private String resetToken;
+    private String createdAt;
+    private String updatedAt;
 
     //test purpose
     private int avatarResID;
 
-    public User(String id, String email, String password, String lastName, String fullName, String role, String avatarUrl)
+    public User(String id, String email, String password, String lastName, String fullName, String role, String avatarUrl, String bio, Boolean isVerifiedArtist, String createdAt, String updatedAt)
     {
         this.id = id;
         this.email = email;
@@ -34,9 +38,13 @@ public class User extends MultiResponseImp implements ListItem {
         this.fullName = fullName;
         this.role = role;
         this.avatarUrl = avatarUrl;
+        this.bio = bio;
+        this.isVerifiedArtist = isVerifiedArtist;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
 
-    public User(String id, String email, String password, String lastName, String fullName, String role, int avatarResID)
+    public User(String id, String email, String password, String lastName, String fullName, String role, int avatarResID, String bio, Boolean isVerifiedArtist, String createdAt, String updatedAt)
     {
         this.id = id;
         this.email = email;
@@ -45,74 +53,11 @@ public class User extends MultiResponseImp implements ListItem {
         this.fullName = fullName;
         this.role = role;
         this.avatarResID = avatarResID;
+        this.bio = bio;
+        this.isVerifiedArtist = isVerifiedArtist;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
-
-
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
-    }
-
-    public String getAvatarUrl() {
-        return avatarUrl;
-    }
-
-    public void setAvatarUrl(String avatarUrl) {
-        this.avatarUrl = avatarUrl;
-    }
-
-    public int getAvatarResID() {
-        return avatarResID;
-    }
-
-    public void setAvatarResID(int avatarResID) {
-        this.avatarResID = avatarResID;
-    }
-
 
     @Override
     public ListItemType getItemType() {

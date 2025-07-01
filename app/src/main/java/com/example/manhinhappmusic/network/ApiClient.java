@@ -29,6 +29,7 @@ public class ApiClient {
         return instance;
     }
     private String token;
+    private String role;
 
     public void createApiService()
     {
@@ -69,5 +70,5 @@ public class ApiClient {
         return token;
     }
 
-
+    public String getRole(){return role;}
 }

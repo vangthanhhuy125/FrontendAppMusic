@@ -21,7 +21,6 @@ public class BaseFragment extends Fragment {
             MainActivity mainActivity = (MainActivity) getActivity();
             mainActivity.setBottomNavigationViewVisibility(bottomNavVisibility);
         }
-
     }
 
     public interface FragmentInteractionListener{
@@ -37,9 +36,19 @@ public class BaseFragment extends Fragment {
     protected FragmentInteractionListener callback;
 
     public static enum FragmentTag{
+        LIST_GENRE,
+        EDIT_PROFILE_ADMIN,
+        ADMIN_PROFILE,
+        ADMIN_HOME,
+        ADMIN_GENRE,
+        ADMIN_FEEDBACK,
+        ARTIST_DETAIL,
+        USER_DETAIL,
         USER_HOME,
         USER_SEARCH,
         USER_PLAYLIST,
+        ADD_GENRE,
+        EDIT_GENRE,
         USER_PROFILE,
         USER_LIBRARY,
         REGISTER,
@@ -50,6 +59,10 @@ public class BaseFragment extends Fragment {
         FORGOT_PASSWORD,
         EDIT_PROFILE,
         CONFIRM_DELETING_GENRE,
+
+        CONFIRM_DELETING_USER,
+        ADD_SONG,
+        EDIT_SONG,
         CONFIRM_DELETING_SONG,
         CONFIRM_LOGGING_OUT,
         CHANGE_PASSWORD,

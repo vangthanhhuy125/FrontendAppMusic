@@ -81,7 +81,4 @@
         android:name="com.example.manhinhappmusic.fragment.user.UserSearchAddSongFragment"
         android:label="fragment_user_search_add_song"
         tools:layout="@layout/fragment_user_search_add_song"/>
-
- /
-
 </navigation>

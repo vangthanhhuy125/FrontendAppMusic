@@ -65,7 +65,6 @@ public class MusicDisplayItemAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-
         if(holder instanceof HomeMixPlaylistHolder)
         {
             Playlist playlist = (Playlist) listItemList.get(position);
@@ -77,10 +76,11 @@ public class MusicDisplayItemAdapter extends RecyclerView.Adapter<RecyclerView.V
 //            homeMixPlaylistHolder.getArtistNameText().setText(playlist.getArtistName() + "\n");
             homeMixPlaylistHolder.getArtistNameText().setText(playlist.getName() +"\n");
 
-            homeMixPlaylistHolder.itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    onItemClickListener.onItemClick(homeMixPlaylistHolder.getAdapterPosition(), playlist);
+            homeMixPlaylistHolder.itemView.setOnClickListener(v -> {
+                int pos = homeMixPlaylistHolder.getAdapterPosition();
+                if (pos != RecyclerView.NO_POSITION) {
+                    Playlist clickedPlaylist = (Playlist) listItemList.get(pos);
+                    onItemClickListener.onItemClick(pos, clickedPlaylist);
                 }
             });
         }
@@ -93,11 +93,12 @@ public class MusicDisplayItemAdapter extends RecyclerView.Adapter<RecyclerView.V
                     .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(15))))
                     .into(homeSongViewHolder.getSongCoverImage());
             homeSongViewHolder.getSongTitleText().setText(song.getTitle());
-            homeSongViewHolder.getArtistNameText().setText(song.getArtist_id());
-            homeSongViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    onItemClickListener.onItemClick(homeSongViewHolder.getAdapterPosition(), song);
+            homeSongViewHolder.getArtistNameText().setText(song.getArtistId());
+            homeSongViewHolder.itemView.setOnClickListener(v -> {
+                int pos = homeSongViewHolder.getAdapterPosition();
+                if (pos != RecyclerView.NO_POSITION) {
+                    Song clickedSong = (Song) listItemList.get(pos);
+                    onItemClickListener.onItemClick(pos, clickedSong);
                 }
             });
         }
@@ -110,10 +111,11 @@ public class MusicDisplayItemAdapter extends RecyclerView.Adapter<RecyclerView.V
                     .into(homeReleasePlaylistViewHolder.getPlaylistCoverImage());
             homeReleasePlaylistViewHolder.getPlaylistTitleText().setText(playlist.getName());
 //            homeReleasePlaylistViewHolder.getArtistNameText().setText(playlist.getArtistName());
-            homeReleasePlaylistViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    onItemClickListener.onItemClick(homeReleasePlaylistViewHolder.getAdapterPosition(), playlist);
+            homeReleasePlaylistViewHolder.itemView.setOnClickListener(v -> {
+                int pos = homeReleasePlaylistViewHolder.getAdapterPosition();
+                if (pos != RecyclerView.NO_POSITION) {
+                    Playlist clickedPlaylist = (Playlist) listItemList.get(pos);
+                    onItemClickListener.onItemClick(pos, clickedPlaylist);
                 }
             });
         }
@@ -126,10 +128,11 @@ public class MusicDisplayItemAdapter extends RecyclerView.Adapter<RecyclerView.V
                     .circleCrop()
                     .into(homeArtistHolder.getArtistImage());
             homeArtistHolder.getArtistNameText().setText(artist.getFullName());
-            homeArtistHolder.itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    onItemClickListener.onItemClick(homeArtistHolder.getAdapterPosition(), artist);
+            homeArtistHolder.itemView.setOnClickListener(v -> {
+                int pos = homeArtistHolder.getAdapterPosition();
+                if (pos != RecyclerView.NO_POSITION) {
+                    User clickedArtist = (User) listItemList.get(pos);
+                    onItemClickListener.onItemClick(pos, clickedArtist);
                 }
             });
         }

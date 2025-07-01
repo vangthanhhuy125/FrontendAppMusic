@@ -42,7 +42,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Song song = songList.get(position);
-        holder.getTextViewArtist().setText(song.getArtist_id());
+        holder.getTextViewArtist().setText(song.getArtistId());
         holder.getTextViewSongTitle().setText(song.getTitle());
         if(song.getCoverImageUrl()!= null && !song.getCoverImageUrl().isEmpty())
             Glide.with(holder.itemView.getContext())
