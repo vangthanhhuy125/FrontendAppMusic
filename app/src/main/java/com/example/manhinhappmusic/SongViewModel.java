@@ -35,4 +35,14 @@ public class SongViewModel extends ViewModel {
         songListLiveData.setValue(songs);
     }
 
+    public void deleteSong(Song song) {
+        List<Song> currentList = songListLiveData.getValue();
+        if (currentList != null) {
+            currentList.removeIf(s -> s.getId().equals(song.getId()));
+            songListLiveData.setValue(new ArrayList<>(currentList));
+        }
+    }
+
+
+
 }

@@ -17,9 +17,10 @@ public class ListSongsAdapter extends RecyclerView.Adapter<ListSongsAdapter.Song
     private OnSongClickListener listener;
 
     public interface OnSongClickListener {
-        void onEditClick(Song song);
-        void onDeleteClick(Song song);
+        void onEditClick(Song song, int position);
+        void onDeleteClick(Song song, int position);
     }
+
 
     public ListSongsAdapter(List<Song> songList, OnSongClickListener listener) {
         this.songList = songList;
@@ -51,15 +52,17 @@ public class ListSongsAdapter extends RecyclerView.Adapter<ListSongsAdapter.Song
 
         holder.iconEdit.setOnClickListener(v -> {
             if (listener != null) {
-                listener.onEditClick(song);
+                listener.onEditClick(song, holder.getAdapterPosition());
             }
         });
 
         holder.iconDelete.setOnClickListener(v -> {
             if (listener != null) {
-                listener.onDeleteClick(song);
+                listener.onDeleteClick(song, holder.getAdapterPosition());
             }
         });
+
+
     }
 
     @Override

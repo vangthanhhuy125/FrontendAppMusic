@@ -2,12 +2,6 @@ package com.example.manhinhappmusic;
 
 import android.content.Context;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -18,6 +12,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -27,14 +27,14 @@ public class AdminPlaylistFragment extends BaseFragment {
     private EditText searchBox;
     private RecyclerView recyclerView;
     private Button btnNewSong;
+    private ImageView btnSort;
     private ListSongsAdapter adapter;
-    private List<Song> fullSongList = new ArrayList<>();
-    private List<Song> filteredSongList = new ArrayList<>();
+    private final List<Song> fullSongList = new ArrayList<>();
+    private final List<Song> filteredSongList = new ArrayList<>();
     private boolean isSortedAscending = true;
     private SongViewModel songViewModel;
 
-    public AdminPlaylistFragment() {
-    }
+    public AdminPlaylistFragment() {}
 
     public static AdminPlaylistFragment newInstance(Song song) {
         AdminPlaylistFragment fragment = new AdminPlaylistFragment();
@@ -45,7 +45,7 @@ public class AdminPlaylistFragment extends BaseFragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_admin_playlist, container, false);
     }
@@ -54,39 +54,39 @@ public class AdminPlaylistFragment extends BaseFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        btnNewSong = view.findViewById(R.id.btnNewSong);
         searchBox = view.findViewById(R.id.searchBox);
         recyclerView = view.findViewById(R.id.recyclerView);
-        ImageView btnSort = view.findViewById(R.id.btn_sort);
-
+        btnSort = view.findViewById(R.id.btn_sort);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         adapter = new ListSongsAdapter(filteredSongList, new ListSongsAdapter.OnSongClickListener() {
             @Override
-            public void onEditClick(Song song) {
+            public void onEditClick(Song song, int position) {
                 callback.onRequestChangeFragment(FragmentTag.EDIT_SONG, song);
             }
 
             @Override
-            public void onDeleteClick(Song song) {
-                callback.onRequestChangeFragment(FragmentTag.CONFIRM_DELETING_SONG, song);
+            public void onDeleteClick(Song song, int position) {
+                ConfirmDeletingSongFragment fragment = ConfirmDeletingSongFragment.newInstance(song, position);
+                fragment.setConfirmDeleteListener((songId, pos) -> {
+                    Song removed = fullSongList.remove(pos);
+                    filterSongs(searchBox.getText().toString().trim());
+                });
+
+                requireActivity()
+                        .getSupportFragmentManager()
+                        .beginTransaction()
+                        .add(R.id.dialog_container, fragment, "ConfirmDeleteOverlay")
+                        .addToBackStack(null)
+                        .commit();
+
+                View container = requireView().findViewById(R.id.dialog_container);
+                container.setVisibility(View.VISIBLE);
             }
         });
 
         recyclerView.setAdapter(adapter);
 
-        Song receivedSong = null;
-        if (getArguments() != null) {
-            receivedSong = getArguments().getParcelable("SONG_DATA");
-        }
-
-        if (receivedSong != null) {
-            filteredSongList.clear();
-            filteredSongList.add(receivedSong);
-            adapter.notifyDataSetChanged();
-        } else {
-            fakeData();
-        }
 
         view.setOnTouchListener((v, event) -> {
             if (searchBox.isFocused()) {
@@ -96,27 +96,40 @@ public class AdminPlaylistFragment extends BaseFragment {
             return false;
         });
 
-        searchBox.addTextChangedListener(new TextWatcher() {
-            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
 
+        searchBox.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
                 filterSongs(s.toString());
             }
-
-            @Override public void afterTextChanged(Editable s) { }
+            @Override public void afterTextChanged(Editable s) {}
         });
+
 
         btnSort.setOnClickListener(v -> sortSongList());
 
-        btnNewSong.setOnClickListener(v -> callback.onRequestChangeFragment(FragmentTag.ADD_SONG, null));
 
         songViewModel = new ViewModelProvider(requireActivity()).get(SongViewModel.class);
-
         songViewModel.getSongList().observe(getViewLifecycleOwner(), songs -> {
-            fullSongList.clear();
-            fullSongList.addAll(songs);
-            filterSongs(searchBox.getText().toString().trim());
+            if (songs == null || songs.isEmpty()) {
+
+                fakeData();
+            } else {
+                fullSongList.clear();
+                fullSongList.addAll(songs);
+                filterSongs(searchBox.getText().toString().trim());
+            }
         });
+
+
+        if (getArguments() != null && getArguments().containsKey("SONG_DATA")) {
+            Song receivedSong = getArguments().getParcelable("SONG_DATA");
+            if (receivedSong != null) {
+                fullSongList.clear();
+                fullSongList.add(receivedSong);
+                filterSongs("");
+            }
+        }
     }
 
     private void fakeData() {
@@ -128,16 +141,12 @@ public class AdminPlaylistFragment extends BaseFragment {
         fullSongList.add(new Song("2", "Em của ngày hôm qua", "Sơn Tùng M-TP", "Quốc dân", R.raw.again, R.drawable.exampleavatar, genre1));
         fullSongList.add(new Song("3", "Bài này chill phết", "Đen Vâu", "Chill", R.raw.again, R.drawable.exampleavatar, genre1));
 
-        filteredSongList.clear();
-        filteredSongList.addAll(fullSongList);
-        if (adapter != null) {
-            adapter.notifyDataSetChanged();
-        }
+        filterSongs("");
     }
 
     private void filterSongs(String keyword) {
         filteredSongList.clear();
-        if (keyword.isEmpty()) {
+        if (keyword == null || keyword.trim().isEmpty()) {
             filteredSongList.addAll(fullSongList);
         } else {
             String lowerKeyword = keyword.toLowerCase();
@@ -148,9 +157,7 @@ public class AdminPlaylistFragment extends BaseFragment {
                 }
             }
         }
-        if (adapter != null) {
-            adapter.notifyDataSetChanged();
-        }
+        adapter.notifyDataSetChanged();
     }
 
     private void hideKeyboard(View view) {
@@ -161,14 +168,14 @@ public class AdminPlaylistFragment extends BaseFragment {
     }
 
     private void sortSongList() {
-        if (isSortedAscending) {
-            Collections.sort(filteredSongList, (s1, s2) -> s1.getTitle().compareToIgnoreCase(s2.getTitle()));
-        } else {
-            Collections.sort(filteredSongList, (s1, s2) -> s2.getTitle().compareToIgnoreCase(s1.getTitle()));
-        }
-        if (adapter != null) {
-            adapter.notifyDataSetChanged();
-        }
+        Collections.sort(filteredSongList, (s1, s2) -> {
+            if (isSortedAscending) {
+                return s1.getTitle().compareToIgnoreCase(s2.getTitle());
+            } else {
+                return s2.getTitle().compareToIgnoreCase(s1.getTitle());
+            }
+        });
+        adapter.notifyDataSetChanged();
         isSortedAscending = !isSortedAscending;
     }
 
@@ -179,7 +186,6 @@ public class AdminPlaylistFragment extends BaseFragment {
                 break;
             }
         }
-
         filterSongs(searchBox.getText().toString().trim());
     }
 }

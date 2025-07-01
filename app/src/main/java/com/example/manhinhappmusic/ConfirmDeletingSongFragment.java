@@ -9,6 +9,7 @@ import android.widget.Button;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
+import androidx.lifecycle.ViewModelProvider;
 
 public class ConfirmDeletingSongFragment extends DialogFragment {
 
@@ -50,8 +51,10 @@ public class ConfirmDeletingSongFragment extends DialogFragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             song = getArguments().getParcelable("song");
+            position = getArguments().getInt(ARG_POSITION);
         }
     }
+
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -66,14 +69,35 @@ public class ConfirmDeletingSongFragment extends DialogFragment {
         Button btnCancel = view.findViewById(R.id.cancel_button);
         Button btnDelete = view.findViewById(R.id.delete_button);
 
-        btnCancel.setOnClickListener(v -> dismiss());
-
-        btnDelete.setOnClickListener(v -> {
-            if (listener != null && song != null) {
-                listener.onConfirmDelete(song.getId(), position);
-            }
-            dismiss();
+        btnCancel.setOnClickListener(v -> {
+            closeSelf();
         });
 
+        btnDelete.setOnClickListener(v -> {
+            SongViewModel viewModel = new ViewModelProvider(requireActivity()).get(SongViewModel.class);
+            viewModel.deleteSong(song);
+
+            if (listener != null) {
+                listener.onConfirmDelete(song.getId(), position);
+            }
+
+            closeSelf();
+        });
+
+
+
     }
+
+    private void closeSelf() {
+        requireActivity()
+                .getSupportFragmentManager()
+                .beginTransaction()
+                .remove(this)
+                .commit();
+
+
+        View container = requireActivity().findViewById(R.id.dialog_container);
+        if (container != null) container.setVisibility(View.GONE);
+    }
+
 }
