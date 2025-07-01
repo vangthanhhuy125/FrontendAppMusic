@@ -30,7 +30,7 @@ public class EditSongFragment extends Fragment {
 
     private OnSongEditedListener listener;
 
-    // Views
+   
     private ImageView songImage;
     private ImageButton editImageButton;
     private EditText songNameInput, artistInput, descriptionInput;
@@ -38,14 +38,14 @@ public class EditSongFragment extends Fragment {
 
     private Song currentSong;
 
-    // Nếu muốn mở chọn ảnh, cần ActivityResultLauncher (cái này có thể mở rộng)
+
     private ActivityResultLauncher<String> pickImageLauncher;
 
     public EditSongFragment() {
-        // Required empty public constructor
+       
     }
 
-    // Factory method để truyền Song vào fragment
+
     public static EditSongFragment newInstance(Song song) {
         EditSongFragment fragment = new EditSongFragment();
         Bundle args = new Bundle();
@@ -63,17 +63,17 @@ public class EditSongFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         if (getArguments() != null) {
-            // Lấy Song được truyền vào
-            currentSong = (Song) getArguments().getSerializable("song");
+            currentSong = getArguments().getParcelable("song");
+
         }
 
-        // Khởi tạo launcher nếu muốn chọn ảnh (nếu bạn muốn mở rộng chức năng chọn ảnh)
+
         pickImageLauncher = registerForActivityResult(
                 new ActivityResultContracts.GetContent(),
                 uri -> {
                     if (uri != null) {
                         songImage.setImageURI(uri);
-                        // Cập nhật đường dẫn ảnh cho Song, bạn cần lưu ý xử lý thật sự nếu cần upload, lưu file,...
+
                         currentSong.setCoverImageUrl(uri.toString());
                     }
                 }
