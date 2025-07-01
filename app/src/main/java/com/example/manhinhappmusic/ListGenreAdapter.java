@@ -33,8 +33,9 @@ public class ListGenreAdapter extends RecyclerView.Adapter<ListGenreAdapter.View
     }
 
     public interface OnGenreClickListener {
-        void onGenreClick(String genreId);
+        void onGenreClick(Genre genre);
     }
+
 
     public ListGenreAdapter(List<Genre> genreList, OnItemRemoveListener removeListener) {
         this.genreList = genreList;
@@ -88,15 +89,18 @@ public class ListGenreAdapter extends RecyclerView.Adapter<ListGenreAdapter.View
             dialog.show(activity.getSupportFragmentManager(), "ConfirmDeleteGenreDialog");
         });
 
-        // Sự kiện click vào item
         holder.itemView.setOnClickListener(v -> {
+            if (genreClickListener != null) {
+                genreClickListener.onGenreClick(genre);
+            }
+        });
+
+        holder.genreImage.setOnClickListener(v -> {
             if (clickListener != null) {
                 clickListener.onItemClick(genre);
             }
-            if (genreClickListener != null) {
-                genreClickListener.onGenreClick(genre.getId());
-            }
         });
+
     }
 
     @Override
