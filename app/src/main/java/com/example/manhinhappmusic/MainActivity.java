@@ -1,8 +1,10 @@
 package com.example.manhinhappmusic;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Pair;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -130,11 +132,36 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.Frag
                 String id = (String) params[0];
                 String name = (String) params[1];
                 String description = (String) params[2];
-                String imageUrl = (String) params[3]; 
+                String imageUrl = (String) params[3];
 
                 destinationFragment = EditGenreFragment.newInstance(id, name, description, imageUrl);
             }
         }
+        else if (destinationTag == BaseFragment.FragmentTag.ADMIN_PROFILE) {
+            destinationFragment = new AdminProfileFragment();
+        }
+        else if (destinationTag == BaseFragment.FragmentTag.ADMIN_HOME) {
+            destinationFragment = new AdminHomeFragment();
+        }
+        else if (destinationTag == BaseFragment.FragmentTag.EDIT_PROFILE_ADMIN) {
+            destinationFragment = new EditProfileAdminFragment();
+        }
+        else if (destinationTag == BaseFragment.FragmentTag.CONFIRM_LOGGING_OUT) {
+            ConfirmLoggingOutFragment fragment = new ConfirmLoggingOutFragment();
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.confirm_log_out_container, fragment)
+                    .commit();
+
+            findViewById(R.id.confirm_log_out_container).setVisibility(View.VISIBLE);
+        }
+        else if (destinationTag == BaseFragment.FragmentTag.LOGIN) {
+            destinationFragment = new LoginFragment();
+        }
+
+
+
+
         else if (destinationTag == BaseFragment.FragmentTag.LIST_GENRE) {
             destinationFragment = new ListGenreFragment();
             if (params.length > 0 && params[0] instanceof Genre) {
@@ -148,7 +175,8 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.Frag
             if (params.length > 0 && params[0] instanceof Genre) {
                 genre = (Genre) params[0];
             }
-            destinationFragment = ConfirmDeletingGenreFragment.newInstance(genre);
+            destinationFragment = ConfirmDeletingGenreFragment.newInstance(genre, 0);
+
         }
         else if (destinationTag == BaseFragment.FragmentTag.ADD_SONG) {
             destinationFragment = new AddSongFragment();
@@ -190,13 +218,6 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.Frag
         else if (destinationTag == BaseFragment.FragmentTag.ADD_GENRE) {
             destinationFragment = new AddGenreFragment();
         }
-         else if (destinationTag == BaseFragment.FragmentTag.ADMIN_PROFILE) {
-            destinationFragment = new AdminProfileFragment();
-        }
-        else if (destinationTag == BaseFragment.FragmentTag.ADMIN_HOME) {
-            destinationFragment = new AdminHomeFragment();
-        }
-            
         else if (destinationTag == BaseFragment.FragmentTag.CONFIRM_DELETING_USER) {
             Fragment fragment = new ConfirmDeletingUserFragment();
             if (params.length > 0 && params[0] instanceof Bundle) {
@@ -255,4 +276,6 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.Frag
     public void onRequestLoadMiniPlayer() {
         loadMiniPlayer();
     }
+
+
 }
