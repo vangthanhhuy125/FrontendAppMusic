@@ -44,7 +44,8 @@ public class BaseFragment extends Fragment {
         ARTIST_DETAIL,
         USER_DETAIL,
         ADMIN_FEEDBACK,
-        ADMIN_PROFILE;
+        ADMIN_PROFILE,
+        ADMIN_HOME;
 
     }
 
