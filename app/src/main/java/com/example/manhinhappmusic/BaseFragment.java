@@ -43,7 +43,8 @@ public class BaseFragment extends Fragment {
         CONFIRM_DELETING_USER,
         ARTIST_DETAIL,
         USER_DETAIL,
-        ADMIN_FEEDBACK;
+        ADMIN_FEEDBACK,
+        ADMIN_PROFILE;
 
     }
 
