@@ -51,19 +51,37 @@ public class ArtistRequestAdapter extends RecyclerView.Adapter<ArtistRequestAdap
 
         holder.btnApprove.setOnClickListener(v -> {
             request.setStatus("approved");
+            request.setRole("artist");
+
+            int index = requestList.indexOf(request);
+            if (index != -1) {
+                requestList.remove(index);
+                notifyItemRemoved(index);
+            }
+
+
+            ConfirmApproveFragment fragment = ConfirmApproveFragment.newInstance(request);
+            fragment.show(fragmentManager, "ConfirmApprove");
+        });
+
+
+        holder.btnReject.setOnClickListener(v -> {
+            request.setStatus("rejected");
+
+            ConfirmRejectFragment fragment = ConfirmRejectFragment.newInstance(request);
+            fragment.setOnRejectConfirmedListener(rejectedRequest -> {
+                requestList.remove(rejectedRequest);
+
+                notifyDataSetChanged();
+            });
+
             fragmentManager.beginTransaction()
-                    .add(R.id.fragment_container_admin_home_view, ConfirmApproveFragment.newInstance(null, null))
+                    .replace(R.id.fragment_container_admin_home_view, fragment)
+
                     .addToBackStack(null)
                     .commit();
         });
 
-        holder.btnReject.setOnClickListener(v -> {
-            request.setStatus("rejected");
-            fragmentManager.beginTransaction()
-                    .add(R.id.fragment_container_admin_home_view, ConfirmRejectFragment.newInstance(null, null))
-                    .addToBackStack(null)
-                    .commit();
-        });
     }
 
     @Override
