@@ -1,5 +1,6 @@
 package com.example.manhinhappmusic;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,6 +10,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -16,7 +18,6 @@ import com.bumptech.glide.Glide;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -63,24 +64,29 @@ public class AdminHomeFragment extends BaseFragment {
             }
         });
 
-
         List<ArtistRequest> artistRequests = new ArrayList<>();
         artistRequests.add(new ArtistRequest("user4", "https://portfolio.com/artistX", "pending", new Date()));
         artistRequests.add(new ArtistRequest("user5", "https://portfolio.com/artistY", "pending", new Date()));
 
         recyclerArtistRequests.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerArtistRequests.setAdapter(new ArtistRequestAdapter(artistRequests));
+        recyclerArtistRequests.setAdapter(new ArtistRequestAdapter(
+                requireContext(),
+                artistRequests,
+                getChildFragmentManager() // Sửa chỗ này: dùng getChildFragmentManager() nếu bạn đang ở trong Fragment
+        ));
     }
-
-
 
     public static class ArtistRequestAdapter extends RecyclerView.Adapter<ArtistRequestAdapter.ViewHolder> {
 
+        private final Context context;
         private final List<ArtistRequest> requests;
+        private final FragmentManager fragmentManager;
         private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
 
-        public ArtistRequestAdapter(List<ArtistRequest> requests) {
+        public ArtistRequestAdapter(Context context, List<ArtistRequest> requests, FragmentManager fragmentManager) {
+            this.context = context;
             this.requests = requests;
+            this.fragmentManager = fragmentManager;
         }
 
         public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -102,8 +108,7 @@ public class AdminHomeFragment extends BaseFragment {
         @NonNull
         @Override
         public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.item_artist_request, parent, false);
+            View view = LayoutInflater.from(context).inflate(R.layout.item_artist_request, parent, false);
             return new ViewHolder(view);
         }
 
@@ -112,27 +117,35 @@ public class AdminHomeFragment extends BaseFragment {
             ArtistRequest request = requests.get(position);
             holder.songName.setText("Portfolio");
             holder.author.setText("Author: " + request.getUserId());
+
             if (request.getSubmittedAt() != null) {
                 holder.requestDate.setText(dateFormat.format(request.getSubmittedAt()));
+            } else {
+                holder.requestDate.setText("N/A");
             }
-
 
             holder.avatar.setImageResource(R.drawable.exampleavatar);
 
             holder.btnApprove.setOnClickListener(v -> {
                 request.setStatus("approved");
-
+                fragmentManager.beginTransaction()
+                        .add(R.id.fragment_container_admin_home_view, ConfirmApproveFragment.newInstance(null, null))
+                        .addToBackStack(null)
+                        .commit();
             });
 
             holder.btnReject.setOnClickListener(v -> {
                 request.setStatus("rejected");
-              
+                fragmentManager.beginTransaction()
+                        .add(R.id.fragment_container_admin_home_view, ConfirmRejectFragment.newInstance(null, null))
+                        .addToBackStack(null)
+                        .commit();
             });
         }
 
         @Override
         public int getItemCount() {
-            return requests.size();
+            return requests != null ? requests.size() : 0;
         }
     }
 }
