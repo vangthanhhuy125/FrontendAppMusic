@@ -1,32 +1,87 @@
-//package com.example.mobile_be.models;
-//
-//import lombok.Data;
-//import lombok.EqualsAndHashCode;
-//import org.springframework.data.mongodb.core.mapping.Document;
-//import org.bson.types.ObjectId;
-//import org.springframework.data.annotation.Id;
-//import java.sql.Date;
-//
-//@Data
-//@EqualsAndHashCode(callSuper = false)
-//
-//@Document(collection = "artistRequest")
-//
-//public class ArtistRequest {
-//    @Id
-//    private ObjectId id;
-//    private ObjectId user_id;
-//    private String portfolioUrl;
-//    private String status;
-//    private ObjectId reviewedBy;
-//    private Date submittedAt;
-//    private Date reviewedAt;
-//
-//    public String getId() {
-//        return id != null ? id.toHexString() : null;
-//    }
-//
-//    public void setId(ObjectId id) {
-//        this.id = id;
-//    }
-//}
+package com.example.manhinhappmusic;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Date;
+
+public class ArtistRequest {
+
+    private String id;
+
+    private String userId;
+
+    private String portfolioUrl;
+
+    private String status;
+
+    private Date submittedAt;
+
+    private Date reviewedAt;
+
+    private String reviewedBy;
+
+    public ArtistRequest() {}
+
+    public ArtistRequest(String userId, String portfolioUrl, String status, Date submittedAt) {
+        this.userId = userId;
+        this.portfolioUrl = portfolioUrl;
+        this.status = status;
+        this.submittedAt = submittedAt;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public String getPortfolioUrl() {
+        return portfolioUrl;
+    }
+
+    public void setPortfolioUrl(String portfolioUrl) {
+        this.portfolioUrl = portfolioUrl;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public Date getSubmittedAt() {
+        return submittedAt;
+    }
+
+    public void setSubmittedAt(Date submittedAt) {
+        this.submittedAt = submittedAt;
+    }
+
+    public Date getReviewedAt() {
+        return reviewedAt;
+    }
+
+    public void setReviewedAt(Date reviewedAt) {
+        this.reviewedAt = reviewedAt;
+    }
+
+    public String getReviewedBy() {
+        return reviewedBy;
+    }
+
+    public void setReviewedBy(String reviewedBy) {
+        this.reviewedBy = reviewedBy;
+    }
+}
