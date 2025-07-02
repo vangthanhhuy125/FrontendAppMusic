@@ -65,22 +65,22 @@ public class ArtistRequestAdapter extends RecyclerView.Adapter<ArtistRequestAdap
         });
 
 
-        holder.btnReject.setOnClickListener(v -> {
-            request.setStatus("rejected");
-
-            ConfirmRejectFragment fragment = ConfirmRejectFragment.newInstance(request);
-            fragment.setOnRejectConfirmedListener(rejectedRequest -> {
-                requestList.remove(rejectedRequest);
-
-                notifyDataSetChanged();
-            });
-
-            fragmentManager.beginTransaction()
-                    .replace(R.id.fragment_container_admin_home_view, fragment)
-
-                    .addToBackStack(null)
-                    .commit();
-        });
+//        holder.btnReject.setOnClickListener(v -> {
+//            request.setStatus("rejected");
+//
+//            ConfirmRejectFragment fragment = ConfirmRejectFragment.newInstance(request);
+//            fragment.setOnRejectConfirmedListener(rejectedRequest -> {
+//                requestList.remove(rejectedRequest);
+//
+//                notifyDataSetChanged();
+//            });
+//
+//            fragmentManager.beginTransaction()
+//                    .replace(R.id.fragment_container_admin_home_view, fragment)
+//
+//                    .addToBackStack(null)
+//                    .commit();
+//        });
 
     }
 
