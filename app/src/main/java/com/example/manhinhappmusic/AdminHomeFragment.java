@@ -14,8 +14,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class AdminHomeFragment extends BaseFragment {
 
@@ -44,17 +48,14 @@ public class AdminHomeFragment extends BaseFragment {
         recyclerArtistRequests = view.findViewById(R.id.recycler_artist_requests);
         imageAvatar = view.findViewById(R.id.image_adavatar);
 
-
         totalUsers.setText("156");
         totalArtists.setText("42");
         totalGenres.setText("18");
         totalSongs.setText("432");
 
-
         Glide.with(this)
                 .load(R.drawable.exampleavatar)
                 .into(imageAvatar);
-
 
         imageAvatar.setOnClickListener(v -> {
             if (callback != null) {
@@ -63,30 +64,38 @@ public class AdminHomeFragment extends BaseFragment {
         });
 
 
-        List<String> songRequests = Arrays.asList("Song A - User1", "Song B - User2", "Song C - User3");
-        List<String> artistRequests = Arrays.asList("Artist X - User4", "Artist Y - User5");
-
-
+        List<ArtistRequest> artistRequests = new ArrayList<>();
+        artistRequests.add(new ArtistRequest("user4", "https://portfolio.com/artistX", "pending", new Date()));
+        artistRequests.add(new ArtistRequest("user5", "https://portfolio.com/artistY", "pending", new Date()));
 
         recyclerArtistRequests.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerArtistRequests.setAdapter(new SimpleTextAdapter(artistRequests));
+        recyclerArtistRequests.setAdapter(new ArtistRequestAdapter(artistRequests));
     }
 
 
-    public static class SimpleTextAdapter extends RecyclerView.Adapter<SimpleTextAdapter.ViewHolder> {
 
-        private final List<String> items;
+    public static class ArtistRequestAdapter extends RecyclerView.Adapter<ArtistRequestAdapter.ViewHolder> {
 
-        public SimpleTextAdapter(List<String> items) {
-            this.items = items;
+        private final List<ArtistRequest> requests;
+        private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+
+        public ArtistRequestAdapter(List<ArtistRequest> requests) {
+            this.requests = requests;
         }
 
         public static class ViewHolder extends RecyclerView.ViewHolder {
-            TextView text;
+            TextView songName, author, requestDate;
+            ImageView avatar;
+            View btnApprove, btnReject;
 
-            public ViewHolder(View itemView) {
+            public ViewHolder(@NonNull View itemView) {
                 super(itemView);
-                text = itemView.findViewById(android.R.id.text1);
+                avatar = itemView.findViewById(R.id.image_artist_request);
+                songName = itemView.findViewById(R.id.text_artist_song_name);
+                author = itemView.findViewById(R.id.text_artist_author);
+                requestDate = itemView.findViewById(R.id.text_artist_request_date);
+                btnApprove = itemView.findViewById(R.id.btn_artist_approve);
+                btnReject = itemView.findViewById(R.id.btn_artist_reject);
             }
         }
 
@@ -94,18 +103,36 @@ public class AdminHomeFragment extends BaseFragment {
         @Override
         public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             View view = LayoutInflater.from(parent.getContext())
-                    .inflate(android.R.layout.simple_list_item_1, parent, false);
+                    .inflate(R.layout.item_artist_request, parent, false);
             return new ViewHolder(view);
         }
 
         @Override
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-            holder.text.setText(items.get(position));
+            ArtistRequest request = requests.get(position);
+            holder.songName.setText("Portfolio");
+            holder.author.setText("Author: " + request.getUserId());
+            if (request.getSubmittedAt() != null) {
+                holder.requestDate.setText(dateFormat.format(request.getSubmittedAt()));
+            }
+
+
+            holder.avatar.setImageResource(R.drawable.exampleavatar);
+
+            holder.btnApprove.setOnClickListener(v -> {
+                request.setStatus("approved");
+
+            });
+
+            holder.btnReject.setOnClickListener(v -> {
+                request.setStatus("rejected");
+              
+            });
         }
 
         @Override
         public int getItemCount() {
-            return items.size();
+            return requests.size();
         }
     }
 }
