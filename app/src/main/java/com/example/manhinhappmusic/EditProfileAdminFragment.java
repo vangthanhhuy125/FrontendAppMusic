@@ -10,6 +10,8 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -18,7 +20,9 @@ public class EditProfileAdminFragment extends BaseFragment {
     private ImageView imgThumbnail;
     private ImageButton btnEditImage;
     private EditText editName, editEmail;
-    private Button btnSave;
+    private Button btnSave, btnCancel;
+    private ActivityResultLauncher<String> imagePickerLauncher;
+
 
     public EditProfileAdminFragment() {
 
@@ -44,11 +48,23 @@ public class EditProfileAdminFragment extends BaseFragment {
         editName = view.findViewById(R.id.edit_name_admin);
         editEmail = view.findViewById(R.id.edit_email_admin);
         btnSave = view.findViewById(R.id.btn_save_ad);
+        btnCancel = view.findViewById(R.id.btn_cancel_ad);
+
+        imagePickerLauncher = registerForActivityResult(
+                new ActivityResultContracts.GetContent(),
+                uri -> {
+                    if (uri != null) {
+                        imgThumbnail.setImageURI(uri);
+                    }
+                }
+        );
+
 
 
         btnEditImage.setOnClickListener(v -> {
-            Toast.makeText(getContext(), "Chức năng sửa ảnh chưa được hỗ trợ", Toast.LENGTH_SHORT).show();
+            imagePickerLauncher.launch("image/*");
         });
+
 
 
         btnSave.setOnClickListener(v -> {
@@ -67,6 +83,12 @@ public class EditProfileAdminFragment extends BaseFragment {
             getParentFragmentManager().setFragmentResult("editProfileResult", result);
 
 
+            if (callback != null) {
+                callback.onRequestChangeFragment(FragmentTag.ADMIN_PROFILE);
+            }
+        });
+
+        btnCancel.setOnClickListener(v -> {
             if (callback != null) {
                 callback.onRequestChangeFragment(FragmentTag.ADMIN_PROFILE);
             }
