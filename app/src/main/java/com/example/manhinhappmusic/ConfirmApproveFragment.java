@@ -6,10 +6,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
-public class ConfirmApproveFragment extends Fragment {
+public class ConfirmApproveFragment extends DialogFragment {
 
     private String mParam1;
     private String mParam2;
@@ -17,12 +18,12 @@ public class ConfirmApproveFragment extends Fragment {
     public ConfirmApproveFragment() {
         // Required empty public constructor
     }
+    private static final String ARG_REQUEST = "artist_request";
 
-    public static ConfirmApproveFragment newInstance(String param1, String param2) {
+    public static ConfirmApproveFragment newInstance(ArtistRequest request) {
         ConfirmApproveFragment fragment = new ConfirmApproveFragment();
         Bundle args = new Bundle();
-        args.putString("param1", param1);
-        args.putString("param2", param2);
+        args.putParcelable(ARG_REQUEST, request);
         fragment.setArguments(args);
         return fragment;
     }
@@ -44,7 +45,7 @@ public class ConfirmApproveFragment extends Fragment {
         Button btnCancel = view.findViewById(R.id.btn_cancel);
         Button btnApprove = view.findViewById(R.id.btn_approve);
 
-        btnCancel.setOnClickListener(v -> closeFragment());
+        btnCancel.setOnClickListener(v -> dismiss());
 
         btnApprove.setOnClickListener(v -> {
             // TODO: Thực hiện xử lý duyệt yêu cầu ở đây (ví dụ gửi API, cập nhật UI)
