@@ -25,7 +25,6 @@ import java.util.Locale;
 public class AdminHomeFragment extends BaseFragment {
 
     private TextView totalUsers, totalArtists, totalGenres, totalSongs;
-    private RecyclerView recyclerArtistRequests;
     private ImageView imageAvatar;
     private ArtistRequestAdapter adapter;
     private final List<ArtistRequest> artistRequests = new ArrayList<>();
@@ -48,7 +47,6 @@ public class AdminHomeFragment extends BaseFragment {
         totalArtists = view.findViewById(R.id.textad_total_artists);
         totalGenres = view.findViewById(R.id.textad_total_genres);
         totalSongs = view.findViewById(R.id.textad_total_songs);
-        recyclerArtistRequests = view.findViewById(R.id.recycler_artist_requests);
         imageAvatar = view.findViewById(R.id.image_adavatar);
 
         totalUsers.setText("156");
@@ -69,9 +67,9 @@ public class AdminHomeFragment extends BaseFragment {
         artistRequests.add(new ArtistRequest("user4", "https://portfolio.com/artistX", "pending", new Date()));
         artistRequests.add(new ArtistRequest("user5", "https://portfolio.com/artistY", "pending", new Date()));
 
-        recyclerArtistRequests.setLayoutManager(new LinearLayoutManager(getContext()));
+
         adapter = new ArtistRequestAdapter(requireContext(), artistRequests, getChildFragmentManager(), artistRequests);
-        recyclerArtistRequests.setAdapter(adapter);
+
     }
 
     public static class ArtistRequestAdapter extends RecyclerView.Adapter<ArtistRequestAdapter.ViewHolder> {
