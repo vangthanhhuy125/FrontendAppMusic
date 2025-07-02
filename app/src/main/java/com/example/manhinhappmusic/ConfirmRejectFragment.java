@@ -6,45 +6,66 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
-public class ConfirmRejectFragment extends Fragment {
+public class ConfirmRejectFragment extends DialogFragment {
 
-    public ConfirmRejectFragment() {
-        // Required empty public constructor
+    public interface OnRejectConfirmedListener {
+        void onRejectConfirmed(ArtistRequest request);
     }
 
-    public static ConfirmRejectFragment newInstance(String param1, String param2) {
+    private static final String ARG_REQUEST = "artist_request";
+
+    private ArtistRequest requestToRemove;
+    private OnRejectConfirmedListener listener;
+
+    public void setOnRejectConfirmedListener(OnRejectConfirmedListener listener) {
+        this.listener = listener;
+    }
+
+    public static ConfirmRejectFragment newInstance(ArtistRequest request) {
         ConfirmRejectFragment fragment = new ConfirmRejectFragment();
         Bundle args = new Bundle();
-        args.putString("param1", param1);
-        args.putString("param2", param2);
+        args.putParcelable(ARG_REQUEST, request);
         fragment.setArguments(args);
         return fragment;
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_confirm_reject, container, false);
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setStyle(STYLE_NO_TITLE, android.R.style.Theme_Material_Light_Dialog_NoActionBar);
+
+        if (getArguments() != null) {
+            requestToRemove = getArguments().getParcelable(ARG_REQUEST);
+        }
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_confirm_reject, container, false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
         Button btnCancel = view.findViewById(R.id.btncancel);
         Button btnReject = view.findViewById(R.id.btn_reject);
 
-        btnCancel.setOnClickListener(v -> closeFragment());
+        btnCancel.setOnClickListener(v -> dismiss());
 
         btnReject.setOnClickListener(v -> {
-            // TODO: Thực hiện hành động từ chối tại đây, ví dụ:
-            // Toast.makeText(getContext(), "Request rejected", Toast.LENGTH_SHORT).show();
-            closeFragment();
+            if (listener != null && requestToRemove != null) {
+                listener.onRejectConfirmed(requestToRemove);
+            }
+            dismiss();
         });
-
-        return view;
-    }
-
-    private void closeFragment() {
-        FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
-        fragmentManager.beginTransaction().remove(this).commit();
     }
 }
