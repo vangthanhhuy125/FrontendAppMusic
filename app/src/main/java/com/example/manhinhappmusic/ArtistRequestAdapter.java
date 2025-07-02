@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.text.SimpleDateFormat;
@@ -17,19 +18,15 @@ import java.util.Locale;
 
 public class ArtistRequestAdapter extends RecyclerView.Adapter<ArtistRequestAdapter.ViewHolder> {
 
-    private Context context;
-    private List<ArtistRequest> requestList;
-    private OnRequestActionListener listener;
+    private final Context context;
+    private final List<ArtistRequest> requestList;
+    private final FragmentManager fragmentManager;
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
 
-    public interface OnRequestActionListener {
-        void onApprove(ArtistRequest request);
-        void onReject(ArtistRequest request);
-    }
-
-    public ArtistRequestAdapter(Context context, List<ArtistRequest> requestList, OnRequestActionListener listener) {
+    public ArtistRequestAdapter(Context context, List<ArtistRequest> requestList, FragmentManager fragmentManager) {
         this.context = context;
         this.requestList = requestList;
-        this.listener = listener;
+        this.fragmentManager = fragmentManager;
     }
 
     @NonNull
@@ -45,15 +42,28 @@ public class ArtistRequestAdapter extends RecyclerView.Adapter<ArtistRequestAdap
 
         holder.textArtistName.setText("Author: " + request.getUserId());
         holder.textSongName.setText("Portfolio");
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+
         if (request.getSubmittedAt() != null) {
-            holder.textRequestDate.setText(sdf.format(request.getSubmittedAt()));
+            holder.textRequestDate.setText(dateFormat.format(request.getSubmittedAt()));
         } else {
             holder.textRequestDate.setText("N/A");
         }
 
-        holder.btnApprove.setOnClickListener(v -> listener.onApprove(request));
-        holder.btnReject.setOnClickListener(v -> listener.onReject(request));
+        holder.btnApprove.setOnClickListener(v -> {
+            request.setStatus("approved");
+            fragmentManager.beginTransaction()
+                    .add(R.id.fragment_container_admin_home_view, ConfirmApproveFragment.newInstance(null, null))
+                    .addToBackStack(null)
+                    .commit();
+        });
+
+        holder.btnReject.setOnClickListener(v -> {
+            request.setStatus("rejected");
+            fragmentManager.beginTransaction()
+                    .add(R.id.fragment_container_admin_home_view, ConfirmRejectFragment.newInstance(null, null))
+                    .addToBackStack(null)
+                    .commit();
+        });
     }
 
     @Override
