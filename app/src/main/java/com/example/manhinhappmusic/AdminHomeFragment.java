@@ -27,6 +27,8 @@ public class AdminHomeFragment extends BaseFragment {
     private TextView totalUsers, totalArtists, totalGenres, totalSongs;
     private RecyclerView recyclerArtistRequests;
     private ImageView imageAvatar;
+    private ArtistRequestAdapter adapter;
+    private final List<ArtistRequest> artistRequests = new ArrayList<>();
 
     public static AdminHomeFragment newInstance() {
         return new AdminHomeFragment();
@@ -64,29 +66,25 @@ public class AdminHomeFragment extends BaseFragment {
             }
         });
 
-        List<ArtistRequest> artistRequests = new ArrayList<>();
         artistRequests.add(new ArtistRequest("user4", "https://portfolio.com/artistX", "pending", new Date()));
         artistRequests.add(new ArtistRequest("user5", "https://portfolio.com/artistY", "pending", new Date()));
 
         recyclerArtistRequests.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerArtistRequests.setAdapter(new ArtistRequestAdapter(
-                requireContext(),
-                artistRequests,
-                getChildFragmentManager() // Sửa chỗ này: dùng getChildFragmentManager() nếu bạn đang ở trong Fragment
-        ));
+        adapter = new ArtistRequestAdapter(requireContext(), artistRequests, getChildFragmentManager(), artistRequests);
+        recyclerArtistRequests.setAdapter(adapter);
     }
 
     public static class ArtistRequestAdapter extends RecyclerView.Adapter<ArtistRequestAdapter.ViewHolder> {
 
         private final Context context;
-        private final List<ArtistRequest> requests;
         private final FragmentManager fragmentManager;
+        private final List<ArtistRequest> requests;
         private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
 
-        public ArtistRequestAdapter(Context context, List<ArtistRequest> requests, FragmentManager fragmentManager) {
+        public ArtistRequestAdapter(Context context, List<ArtistRequest> requests, FragmentManager fragmentManager, List<ArtistRequest> fullListRef) {
             this.context = context;
-            this.requests = requests;
             this.fragmentManager = fragmentManager;
+            this.requests = fullListRef;
         }
 
         public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -115,6 +113,7 @@ public class AdminHomeFragment extends BaseFragment {
         @Override
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
             ArtistRequest request = requests.get(position);
+
             holder.songName.setText("Portfolio");
             holder.author.setText("Author: " + request.getUserId());
 
@@ -128,18 +127,33 @@ public class AdminHomeFragment extends BaseFragment {
 
             holder.btnApprove.setOnClickListener(v -> {
                 request.setStatus("approved");
-                fragmentManager.beginTransaction()
-                        .add(R.id.fragment_container_admin_home_view, ConfirmApproveFragment.newInstance(null, null))
-                        .addToBackStack(null)
-                        .commit();
+                request.setRole("artist");
+
+                if (position != RecyclerView.NO_POSITION) {
+
+                    ConfirmApproveFragment fragment = ConfirmApproveFragment.newInstance(request);
+                    fragment.show(fragmentManager, "ConfirmApprove");
+
+
+                    requests.remove(position);
+                    notifyItemRemoved(position);
+                }
             });
 
             holder.btnReject.setOnClickListener(v -> {
                 request.setStatus("rejected");
-                fragmentManager.beginTransaction()
-                        .add(R.id.fragment_container_admin_home_view, ConfirmRejectFragment.newInstance(null, null))
-                        .addToBackStack(null)
-                        .commit();
+
+                ConfirmRejectFragment fragment = ConfirmRejectFragment.newInstance(request);
+                fragment.setOnRejectConfirmedListener(rejectedRequest -> {
+                    int index = requests.indexOf(rejectedRequest);
+                    if (index != -1) {
+                        requests.remove(index);
+                        notifyItemRemoved(index);
+                    }
+                });
+
+
+                fragment.show(fragmentManager, "ConfirmReject");
             });
         }
 
@@ -149,3 +163,4 @@ public class AdminHomeFragment extends BaseFragment {
         }
     }
 }
+
