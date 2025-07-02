@@ -20,7 +20,7 @@ import java.util.List;
 public class AdminHomeFragment extends BaseFragment {
 
     private TextView totalUsers, totalArtists, totalGenres, totalSongs;
-    private RecyclerView recyclerSongRequests, recyclerArtistRequests;
+    private RecyclerView recyclerArtistRequests;
     private ImageView imageAvatar;
 
     public static AdminHomeFragment newInstance() {
@@ -41,7 +41,6 @@ public class AdminHomeFragment extends BaseFragment {
         totalArtists = view.findViewById(R.id.textad_total_artists);
         totalGenres = view.findViewById(R.id.textad_total_genres);
         totalSongs = view.findViewById(R.id.textad_total_songs);
-        recyclerSongRequests = view.findViewById(R.id.recycler_song_requests);
         recyclerArtistRequests = view.findViewById(R.id.recycler_artist_requests);
         imageAvatar = view.findViewById(R.id.image_adavatar);
 
@@ -68,8 +67,6 @@ public class AdminHomeFragment extends BaseFragment {
         List<String> artistRequests = Arrays.asList("Artist X - User4", "Artist Y - User5");
 
 
-        recyclerSongRequests.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerSongRequests.setAdapter(new SimpleTextAdapter(songRequests));
 
         recyclerArtistRequests.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerArtistRequests.setAdapter(new SimpleTextAdapter(artistRequests));
