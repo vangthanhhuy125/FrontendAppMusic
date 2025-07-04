@@ -60,7 +60,6 @@ public class ConfirmDeletingSongFragment extends DialogFragment {
         }
     }
 
-
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {

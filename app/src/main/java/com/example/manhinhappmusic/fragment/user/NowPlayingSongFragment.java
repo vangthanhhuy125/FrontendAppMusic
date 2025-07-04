@@ -12,6 +12,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
+import androidx.lifecycle.Observer;
 import androidx.palette.graphics.Palette;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.LinearSmoothScroller;
@@ -44,6 +45,7 @@ import com.example.manhinhappmusic.model.MediaPlayerManager;
 import com.example.manhinhappmusic.R;
 import com.example.manhinhappmusic.model.Song;
 import com.example.manhinhappmusic.network.ApiService;
+import com.example.manhinhappmusic.repository.SongRepository;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.button.MaterialButton;
@@ -70,8 +72,7 @@ public class NowPlayingSongFragment extends BottomSheetDialogFragment {
     private ImageButton skipPreviousButton;
     private ImageButton skipNextButton;
     private ImageButton minimizeButton;
-
-//    private ImageButton moreOptionButton;
+    //    private ImageButton moreOptionButton;
     private SeekBar seekBar;
     private MaterialButton playButton;
     private RecyclerView lyricsText;
@@ -84,38 +85,53 @@ public class NowPlayingSongFragment extends BottomSheetDialogFragment {
     private Runnable updateSeekBar = new Runnable() {
         @Override
         public void run() {
-            if(mediaPlayerManager.isPrepared() && mediaPlayerManager.mediaPlayer.isPlaying()){
-                int currentPosition = mediaPlayerManager.getMediaPlayer().getCurrentPosition();
-                seekBar.setProgress(currentPosition);
-                currentPlayTimeTextView.setText(formatTime(mediaPlayerManager.getMediaPlayer().getCurrentPosition()));
-                int newCurrentLyricPosition = getCurrentLyricPosition(currentPosition);
-                lyricAdapter.setCurrentLyricPosition(newCurrentLyricPosition);
-                LinearLayoutManager layoutManager = (LinearLayoutManager) lyricsText.getLayoutManager();
-                if(currentLyricPosition != newCurrentLyricPosition)
-                {
-                    if(layoutManager.findFirstVisibleItemPosition() <= newCurrentLyricPosition && layoutManager.findLastVisibleItemPosition() >= newCurrentLyricPosition)
+            try {
+                if(mediaPlayerManager.isPrepared() && mediaPlayerManager.mediaPlayer.isPlaying()){
+                    int currentPosition = mediaPlayerManager.getMediaPlayer().getCurrentPosition();
+                    seekBar.setProgress(currentPosition);
+                    currentPlayTimeTextView.setText(formatTime(mediaPlayerManager.getMediaPlayer().getCurrentPosition()));
+
+                    if(lyricLines != null && lyricLines.size() > 0 )
                     {
-                        int recyclerViewHeight = lyricsText.getHeight();
-                        View itemView = layoutManager.findViewByPosition(newCurrentLyricPosition);
-                        if (itemView != null) {
-                            int itemHeight = itemView.getHeight();
-                            int offset = (recyclerViewHeight / 2) - (itemHeight / 2);
-                            layoutManager.scrollToPositionWithOffset(newCurrentLyricPosition, offset);
+                        int newCurrentLyricPosition = getCurrentLyricPosition(currentPosition);
+                        lyricAdapter.setCurrentLyricPosition(newCurrentLyricPosition);
+                        LinearLayoutManager layoutManager = (LinearLayoutManager) lyricsText.getLayoutManager();
+                        if(currentLyricPosition != newCurrentLyricPosition)
+                        {
+                            if(layoutManager.findFirstVisibleItemPosition() <= newCurrentLyricPosition && layoutManager.findLastVisibleItemPosition() >= newCurrentLyricPosition)
+                            {
+                                int recyclerViewHeight = lyricsText.getHeight();
+                                View itemView = layoutManager.findViewByPosition(newCurrentLyricPosition);
+                                if (itemView != null) {
+                                    int itemHeight = itemView.getHeight();
+                                    int offset = (recyclerViewHeight / 2) - (itemHeight / 2);
+                                    layoutManager.scrollToPositionWithOffset(newCurrentLyricPosition, offset);
+                                }
+                                currentLyricLayout.setVisibility(View.GONE);
+                            }
+                            else
+                            {
+                                currentLyricText.setText(lyricLines.get(newCurrentLyricPosition).getText());
+                                currentLyricLayout.setVisibility(View.VISIBLE);
+                            }
+
+
                         }
-                        currentLyricLayout.setVisibility(View.GONE);
-                    }
-                    else
-                    {
-                        currentLyricText.setText(lyricLines.get(newCurrentLyricPosition).getText());
-                        currentLyricLayout.setVisibility(View.VISIBLE);
+
+                        currentLyricPosition = newCurrentLyricPosition;
                     }
 
-
+                    handler.postDelayed(this, 200);
                 }
-
-                currentLyricPosition = newCurrentLyricPosition;
-                handler.postDelayed(this, 200);
             }
+            catch (Exception ex)
+            {
+
+            }
+            finally {
+
+            }
+
         }
     };
     private MediaPlayerManager mediaPlayerManager;
@@ -141,6 +157,12 @@ public class NowPlayingSongFragment extends BottomSheetDialogFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 //
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
     }
 
     @Override
@@ -408,6 +430,7 @@ public class NowPlayingSongFragment extends BottomSheetDialogFragment {
                                             });
                                     binding.mainLayout.setBackground(gradientDrawable);
                                     binding.lyricsLayout.setBackgroundTintList(ColorStateList.valueOf(vibrant));
+                                    binding.lyricsLayout.setVisibility(View.VISIBLE);
 
                                 });
 
@@ -426,16 +449,26 @@ public class NowPlayingSongFragment extends BottomSheetDialogFragment {
                         .into(songsCoverImage);
 
             songsTitleTextView.setText(song.getTitle());
-            //songsArtistsNameTextView.setText(mediaPlayerManager.getCurrentSong().getArtistId());
+            songsArtistsNameTextView.setText(mediaPlayerManager.getCurrentSong().getArtistName());
             songDurationTextView.setText(formatTime(mediaPlayerManager.getMediaPlayer().getDuration()));
             seekBar.setMax(mediaPlayerManager.getMediaPlayer().getDuration());
-            lyricLines = LyricLine.parseLrc(getResources().openRawResource(R.raw.ocean_view_lyrics));
             lyricAdapter.clearSungLyric();
-            if(mediaPlayerManager.isPrepared())
-            {
-                lyricAdapter.setLyrics(LyricLine.parseToStrings(lyricLines));
 
-            }
+            SongRepository.getInstance().getSong(mediaPlayerManager.getCurrentSong().getId()).observe(getViewLifecycleOwner(), new Observer<Song>() {
+                @Override
+                public void onChanged(Song song) {
+                    List<String> lyrics = song.getLyrics();
+                    if(lyrics != null && lyrics.size() > 0)
+                    {
+                        lyricLines = LyricLine.parseLrc(lyrics);
+                        lyricAdapter.setLyrics(LyricLine.parseToStrings(lyricLines));
+
+                    }
+                }
+            });
+
+
+
         }
         catch (Exception ex)
         {

@@ -68,11 +68,7 @@ public class TestData {
 //                new Song("12", "メロドラマ", "Imase", "", R.raw.imase_and_natori_01, R.raw.imase_cover, null),
 //                new Song("13", "東京フラッシュ", "Vaundy", "", R.raw.vaundy_01, R.raw.vaundy_cover, null),
 //                new Song("14", "sink", "Vaundy", "", R.raw.vaundy_02, R.raw.vaundy_cover, null)
-
-
-                ));
-
-
+        ));
 
         userPlaylistList.addAll(Arrays.asList(
 //                new Playlist("-1","Favorites", "gh", new ArrayList<>(),"hjh", R.drawable.baseline_favorite_24, "1", new ArrayList<>()),
@@ -115,8 +111,8 @@ public class TestData {
 //                )), "Fdf", R.raw.vaundy_cover,"2", new ArrayList<>(Arrays.asList("Vaundy")))
         ));
 
-        playlistList.addAll(userPlaylistList);
-        playlistList.addAll(nonUserPlaylistList);
+//        playlistList.addAll(userPlaylistList);
+//        playlistList.addAll(nonUserPlaylistList);
 
 
 //        mixPlaylistList.addAll(Arrays.asList(
@@ -152,19 +148,17 @@ public class TestData {
 //                new User("6", "","","Still Woozy", "Still Woozy", "", R.raw.still_woozy_artist_image)
 //
 //                ));
-        genreList.addAll(Arrays.asList(
-                new Genre("0","US-UK","",R.raw.us_uk_genre_thumbnail),
-                new Genre("1","Indie","",R.raw.indie_genre_thumbnail),
-                new Genre("2","Pop","",R.raw.pop_genre_thumbnail),
-                new Genre("3","Hip-Hop","",R.raw.hiphop_genre_thumbnail),
-                new Genre("4","Rock","",R.raw.rock_genre_thumbnail),
-                new Genre("5","J-POP","",R.raw.jpop_genre_thumbnail),
-                new Genre("6","Jazz","",R.raw.jazz_genre_thumbnail),
-                new Genre("7","Lofi","",R.raw.lofi_genre_thumbnail),
-                new Genre("8","Country","",R.raw.country_genre_thumbnail),
-                new Genre("9","Electronic","",R.raw.electronic_genre_thumbnail)
-
-                ));
-
+//        genreList.addAll(Arrays.asList(
+//                new Genre("0","US-UK","",R.raw.us_uk_genre_thumbnail),
+//                new Genre("1","Indie","",R.raw.indie_genre_thumbnail),
+//                new Genre("2","Pop","",R.raw.pop_genre_thumbnail),
+//                new Genre("3","Hip-Hop","",R.raw.hiphop_genre_thumbnail),
+//                new Genre("4","Rock","",R.raw.rock_genre_thumbnail),
+//                new Genre("5","J-POP","",R.raw.jpop_genre_thumbnail),
+//                new Genre("6","Jazz","",R.raw.jazz_genre_thumbnail),
+//                new Genre("7","Lofi","",R.raw.lofi_genre_thumbnail),
+//                new Genre("8","Country","",R.raw.country_genre_thumbnail),
+//                new Genre("9","Electronic","",R.raw.electronic_genre_thumbnail)
+//        ));
     }
 }

@@ -31,29 +31,23 @@ public class EditSongFragment extends Fragment {
     public interface OnSongEditedListener {
         void onSongEdited(Song updatedSong);
     }
-
     private OnSongEditedListener listener;
-
 
     private ImageView songImage;
     private ImageButton editImageButton;
     private EditText songNameInput, artistInput, descriptionInput;
     private Button saveButton;
-
     private Song currentSong;
-
-
     private ActivityResultLauncher<String> pickImageLauncher;
 
     public EditSongFragment() {
 
     }
 
-
     public static EditSongFragment newInstance(Song song) {
         EditSongFragment fragment = new EditSongFragment();
         Bundle args = new Bundle();
-        args.putParcelable("song", (Parcelable) song);
+        args.putSerializable("song", song);
         fragment.setArguments(args);
         return fragment;
     }
@@ -68,16 +62,13 @@ public class EditSongFragment extends Fragment {
 
         if (getArguments() != null) {
             currentSong = getArguments().getParcelable("song");
-
         }
-
 
         pickImageLauncher = registerForActivityResult(
                 new ActivityResultContracts.GetContent(),
                 uri -> {
                     if (uri != null) {
                         songImage.setImageURI(uri);
-
                         currentSong.setCoverImageUrl(uri.toString());
                     }
                 }
@@ -88,7 +79,6 @@ public class EditSongFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_edit_song, container, false);
-
         songImage = view.findViewById(R.id.songImage);
         editImageButton = view.findViewById(R.id.editImageButton);
         songNameInput = view.findViewById(R.id.songNameInput);

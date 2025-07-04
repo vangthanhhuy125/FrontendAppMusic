@@ -32,6 +32,7 @@ import com.example.manhinhappmusic.model.MusicDisplayItem;
 import com.example.manhinhappmusic.model.Playlist;
 import com.example.manhinhappmusic.model.Song;
 import com.example.manhinhappmusic.model.User;
+import com.example.manhinhappmusic.repository.ArtistRepository;
 import com.example.manhinhappmusic.repository.GenreRepository;
 import com.example.manhinhappmusic.repository.PlaylistRepository;
 import com.example.manhinhappmusic.repository.SongRepository;
@@ -49,10 +50,12 @@ public class UserGenreFragment extends BaseFragment {
 
 
     private static final String ARG_ID = "genreId";
+    private static final String ARG_NAME = "genreName";
 
     private NavController navController;
     private FragmentUserGenreBinding binding;
     private String id;
+    private String name;
     private TextView genreTitleText;
     private RecyclerView musicDisplayView;
     private MusicDisplayAdapter musicDisplayAdapter;
@@ -78,6 +81,7 @@ public class UserGenreFragment extends BaseFragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             id = getArguments().getString(ARG_ID);
+            name = getArguments().getString(ARG_NAME);
         }
     }
 
@@ -91,26 +95,40 @@ public class UserGenreFragment extends BaseFragment {
     @Override
     public void onResume() {
         super.onResume();
+        genreTitleText.setText(name);
 
         List<MusicDisplayItem> musicDisplayItems = musicDisplayAdapter.getItems();
         musicDisplayItems.clear();
-        SongRepository.getInstance().getRecentlySongs().observe(getViewLifecycleOwner(), new Observer<List<Song>>() {
-            @Override
-            public void onChanged(List<Song> songs) {
-                musicDisplayItems.add(new MusicDisplayItem("aaa", "Recently", new ArrayList<>(songs), MusicDisplayItem.HomeDisplayType.SONG));
-                musicDisplayAdapter.notifyDataSetChanged();
 
-            }
-        });
-        PlaylistRepository.getInstance().getAll().observe(getViewLifecycleOwner(), new Observer<List<Playlist>>() {
+        PlaylistRepository.getInstance().getNewReleasePlaylists().observe(getViewLifecycleOwner(), new Observer<List<Playlist>>() {
             @Override
             public void onChanged(List<Playlist> playlists) {
                 musicDisplayItems.add(new MusicDisplayItem("aaa", "New release", new ArrayList<>(playlists), MusicDisplayItem.HomeDisplayType.RELEASE_PLAYLIST));
-                musicDisplayItems.add(new MusicDisplayItem("aaa", "Featuring", new ArrayList<>(playlists), MusicDisplayItem.HomeDisplayType.MIX_PLAYLIST));
-                musicDisplayItems.add(new MusicDisplayItem("aaa", "Trending artist", new ArrayList<>(TestData.artistList), MusicDisplayItem.HomeDisplayType.ARTIST));
-                musicDisplayAdapter.notifyDataSetChanged();
+                musicDisplayAdapter.notifyItemInserted(musicDisplayAdapter.getItemCount() - 1);
+
             }
 
+        });
+        PlaylistRepository.getInstance().getFeaturedPlaylists().observe(getViewLifecycleOwner(), new Observer<List<Playlist>>() {
+            @Override
+            public void onChanged(List<Playlist> playlists) {
+
+                musicDisplayItems.add(new MusicDisplayItem("aaa", "Featuring", new ArrayList<>(playlists), MusicDisplayItem.HomeDisplayType.RELEASE_PLAYLIST));
+                musicDisplayAdapter.notifyItemInserted(musicDisplayAdapter.getItemCount() - 1);
+
+            }
+
+        });
+
+        ArtistRepository.getInstance().getTrendingArtist().observe(getViewLifecycleOwner(), new Observer<List<User>>() {
+            @Override
+            public void onChanged(List<User> users) {
+
+                musicDisplayItems.add(new MusicDisplayItem("aaa", "Trending artist", new ArrayList<>(users), MusicDisplayItem.HomeDisplayType.ARTIST));                musicDisplayAdapter.notifyItemInserted(musicDisplayAdapter.getItemCount() - 1);
+                musicDisplayAdapter.notifyItemInserted(musicDisplayAdapter.getItemCount() - 1);
+                callback.setIsProcessing(false);
+
+            }
         });
     }
 
@@ -121,9 +139,7 @@ public class UserGenreFragment extends BaseFragment {
         genreTitleText = binding.genreTitleText;
         musicDisplayView = binding.musicDisplayView;
         backButton = binding.backButton;
-        genre = GenreRepository.getInstance().getItemById(id).getValue();
 
-        genreTitleText.setText(genre.getName());
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

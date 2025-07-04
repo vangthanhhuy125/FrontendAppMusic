@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
-             xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_main"
     app:startDestination="@id/userHomeFragment">
@@ -8,33 +8,70 @@
         android:id="@+id/userHomeFragment"
         android:name="com.example.manhinhappmusic.fragment.user.UserHomeFragment"
         android:label="fragment_user_home"
-        tools:layout="@layout/fragment_user_home" />
+        tools:layout="@layout/fragment_user_home" >
+        <action
+            android:id="@+id/action_userHomeFragment_to_userProfileFragment2"
+            app:destination="@id/userProfileFragment" />
+    </fragment>
     <fragment
         android:id="@+id/userSearchFragment"
         android:name="com.example.manhinhappmusic.fragment.user.UserSearchFragment"
         android:label="fragment_user_search"
-        tools:layout="@layout/fragment_user_search" />
+        tools:layout="@layout/fragment_user_search" >
+        <action
+            android:id="@+id/action_userSearchFragment_to_seacrhExFragment2"
+            app:destination="@id/seacrhExFragment" />
+        <action
+            android:id="@+id/action_userSearchFragment_to_addSongToPlaylistFragment"
+            app:destination="@id/addSongToPlaylistFragment" />
+    </fragment>
     <fragment
         android:id="@+id/userLibraryFragment"
         android:name="com.example.manhinhappmusic.fragment.user.UserLibraryFragment"
         android:label="fragment_user_library"
-        tools:layout="@layout/fragment_user_library" />
+        tools:layout="@layout/fragment_user_library" >
+        <action
+            android:id="@+id/action_userLibraryFragment_to_userPlaylistFragment2"
+            app:destination="@id/userPlaylistFragment" />
+        <action
+            android:id="@+id/action_userLibraryFragment_to_userLibrarySearchFragment2"
+            app:destination="@id/userLibrarySearchFragment" />
+    </fragment>
     <fragment
         android:id="@+id/userPlaylistFragment"
         android:name="com.example.manhinhappmusic.fragment.user.UserPlaylistFragment"
         android:label="fragment_user_playlist"
-        tools:layout="@layout/fragment_user_playlist" />
+        tools:layout="@layout/fragment_user_playlist" >
+        <action
+            android:id="@+id/action_userPlaylistFragment_to_editPlaylistFragment2"
+            app:destination="@id/editPlaylistFragment" />
+        <action
+            android:id="@+id/action_userPlaylistFragment_to_userPlaylistAddSongFragment2"
+            app:destination="@id/userPlaylistAddSongFragment" />
+        <action
+            android:id="@+id/action_userPlaylistFragment_to_addSongToPlaylistFragment2"
+            app:destination="@id/addSongToPlaylistFragment" />
+    </fragment>
     <fragment
         android:id="@+id/userProfileFragment"
         android:name="com.example.manhinhappmusic.fragment.user.UserProfileFragment"
         android:label="fragment_user_profile"
-        tools:layout="@layout/fragment_user_profile" />
+        tools:layout="@layout/fragment_user_profile" >
+        <action
+            android:id="@+id/action_userProfileFragment_to_editProfileFragment2"
+            app:destination="@id/editProfileFragment" />
+        <action
+            android:id="@+id/action_userProfileFragment_to_feedbackFragment2"
+            app:destination="@id/feedbackFragment" />
+    </fragment>
     <fragment
         android:id="@+id/userGenreFragment"
         android:name="com.example.manhinhappmusic.fragment.user.UserGenreFragment"
         android:label="fragment_user_genre"
         tools:layout="@layout/fragment_user_genre">
         <argument android:name="genreId"
+            app:argType="string"/>
+        <argument android:name="genreName"
             app:argType="string"/>
     </fragment>
     <fragment
@@ -44,12 +81,23 @@
         tools:layout="@layout/fragment_user_artist">
         <argument android:name="artistId"
             app:argType="string"/>
+        <argument android:name="artistName"
+            app:argType="string"/>
+        <argument android:name="artistImageUrl"
+            app:argType="string"/>
     </fragment>
     <fragment
         android:id="@+id/seacrhExFragment"
         android:name="com.example.manhinhappmusic.fragment.user.SearchExFragment"
         android:label="fragment_seacrh_ex"
-        tools:layout="@layout/fragment_seacrh_ex" />
+        tools:layout="@layout/fragment_seacrh_ex" >
+        <action
+            android:id="@+id/action_seacrhExFragment_to_userGenreFragment"
+            app:destination="@id/userGenreFragment" />
+        <action
+            android:id="@+id/action_seacrhExFragment_to_userArtistFragment"
+            app:destination="@id/userArtistFragment" />
+    </fragment>
     <fragment
         android:id="@+id/userLibrarySearchFragment"
         android:name="com.example.manhinhappmusic.fragment.user.UserLibrarySearchFragment"
@@ -77,8 +125,21 @@
         android:label="fragment_edit_profile"
         tools:layout="@layout/fragment_edit_profile" />
     <fragment
-        android:id="@+id/userSearchAddSongFragment"
-        android:name="com.example.manhinhappmusic.fragment.user.UserSearchAddSongFragment"
-        android:label="fragment_user_search_add_song"
-        tools:layout="@layout/fragment_user_search_add_song"/>
+        android:id="@+id/addSongToPlaylistFragment"
+        android:name="com.example.manhinhappmusic.fragment.user.AddSongToPlaylistsFragment"
+        android:label="fragment_add_song_to_playlist"
+        tools:layout="@layout/fragment_add_song_to_playlists">
+        <argument android:name="songId"
+            app:argType="string"/>
+    </fragment>
+    <fragment
+        android:id="@+id/addSongFragment"
+        android:name="com.example.manhinhappmusic.fragment.artist.AddSongFragment"
+        android:label="AddSongFragment" />
+    <fragment
+        android:id="@+id/feedbackFragment"
+        android:name="com.example.manhinhappmusic.fragment.user.UserFeedbackFragment"
+        android:label="UserFeedbackFragment" />
+
+
 </navigation>

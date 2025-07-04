@@ -35,7 +35,7 @@ public class MusicDisplayAdapter extends RecyclerView.Adapter<MusicDisplayAdapte
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         return new ViewHolder(LayoutInflater.from(parent.getContext()
-                ).inflate(R.layout.item_music_display, parent, false));
+        ).inflate(R.layout.item_music_display, parent, false));
     }
 
     @Override

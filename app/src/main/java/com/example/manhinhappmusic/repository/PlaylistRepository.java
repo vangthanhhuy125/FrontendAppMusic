@@ -6,8 +6,10 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.manhinhappmusic.TestData;
+import com.example.manhinhappmusic.dto.AddSongsRequest;
 import com.example.manhinhappmusic.dto.AuthResponse;
 import com.example.manhinhappmusic.dto.LoginRequest;
+import com.example.manhinhappmusic.dto.SongResponse;
 import com.example.manhinhappmusic.model.Playlist;
 import com.example.manhinhappmusic.model.Song;
 import com.example.manhinhappmusic.network.ApiClient;
@@ -25,7 +27,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 @Data
-public class PlaylistRepository implements AppRepository<Playlist> {
+public class PlaylistRepository extends AppRepository {
 
     private static PlaylistRepository instance;
     private PlaylistRepository()
@@ -42,7 +44,6 @@ public class PlaylistRepository implements AppRepository<Playlist> {
         }
         return  instance;
     }
-    @Override
     public LiveData<Playlist> getItemById(String id) {
         MutableLiveData<Playlist> playlist = new MutableLiveData<>();
 
@@ -54,24 +55,23 @@ public class PlaylistRepository implements AppRepository<Playlist> {
                 {
                     playlist.setValue(response.body());
                 }
-                else {
-                    Log.e("API", "Response Error: "+ response.code());
-                }
+
             }
 
             @Override
             public void onFailure(Call<Playlist> call, Throwable throwable) {
-                Log.e("API", "Response error: " + throwable.getMessage());
+
+                if(callback != null)
+                    callback.onError(throwable);
             }
         });
         return playlist;
     }
 
-    @Override
     public LiveData<List<Playlist>> getAll() {
         MutableLiveData<List<Playlist>> playlists = new MutableLiveData<>();
 
-       apiClient.getApiService().getAllPlaylists().enqueue(new Callback<List<Playlist>>() {
+        apiClient.getApiService().getAllPlaylists().enqueue(new Callback<List<Playlist>>() {
             @Override
             public void onResponse(Call<List<Playlist>> call, Response<List<Playlist>> response) {
                 if(response.isSuccessful() && response.body() != null)
@@ -83,7 +83,57 @@ public class PlaylistRepository implements AppRepository<Playlist> {
 
             @Override
             public void onFailure(Call<List<Playlist>> call, Throwable throwable) {
-                Log.e("API", "Response error: " + throwable.getMessage());
+
+                if(callback != null)
+                    callback.onError(throwable);
+            }
+        });
+
+        return playlists;
+    }
+
+    public LiveData<List<Playlist>> getFeaturedPlaylists() {
+        MutableLiveData<List<Playlist>> playlists = new MutableLiveData<>();
+
+        apiClient.getApiService().getFeaturedPlaylists().enqueue(new Callback<List<Playlist>>() {
+            @Override
+            public void onResponse(Call<List<Playlist>> call, Response<List<Playlist>> response) {
+                if(response.isSuccessful() && response.body() != null)
+                {
+                    playlists.setValue(response.body());
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<List<Playlist>> call, Throwable throwable) {
+
+                if(callback != null)
+                    callback.onError(throwable);
+            }
+        });
+
+        return playlists;
+    }
+
+    public LiveData<List<Playlist>> getNewReleasePlaylists() {
+        MutableLiveData<List<Playlist>> playlists = new MutableLiveData<>();
+
+        apiClient.getApiService().getNewReleasePlaylists().enqueue(new Callback<List<Playlist>>() {
+            @Override
+            public void onResponse(Call<List<Playlist>> call, Response<List<Playlist>> response) {
+                if(response.isSuccessful() && response.body() != null)
+                {
+                    playlists.setValue(response.body());
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<List<Playlist>> call, Throwable throwable) {
+
+                if(callback != null)
+                    callback.onError(throwable);
             }
         });
 
@@ -113,6 +163,8 @@ public class PlaylistRepository implements AppRepository<Playlist> {
                     @Override
                     public void onFailure(Call<List<Playlist>> call, Throwable throwable) {
 
+                        if(callback != null)
+                            callback.onError(throwable);
                     }
                 });
             }
@@ -120,6 +172,8 @@ public class PlaylistRepository implements AppRepository<Playlist> {
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable throwable) {
 
+                if(callback != null)
+                    callback.onError(throwable);
             }
         });
 
@@ -140,6 +194,8 @@ public class PlaylistRepository implements AppRepository<Playlist> {
             @Override
             public void onFailure(Call<Playlist> call, Throwable throwable) {
 
+                if(callback != null)
+                    callback.onError(throwable);
             }
         });
 
@@ -158,31 +214,35 @@ public class PlaylistRepository implements AppRepository<Playlist> {
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable throwable) {
 
+                if(callback != null)
+                    callback.onError(throwable);
             }
         });
 
         return isDeleted;
     }
 
-    public LiveData<Playlist> addSongs(String id, List<String> songs)
+    public LiveData<ResponseBody> addSongs(String id, List<String> songs)
     {
-        MutableLiveData<Playlist> playlist = new MutableLiveData<>();
-        Map<String, List<String>> changes = new HashMap<>();
-        changes.put("songs", songs);
-        apiClient.getApiService().addSongs(id, changes).enqueue(new Callback<Playlist>() {
+        MutableLiveData<ResponseBody> result = new MutableLiveData<>();
+        ;
+        apiClient.getApiService().addSongsToPlaylist(new AddSongsRequest(songs, id)).enqueue(new Callback<ResponseBody>() {
             @Override
-            public void onResponse(Call<Playlist> call, Response<Playlist> response) {
-                if(response.isSuccessful() && response.body() != null)
-                    playlist.setValue(response.body());
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if(response.isSuccessful() && response.body()  != null)
+                {
+                    result.setValue(response.body());
+                }
+
             }
 
             @Override
-            public void onFailure(Call<Playlist> call, Throwable throwable) {
-
+            public void onFailure(Call<ResponseBody> call, Throwable throwable) {
+                callback.onError(throwable);
             }
         });
 
-        return playlist;
+        return result;
     }
 
     public LiveData<Playlist> removeSongs(String id, List<String> songs)
@@ -203,6 +263,8 @@ public class PlaylistRepository implements AppRepository<Playlist> {
             @Override
             public void onFailure(Call<Playlist> call, Throwable throwable) {
 
+                if(callback != null)
+                    callback.onError(throwable);
             }
         });
 
@@ -212,22 +274,25 @@ public class PlaylistRepository implements AppRepository<Playlist> {
     public LiveData<List<Song>> getAllSongs(String id)
     {
         MutableLiveData<List<Song>> songs = new MutableLiveData<>();
-        apiClient.getApiService().getAllSongs(id).enqueue(new Callback<List<Song>>() {
+        List<Song> songList = new ArrayList<>();
+        apiClient.getApiService().getAllSongs(id).enqueue(new Callback<List<SongResponse>>() {
             @Override
-            public void onResponse(Call<List<Song>> call, Response<List<Song>> response) {
+            public void onResponse(Call<List<SongResponse>> call, Response<List<SongResponse>> response) {
                 if(response.isSuccessful() && response.body() != null)
                 {
-                    songs.setValue(response.body());
-
+                    for(SongResponse songResponse : response.body())
+                    {
+                        songList.add(songResponse.toSong());
+                    }
+                    songs.setValue(songList);
                 }
             }
 
             @Override
-            public void onFailure(Call<List<Song>> call, Throwable throwable) {
-
+            public void onFailure(Call<List<SongResponse>> call, Throwable throwable) {
+                callback.onError(throwable);
             }
         });
-
         return songs;
     }
 

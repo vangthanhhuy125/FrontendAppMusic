@@ -16,6 +16,7 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.manhinhappmusic.R;
+import com.example.manhinhappmusic.dto.SongResponse;
 import com.example.manhinhappmusic.model.Song;
 import com.example.manhinhappmusic.network.ApiService;
 
@@ -42,13 +43,13 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Song song = songList.get(position);
-        holder.getTextViewArtist().setText(song.getArtistId());
+        holder.getTextViewArtist().setText(song.getArtistName());
         holder.getTextViewSongTitle().setText(song.getTitle());
         if(song.getCoverImageUrl()!= null && !song.getCoverImageUrl().isEmpty())
             Glide.with(holder.itemView.getContext())
-                .load(ApiService.BASE_URL + song.getCoverImageUrl())
-                .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(15))))
-                .into(holder.getImageViewThumbnail());
+                    .load(ApiService.BASE_URL + song.getCoverImageUrl())
+                    .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(15))))
+                    .into(holder.getImageViewThumbnail());
         else
             Glide.with(holder.itemView.getContext())
                     .load(R.drawable.music_default_cover)
@@ -97,12 +98,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
             textViewSongTitle = itemView.findViewById(R.id.txtSongTitle);
             moreOptionsButton = itemView.findViewById(R.id.more_options_button);
             imageViewThumbnail = itemView.findViewById(R.id.imgThumbnail);
-            moreOptionsButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
 
-                }
-            });
         }
 
         public TextView getTextViewArtist() {

@@ -1,5 +1,6 @@
 package com.example.manhinhappmusic.adapter;
 
+import android.annotation.SuppressLint;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,7 +19,9 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.manhinhappmusic.R;
+import com.example.manhinhappmusic.dto.PlaylistResponse;
 import com.example.manhinhappmusic.dto.SongResponse;
+import com.example.manhinhappmusic.dto.UserResponse;
 import com.example.manhinhappmusic.model.User;
 import com.example.manhinhappmusic.model.ListItem;
 import com.example.manhinhappmusic.model.ListItemType;
@@ -58,43 +61,44 @@ public class SearchResultAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
 
-       if(viewType == ListItemType.SONG.ordinal())
-       {
-           return new SongViewHolder(layoutInflater.inflate(R.layout.item_search_result_song, parent, false));
-       }
-       else if(viewType == ListItemType.ARTIST.ordinal())
-       {
-           return new ArtistViewHolder(layoutInflater.inflate(R.layout.item_search_result_artist, parent, false));
+        if(viewType == ListItemType.SONG.ordinal())
+        {
+            return new SongViewHolder(layoutInflater.inflate(R.layout.item_search_result_song, parent, false));
+        }
+        else if(viewType == ListItemType.ARTIST.ordinal())
+        {
+            return new ArtistViewHolder(layoutInflater.inflate(R.layout.item_search_result_artist, parent, false));
 
-       }
-       else if(viewType == ListItemType.PLAYLIST.ordinal())
-       {
-           return new PlaylistViewHolder(layoutInflater.inflate(R.layout.item_search_result_playlist, parent, false));
+        }
+        else if(viewType == ListItemType.PLAYLIST.ordinal())
+        {
+            return new PlaylistViewHolder(layoutInflater.inflate(R.layout.item_search_result_playlist, parent, false));
 
-       }
-       return null;
+        }
+        return null;
     }
 
     @Override
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, @SuppressLint("RecyclerView") int position) {
         if(holder instanceof SongViewHolder)
         {
             SongResponse song = (SongResponse)listItemList.get(position);
             SongViewHolder songViewHolder = (SongViewHolder) holder;
             if(song.getCoverImageUrl() != null && !song.getCoverImageUrl().isEmpty())
                 Glide.with(holder.itemView.getContext())
-                    .load(ApiService.BASE_URL + song.getCoverImageUrl())
-                    .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(15))))
-                    .into(songViewHolder.getSongCoverImage());
+                        .load(ApiService.BASE_URL + song.getCoverImageUrl())
+                        .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(15))))
+                        .into(songViewHolder.getSongCoverImage());
             else
                 Glide.with(holder.itemView.getContext())
                         .load(R.drawable.music_default_cover)
                         .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(15))))
                         .into(songViewHolder.getSongCoverImage());
             songViewHolder.getSongTitleText().setText("Song • "+ song.getTitle());
-            songViewHolder.getSongArtistText().setText(song.getArtistId());
+            songViewHolder.getSongArtistText().setText(song.getArtistName());
             CheckBox checkBox = songViewHolder.getCheckBox();
-            checkBox.setChecked(song.getPlaylistIds().size() > 0 ? true : false);
+            if(checkStates.get(position) || (song.getIsInLibrary() != null && song.getIsInLibrary()))
+                checkBox.setChecked(true);
             checkBox.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -126,12 +130,12 @@ public class SearchResultAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         }
         else if(holder instanceof ArtistViewHolder)
         {
-            User artist = (User) listItemList.get(position);
+            UserResponse artist = (UserResponse) listItemList.get(position);
             ArtistViewHolder artistViewHolder = (ArtistViewHolder)holder;
-//            Glide.with(holder.itemView.getContext())
-//                    .load(ApiService.BASE_URL + artistViewHolder.ge())
-//                    .circleCrop()
-//                    .into(artistViewHolder.getArtistImage());
+            Glide.with(holder.itemView.getContext())
+                    .load(ApiService.BASE_URL + artist.getAvatarUrl())
+                    .circleCrop()
+                    .into(artistViewHolder.getArtistImage());
             artistViewHolder.getArtistNameText().setText(artist.getFullName());
             artistViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -140,43 +144,43 @@ public class SearchResultAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 }
             });
         } else if (holder instanceof PlaylistViewHolder) {
-            Playlist playlist = (Playlist) listItemList.get(position);
+            PlaylistResponse playlist = (PlaylistResponse) listItemList.get(position);
             PlaylistViewHolder playlistViewHolder = (PlaylistViewHolder) holder;
             if(playlist.getThumbnailUrl() != null && !playlist.getThumbnailUrl().isEmpty())
                 Glide.with(holder.itemView.getContext())
-                    .load(ApiService.BASE_URL + playlist.getThumbnailUrl())
-                    .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(15))))
-                    .into(playlistViewHolder.getPlaylistCoverImage());
+                        .load(ApiService.BASE_URL + playlist.getThumbnailUrl())
+                        .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(15))))
+                        .into(playlistViewHolder.getPlaylistCoverImage());
             else
                 Glide.with(holder.itemView.getContext())
                         .load(R.drawable.music_default_cover)
                         .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(15))))
                         .into(playlistViewHolder.getPlaylistCoverImage());
             playlistViewHolder.getPlaylistTitleText().setText(playlist.getName());
-//            CheckBox checkBox = playlistViewHolder.getCheckBox();
-//            checkBox.setChecked(checkStates.get(position));
-//            checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-//                @Override
-//                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-//                    checkStates.put(playlistViewHolder.getAdapterPosition(),checkBox.isChecked() );
-//
-//                    if(checkBox.isChecked())
-//                    {
-//                        if(onItemCheckedCheckBoxClickListener != null)
-//                        {
-//                            onItemCheckedCheckBoxClickListener.onItemCheckBoxClick(playlistViewHolder.getAdapterPosition(), playlist, checkBox);
-//                        }
-//                    }
-//                    else
-//                    {
-////                        checkBox.setChecked(true);
-//                        if(onItemUncheckedCheckBoxClickListener != null)
-//                        {
-//                            onItemUncheckedCheckBoxClickListener.onItemCheckBoxClick(playlistViewHolder.getAdapterPosition(), playlist, checkBox);
-//                        }
-//                    }
-//                }
-//            });
+            CheckBox checkBox = playlistViewHolder.getCheckBox();
+            checkBox.setChecked(playlist.getIsInLibrary() != null ? playlist.getIsInLibrary() : false);
+            checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    checkStates.put(playlistViewHolder.getAdapterPosition(),checkBox.isChecked() );
+
+                    if(checkBox.isChecked())
+                    {
+                        if(onItemCheckedCheckBoxClickListener != null)
+                        {
+                            onItemCheckedCheckBoxClickListener.onItemCheckBoxClick(playlistViewHolder.getAdapterPosition(), playlist, checkBox);
+                        }
+                    }
+                    else
+                    {
+//                        checkBox.setChecked(true);
+                        if(onItemUncheckedCheckBoxClickListener != null)
+                        {
+                            onItemUncheckedCheckBoxClickListener.onItemCheckBoxClick(playlistViewHolder.getAdapterPosition(), playlist, checkBox);
+                        }
+                    }
+                }
+            });
 
             playlistViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override

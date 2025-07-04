@@ -17,7 +17,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class ApiClient {
 
 
-    private ApiService apiService;
+    private static ApiService apiService;
 
     public static ApiClient instance;
 
@@ -62,7 +62,7 @@ public class ApiClient {
         apiService = retrofit.create(ApiService.class);
     }
 
-    public ApiService getApiService() {
+    public static ApiService getApiService() {
         return apiService;
     }
 

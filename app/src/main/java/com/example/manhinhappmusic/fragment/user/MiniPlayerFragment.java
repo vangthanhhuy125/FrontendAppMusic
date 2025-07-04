@@ -86,6 +86,12 @@ public class MiniPlayerFragment extends BaseFragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        callback.setIsProcessing(false);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
@@ -226,24 +232,24 @@ public class MiniPlayerFragment extends BaseFragment {
         Song song = mediaPlayerManager.getCurrentSong();
         if(song.getCoverImageUrl() != null && !song.getCoverImageUrl().isEmpty())
             Glide.with(this.getContext())
-                .asBitmap()
-                .load(ApiService.BASE_URL + mediaPlayerManager.getCurrentSong().getCoverImageUrl())
-                .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(15))))
-                .into(new CustomTarget<Bitmap>() {
-                    @Override
-                    public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
-                        songsCoverImage.setImageBitmap(resource);
-                        Palette.from(resource).generate(palette -> {
-                            int vibrant = palette.getVibrantColor(Color.GRAY);
-                            miniPlayerBackground.setBackgroundTintList(ColorStateList.valueOf(vibrant));
-                        });
-                    }
+                    .asBitmap()
+                    .load(ApiService.BASE_URL + mediaPlayerManager.getCurrentSong().getCoverImageUrl())
+                    .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(15))))
+                    .into(new CustomTarget<Bitmap>() {
+                        @Override
+                        public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                            songsCoverImage.setImageBitmap(resource);
+                            Palette.from(resource).generate(palette -> {
+                                int vibrant = palette.getVibrantColor(Color.GRAY);
+                                miniPlayerBackground.setBackgroundTintList(ColorStateList.valueOf(vibrant));
+                            });
+                        }
 
-                    @Override
-                    public void onLoadCleared(@Nullable Drawable placeholder) {
+                        @Override
+                        public void onLoadCleared(@Nullable Drawable placeholder) {
 
-                    }
-                });
+                        }
+                    });
         else
         {
             Glide.with(this.getContext())
@@ -251,14 +257,10 @@ public class MiniPlayerFragment extends BaseFragment {
                     .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(15))))
                     .into(songsCoverImage);
 
-//            Palette.from(BitmapFactory.decodeStream(this.getContext().getResources().openRawResource(R.drawable.music_default_cover))).generate(palette -> {
-//            int vibrant = palette.getVibrantColor(Color.GRAY);
-//            miniPlayerBackground.setBackgroundTintList(ColorStateList.valueOf(vibrant));
-//        });
         }
 
         songsNameText.setText(song.getTitle());
-//        artistsNameText.setText(mediaPlayerManager.getCurrentSong().getArtistId());
+        artistsNameText.setText(mediaPlayerManager.getCurrentSong().getArtistName());
         seekBar.setMax(mediaPlayerManager.getMediaPlayer().getDuration());
 
     }

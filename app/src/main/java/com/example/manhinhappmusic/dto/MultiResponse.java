@@ -1,7 +1,10 @@
 package com.example.manhinhappmusic.dto;
 
-public interface MultiResponse {
-    public String getType();
+import lombok.Data;
+
+@Data
+public class MultiResponse {
+    private String type; // "song", "artist", "playlist"
+    private Object data;
 
 }
-

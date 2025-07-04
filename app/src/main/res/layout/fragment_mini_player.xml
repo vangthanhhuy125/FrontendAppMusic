@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:context=".fragment.user.MiniPlayerFragment">
+    tools:context=".MiniPlayerFragment">
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/mini_player_background"
@@ -22,19 +22,18 @@
             android:padding="10dp">
 
 
-            <ImageView
+            <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/songs_cover_image"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_marginEnd="10dp"
                 android:scaleType="centerCrop"
-                android:src="@drawable/white_baseline_music_note_24"
+                android:src="@drawable/exampleavatar"
                 app:shapeAppearanceOverlay="@style/RoundedCornerImageStyle" />
 
             <LinearLayout
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:orientation="vertical">
 
                 <TextView
@@ -44,9 +43,7 @@
                     android:text="Song's name"
                     android:textColor="#FFFFFF"
                     android:textSize="18dp"
-                    android:textStyle="bold"
-                    android:maxLines="1"
-                    android:ellipsize="end"/>
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/artist_name_text"
@@ -54,13 +51,15 @@
                     android:layout_height="wrap_content"
                     android:text="Artist"
                     android:textColor="#CCFFFFFF"
-                    android:textSize="16dp"
-                    android:maxLines="1"
-                    android:ellipsize="end"/>
+                    android:textSize="16dp" />
 
 
             </LinearLayout>
 
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
 
             <ImageButton
                 android:id="@+id/skip_previous_button"

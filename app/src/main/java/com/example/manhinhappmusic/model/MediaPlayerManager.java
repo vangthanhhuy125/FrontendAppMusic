@@ -90,7 +90,7 @@ public class MediaPlayerManager {
             }
 
             for (OnCompletionListener onCompletionListener: onCompletionListeners.values()) {
-                 onCompletionListener.onCompletion();
+                onCompletionListener.onCompletion();
             }
         }
         else
@@ -103,11 +103,11 @@ public class MediaPlayerManager {
 
     private void shuffle()
     {
-            shufflePlaylist = new ArrayList<>(playlist);
-            shufflePlaylist.remove(currentSong);
-            Collections.shuffle(shufflePlaylist);
-            shufflePlaylist.add(0,currentSong);
-            currentPosition = 0;
+        shufflePlaylist = new ArrayList<>(playlist);
+        shufflePlaylist.remove(currentSong);
+        Collections.shuffle(shufflePlaylist);
+        shufflePlaylist.add(0,currentSong);
+        currentPosition = 0;
 
     }
 
@@ -318,15 +318,15 @@ public class MediaPlayerManager {
     }
 
     public void removeOnCompletionListener(String className) {
-            onCompletionListeners.remove(className);
+        onCompletionListeners.remove(className);
     }
     public void removeOnPlayingStateChangeListener(String className) {
-            onPlayingStateChangeListeners.remove(className);
+        onPlayingStateChangeListeners.remove(className);
     }
 
     public void removeOnPlayingSongChangeListener(String className)
     {
-            onPlayingSongChangeListeners.remove(className);
+        onPlayingSongChangeListeners.remove(className);
     }
 
     public boolean isPlayingNextSong() {
@@ -336,7 +336,7 @@ public class MediaPlayerManager {
     public void setPlaylist(List<Song> playlist) {
 
         clearAllStates();
-       this.playlist = playlist;
+        this.playlist = playlist;
     }
 
     public void setCurrentSong(int currentPosition)
@@ -367,7 +367,7 @@ public class MediaPlayerManager {
             }
             catch (Exception ex)
             {
-               // Log.e("Media player", ex.getMessage());
+                // Log.e("Media player", ex.getMessage());
             }
             for(OnPlayingSongChangeListener onPlayingSongChangeListener: onPlayingSongChangeListeners.values())
             {
@@ -376,6 +376,7 @@ public class MediaPlayerManager {
         }
 
     }
+
 
     public boolean isPrepared() {
         return isPrepared;

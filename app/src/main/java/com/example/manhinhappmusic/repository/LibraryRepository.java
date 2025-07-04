@@ -8,7 +8,12 @@ import com.example.manhinhappmusic.TestData;
 
 import java.util.List;
 
-public class LibraryRepository implements AppRepository<List<Playlist>> {
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+public class LibraryRepository extends AppRepository {
 
     private static LibraryRepository instance;
     private LibraryRepository()
@@ -24,20 +29,43 @@ public class LibraryRepository implements AppRepository<List<Playlist>> {
         return instance;
     }
 
-    @Override
-    public LiveData<List<Playlist>> getItemById(String id) {
+    public LiveData<ResponseBody> addPlaylistToLibrary(String id)
+    {
+        MutableLiveData<ResponseBody> result = new MutableLiveData<>();
+        apiClient.getApiService().addPlaylistToLibrary(id).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if(response.isSuccessful() && response.body() != null)
+                {
+                    result.setValue(response.body());
+                }
+            }
 
-        MutableLiveData<List<Playlist>> library = new MutableLiveData<>();
-//        new Thread(() -> {
-//
-//        }).start();
-
-        library.setValue(TestData.userPlaylistList);
-        return library;
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable throwable) {
+                callback.onError(throwable);
+            }
+        });
+        return result;
     }
 
-    @Override
-    public LiveData<List<List<Playlist>>> getAll() {
-        return null;
+    public LiveData<ResponseBody> removePlaylistFromLibrary(String id)
+    {
+        MutableLiveData<ResponseBody> result = new MutableLiveData<>();
+        apiClient.getApiService().addPlaylistToLibrary(id).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if(response.isSuccessful() && response.body() != null)
+                {
+                    result.setValue(response.body());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable throwable) {
+                callback.onError(throwable);
+            }
+        });
+        return result;
     }
 }

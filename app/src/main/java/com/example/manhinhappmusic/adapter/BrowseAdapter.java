@@ -82,7 +82,7 @@ public class BrowseAdapter extends RecyclerView.Adapter<BrowseAdapter.ViewHolder
         Genre genre = genreList.get(position);
         holder.getBrowseText().setText(genre.getName());
         Glide.with(holder.itemView.getContext())
-                .load(genre.getThumbnailResID())
+                .load(genre.getThumbnailUrl())
                 .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(15))))
                 .into(holder.getBrowseImage());
         holder.getBrowseHolderCardView().setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(holder.itemView.getContext(), colors[position % Array.getLength(colors)])));

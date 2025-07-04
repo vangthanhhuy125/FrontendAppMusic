@@ -16,39 +16,33 @@ public class BaseFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        callback.setIsProcessing(true);
         if(getActivity() instanceof MainActivity )
         {
             MainActivity mainActivity = (MainActivity) getActivity();
             mainActivity.setBottomNavigationViewVisibility(bottomNavVisibility);
         }
+
     }
 
     public interface FragmentInteractionListener{
+        boolean isProcessing = true;
         void onRequestChangeFragment(FragmentTag destinationTag, Object... params);
         void onRequestChangeFrontFragment(FragmentTag destinationTag, Object... params);
-
         void onRequestChangeActivity(FragmentTag destinationTag, Object... params);
         void onRequestOpenBottomSheetFragment(FragmentTag destinationTag, Object... params);
         void onRequestGoBackPreviousFragment();
         void onRequestLoadMiniPlayer();
+        void setIsProcessing(boolean isProcessing);
+
     }
 
     protected FragmentInteractionListener callback;
 
     public static enum FragmentTag{
-        LIST_GENRE,
-        EDIT_PROFILE_ADMIN,
-        ADMIN_PROFILE,
-        ADMIN_HOME,
-        ADMIN_GENRE,
-        ADMIN_FEEDBACK,
-        ARTIST_DETAIL,
-        USER_DETAIL,
         USER_HOME,
         USER_SEARCH,
         USER_PLAYLIST,
-        ADD_GENRE,
-        EDIT_GENRE,
         USER_PROFILE,
         USER_LIBRARY,
         REGISTER,
@@ -59,10 +53,6 @@ public class BaseFragment extends Fragment {
         FORGOT_PASSWORD,
         EDIT_PROFILE,
         CONFIRM_DELETING_GENRE,
-
-        CONFIRM_DELETING_USER,
-        ADD_SONG,
-        EDIT_SONG,
         CONFIRM_DELETING_SONG,
         CONFIRM_LOGGING_OUT,
         CHANGE_PASSWORD,
@@ -74,6 +64,16 @@ public class BaseFragment extends Fragment {
         USER_ARTIST,
         USER_SEARCH_ADD_SONG,
         PLAYLIST_EDIT,
+        ARTIST_DETAIL,
+        USER_DETAIL,
+        ADD_GENRE,
+        CONFIRM_DELETING_USER,
+        LIST_GENRE,
+        EDIT_GENRE,
+        ADMIN_HOME,
+        ADMIN_PROFILE,
+        EDIT_PROFILE_ADMIN,
+
 
 
     }

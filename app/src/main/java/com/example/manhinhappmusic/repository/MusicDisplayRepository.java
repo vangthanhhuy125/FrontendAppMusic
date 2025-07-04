@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class MusicDisplayRepository implements AppRepository<MusicDisplayItem> {
+public class MusicDisplayRepository extends AppRepository {
 
     private MutableLiveData<List<MusicDisplayItem>> homeDisplayItems = new MutableLiveData<>();
     private static MusicDisplayRepository instance;
@@ -37,10 +37,10 @@ public class MusicDisplayRepository implements AppRepository<MusicDisplayItem> {
                 new MusicDisplayItem("2","Featuring", new ArrayList<>(TestData.mixPlaylistList), MusicDisplayItem.HomeDisplayType.MIX_PLAYLIST),
                 new MusicDisplayItem("4", "Trending artists", new ArrayList<>(TestData.artistList), MusicDisplayItem.HomeDisplayType.ARTIST)
 
-                ));
+        ));
 
     }
-    @Override
+
     public LiveData<MusicDisplayItem> getItemById(String id) {
         MutableLiveData<MusicDisplayItem> homeDisplayItem = new MutableLiveData<>();
 

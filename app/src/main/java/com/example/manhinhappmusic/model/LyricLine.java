@@ -55,6 +55,25 @@ public class LyricLine {
         return lyrics;
     }
 
+    public static List<LyricLine> parseLrc(List<String> input)
+    {
+        List<LyricLine> lyricLines = new ArrayList<>();
+        for (String line : input)
+        {
+            Matcher matcher = Pattern.compile("\\[(\\d{2}):(\\d{2}).(\\d{2})\\]").matcher(line);
+            while (matcher.find())
+            {
+                int minutes = Integer.parseInt(matcher.group(1));
+                int seconds = Integer.parseInt(matcher.group(2));
+                int hundredths = Integer.parseInt(matcher.group(3));
+                long milliseconds = minutes * 60_000 + seconds * 1000 + hundredths * 10;
+                String text = line.substring(matcher.end()).trim();
+                lyricLines.add(new LyricLine(milliseconds, text));
+            }
+        }
+        return lyricLines;
+    }
+
     public static List<String> parseToStrings(List<LyricLine> lyricLines)
     {
         List<String> lyrics = new ArrayList<>();

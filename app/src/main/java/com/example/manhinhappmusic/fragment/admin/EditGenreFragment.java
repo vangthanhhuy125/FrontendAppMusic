@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,17 +22,32 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.manhinhappmusic.R;
 import com.example.manhinhappmusic.adapter.EditSongAdapter;
 import com.example.manhinhappmusic.fragment.BaseFragment;
 import com.example.manhinhappmusic.fragment.artist.ConfirmDeletingSongFragment;
 import com.example.manhinhappmusic.model.Genre;
 import com.example.manhinhappmusic.model.Song;
+import com.example.manhinhappmusic.model.User;
+import com.example.manhinhappmusic.network.ApiClient;
+import com.example.manhinhappmusic.network.ApiService;
+import com.example.manhinhappmusic.util.RealPathUtil;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
+import lombok.Data;
 import lombok.Setter;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 
 public class EditGenreFragment extends BaseFragment {
 
@@ -50,16 +66,17 @@ public class EditGenreFragment extends BaseFragment {
     private String genreName;
     private String genreDescription;
     private String genreImageUrl;
+    private Uri selectedImageUri;
+
+    private final ApiService apiService = ApiClient.getApiService();
+    private static final String ARG_GENRE = "genre";
 
     public EditGenreFragment() {}
 
-    public static EditGenreFragment newInstance(String id, String name, String description, String imageUrl) {
+    public static EditGenreFragment newInstance(Genre genre) {
         EditGenreFragment fragment = new EditGenreFragment();
         Bundle args = new Bundle();
-        args.putString("id", id);
-        args.putString("name", name);
-        args.putString("description", description);
-        args.putString("imageUrl", imageUrl);
+        args.putSerializable(ARG_GENRE, genre);
         fragment.setArguments(args);
         return fragment;
     }
@@ -68,11 +85,8 @@ public class EditGenreFragment extends BaseFragment {
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
                 if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
-                    Uri selectedImageUri = result.getData().getData();
-                    if (selectedImageUri != null) {
-                        imgThumbnail.setImageURI(selectedImageUri);
-                        genre.setUrlCoverImage(selectedImageUri.toString());
-                    }
+                    selectedImageUri = result.getData().getData();
+                    imgThumbnail.setImageURI(selectedImageUri);
                 }
             }
     );
@@ -80,16 +94,12 @@ public class EditGenreFragment extends BaseFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         if (getArguments() != null) {
-            genreId = getArguments().getString("id");
-            genreName = getArguments().getString("name");
-            genreDescription = getArguments().getString("description");
-            genreImageUrl = getArguments().getString("imageUrl");
+            genre = (Genre) getArguments().getSerializable("genre");
+            if (genre != null) {
+                genreId = genre.getId(); // ✅ Gán id tại đây
+            }
         }
-
-
-        genre = new Genre(genreId, genreName, genreDescription, genreImageUrl);
     }
 
     @Override
@@ -108,56 +118,65 @@ public class EditGenreFragment extends BaseFragment {
         btnSave = view.findViewById(R.id.btn_save);
         recyclerView = view.findViewById(R.id.list_song_view);
 
-        editName.setText(genreName);
-        editDescription.setText(genreDescription);
+        if (genre != null) {
+            editName.setText(genre.getName());
+            editDescription.setText(genre.getDescription());
+            genreId = genre.getId();
 
-        if (genreImageUrl != null && !genreImageUrl.isEmpty()) {
-            imgThumbnail.setImageURI(Uri.parse(genreImageUrl));
-        } else {
-            imgThumbnail.setImageResource(R.drawable.exampleavatar);
+            if (genre.getThumbnailUrl() != null && !genre.getThumbnailUrl().isEmpty()) {
+                Glide.with(this).load(genre.getThumbnailUrl()).into(imgThumbnail);
+            }
         }
-
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        songAdapter = new EditSongAdapter(songList, (song, position) -> {
-            ConfirmDeletingSongFragment confirmFragment = ConfirmDeletingSongFragment.newInstance(song, position);
-            confirmFragment.setConfirmDeleteListener((songId, pos) -> {
-                deleteSongFromDatabase(songId);
-                songList.remove(pos);
-                songAdapter.notifyItemRemoved(pos);
-            });
-            confirmFragment.show(getParentFragmentManager(), "CONFIRM_DELETE_SONG");
-        });
-
-        recyclerView.setAdapter(songAdapter);
 
         btnEditImage.setOnClickListener(v -> {
             Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
             pickImageLauncher.launch(intent);
         });
 
-        btnSave.setOnClickListener(v -> {
-            String newName = editName.getText().toString().trim();
-            String newDescription = editDescription.getText().toString().trim();
-
-            if (newName.isEmpty()) {
-                editName.setError("Vui lòng nhập tên thể loại");
-                editName.requestFocus();
-                return;
-            }
-
-            genre.setName(newName);
-            genre.setDescription(newDescription);
-
-
-            Toast.makeText(getContext(), "Đã lưu thay đổi", Toast.LENGTH_SHORT).show();
-
-            if (callback != null) {
-                callback.onRequestChangeFragment(FragmentTag.LIST_GENRE, genre);
-            }
-        });
+        btnSave.setOnClickListener(v -> updateGenreToServer());
     }
 
-    private void deleteSongFromDatabase(String songId) {
-        // Xử lý xóa bài hát nếu có database
+    private void updateGenreToServer() {
+        String newName = editName.getText().toString().trim();
+        String newDescription = editDescription.getText().toString().trim();
+
+        if (newName.isEmpty()) {
+            editName.setError("Vui lòng nhập tên thể loại");
+            editName.requestFocus();
+            return;
+        }
+
+        RequestBody namePart = RequestBody.create(MediaType.parse("text/plain"), newName);
+        RequestBody descPart = RequestBody.create(MediaType.parse("text/plain"), newDescription);
+
+        MultipartBody.Part thumbnailPart = null;
+        if (selectedImageUri != null) {
+            File file = new File(Objects.requireNonNull(RealPathUtil.getRealPathFromURI(requireContext(), selectedImageUri)));
+            RequestBody filePart = RequestBody.create(MediaType.parse("image/*"), file);
+            thumbnailPart = MultipartBody.Part.createFormData("thumbnail", file.getName(), filePart);
+        }
+
+        Call<Genre> call = apiService.updateGenre(genreId, thumbnailPart, namePart, descPart);
+        call.enqueue(new Callback<Genre>() {
+            @Override
+            public void onResponse(@NonNull Call<Genre> call, @NonNull Response<Genre> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    Toast.makeText(getContext(), "Cập nhật thể loại thành công", Toast.LENGTH_SHORT).show();
+                    if (callback != null) {
+                        Bundle result = new Bundle();
+                        result.putSerializable("genre_result", response.body());
+                        callback.onRequestChangeFragment(FragmentTag.LIST_GENRE, response.body());
+                    }
+                } else {
+                    Log.e("EditGenreFragment", "Lỗi khi cập nhật: " + response.message());
+                    Toast.makeText(getContext(), "Lỗi khi cập nhật: " + response.message(), Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<Genre> call, @NonNull Throwable t) {
+                Toast.makeText(getContext(), "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

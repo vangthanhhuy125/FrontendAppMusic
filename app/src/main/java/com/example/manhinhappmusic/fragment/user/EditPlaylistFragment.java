@@ -7,6 +7,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -27,6 +29,8 @@ import com.bumptech.glide.load.MultiTransformation;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
+import com.example.manhinhappmusic.databinding.FragmentEditPlaylistBinding;
+import com.example.manhinhappmusic.dto.SongResponse;
 import com.example.manhinhappmusic.fragment.BaseFragment;
 import com.example.manhinhappmusic.fragment.ConfirmDiscardingChangesFragment;
 import com.example.manhinhappmusic.model.Playlist;
@@ -49,6 +53,9 @@ import java.util.Map;
  */
 public class EditPlaylistFragment extends BaseFragment {
 
+
+    private FragmentEditPlaylistBinding binding;
+    private NavController navController;
     private ImageButton cancelButton;
     private Button saveButton;
     private ImageView playlistCoverImage;
@@ -99,21 +106,29 @@ public class EditPlaylistFragment extends BaseFragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        callback.setIsProcessing(false);
+
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_edit_playlist, container, false);
+        binding = FragmentEditPlaylistBinding.inflate(inflater, container, false);
+        return  binding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        cancelButton = view.findViewById(R.id.cancel_button);
-        saveButton = view.findViewById(R.id.save_button);
-        playlistCoverImage = view.findViewById(R.id.playlist_cover_image);
-        changePlaylistCoverButton = view.findViewById(R.id.change_cover_button);
-        playlistNameEditText = view.findViewById(R.id.playlist_name_edittext);
-        songsView = view.findViewById(R.id.songs_view);
+        navController = Navigation.findNavController(view);
+        cancelButton = binding.cancelButton;
+        saveButton = binding.saveButton;
+        playlistCoverImage = binding.playlistCoverImage;
+        changePlaylistCoverButton = binding.changeCoverButton;
+        playlistNameEditText = binding.playlistNameEdittext;
+        songsView = binding.songsView;
 
         Glide.with(this.getContext())
                 .load(ApiService.BASE_URL + playlist.getThumbnailUrl())
@@ -189,7 +204,7 @@ public class EditPlaylistFragment extends BaseFragment {
                     confirmDiscardingChangesFragment.show(getParentFragmentManager(), "");
                 }
                 else
-                    callback.onRequestGoBackPreviousFragment();
+                    navController.popBackStack();
 
 
             }
@@ -197,65 +212,79 @@ public class EditPlaylistFragment extends BaseFragment {
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Bundle result = new Bundle();
+                callback.setIsProcessing(true);
+
 //                result.putString("playlist_name", playlistNameEditText.getText().toString());
                 //playlist.setSongs(playlistSongEditAdapter.getSongList());
+                Map<String, Object> changes = new HashMap<>();
                 if(isTitleModified)
                 {
-                    Map<String, Object> changes = new HashMap<>();
                     changes.put("name", playlistNameEditText.getText().toString());
                     playlist.setName(playlistNameEditText.getText().toString());
-
-                    PlaylistRepository.getInstance().edit(playlist.getId(), changes).observe(getViewLifecycleOwner(), new Observer<Playlist>() {
-                        @Override
-                        public void onChanged(Playlist modifiedPlaylist) {
-                        }
-
-                    });
                 }
-
-
                 if(isSongListModified)
                 {
-
-                    List<String> deletedSongs = new ArrayList<>();
-                    List<Song> original = new ArrayList<>(playlist.getSongsList());
-                    for(Song song: original)
+                    List<String> newSongs = new ArrayList<>();
+                    for(Song song : playlistSongEditAdapter.getSongList())
                     {
-                        boolean isFound = false;
-                        for(Song editSong: playlistSongEditAdapter.getSongList())
-                        {
+                        newSongs.add(song.getId());
+                    }
+                    playlist.setSongs(newSongs);
+                    playlist.getSongsList().clear();
+                    changes.put("songs", newSongs);
+                }
 
-                            if(song.getId().equals(editSong.getId()))
-                            {
-                                isFound = true;
-                                break;
-                            }
-
-                        }
-                        if(!isFound)
-                        {
-                            playlist.getSongsList().remove(song);
-                            deletedSongs.add(song.getId());
-                        }
-
+                PlaylistRepository.getInstance().edit(playlist.getId(), changes).observe(getViewLifecycleOwner(), new Observer<Playlist>() {
+                    @Override
+                    public void onChanged(Playlist modifiedPlaylist) {
+                        callback.setIsProcessing(false);
+                        navController.popBackStack();
                     }
 
-                    PlaylistRepository.getInstance().removeSongs(playlist.getId(), deletedSongs).observe(getViewLifecycleOwner(), new Observer<Playlist>() {
-                        @Override
-                        public void onChanged(Playlist playlist) {
-                            Toast.makeText(getContext(), "Playlist has been changed", Toast.LENGTH_SHORT).show();
-                            getParentFragmentManager().setFragmentResult("update_playlist", result);
-                            callback.onRequestGoBackPreviousFragment();
-                        }
-                    });
-                }
-                else
-                {
-                    Toast.makeText(getContext(), "Playlist has been changed", Toast.LENGTH_SHORT).show();
-                    getParentFragmentManager().setFragmentResult("update_playlist", result);
-                    callback.onRequestGoBackPreviousFragment();
-                }
+                });
+
+
+//                if(isSongListModified)
+//                {
+//
+//                    List<String> deletedSongs = new ArrayList<>();
+//                    List<Song> original = new ArrayList<>(playlist.getSongsList());
+//                    for(Song song: original)
+//                    {
+//                        boolean isFound = false;
+//                        for(Song editSong: playlistSongEditAdapter.getSongList())
+//                        {
+//
+//                            if(song.getId().equals(editSong.getId()))
+//                            {
+//                                isFound = true;
+//                                break;
+//                            }
+//
+//                        }
+//                        if(!isFound)
+//                        {
+//                            playlist.getSongsList().remove(song);
+//                            deletedSongs.add(song.getId());
+//                        }
+//
+//                    }
+//
+//                    PlaylistRepository.getInstance().removeSongs(playlist.getId(), deletedSongs).observe(getViewLifecycleOwner(), new Observer<Playlist>() {
+//                        @Override
+//                        public void onChanged(Playlist playlist) {
+//                            Toast.makeText(getContext(), "Playlist has been changed", Toast.LENGTH_SHORT).show();
+//                            getParentFragmentManager().setFragmentResult("update_playlist", result);
+//                            callback.onRequestGoBackPreviousFragment();
+//                        }
+//                    });
+//                }
+//                else
+//                {
+//                    Toast.makeText(getContext(), "Playlist has been changed", Toast.LENGTH_SHORT).show();
+//                    getParentFragmentManager().setFragmentResult("update_playlist", result);
+//                    callback.onRequestGoBackPreviousFragment();
+//                }
 
             }
         });

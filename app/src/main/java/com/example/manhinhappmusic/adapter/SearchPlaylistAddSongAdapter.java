@@ -66,9 +66,9 @@ public class SearchPlaylistAddSongAdapter extends RecyclerView.Adapter<SearchPla
 //        holder.getPlaylistCoverImage().setImageResource(playlist.getThumnailResID());
         if(playlist.getThumbnailUrl() != null && !playlist.getThumbnailUrl().isEmpty())
             Glide.with(holder.itemView.getContext())
-                .load(ApiService.BASE_URL + playlist.getThumbnailUrl())
-                .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(15))))
-                .into(holder.getPlaylistCoverImage());
+                    .load(ApiService.BASE_URL + playlist.getThumbnailUrl())
+                    .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(15))))
+                    .into(holder.getPlaylistCoverImage());
         else
             Glide.with(holder.itemView.getContext())
                     .load(R.drawable.music_default_cover)
@@ -149,7 +149,7 @@ public class SearchPlaylistAddSongAdapter extends RecyclerView.Adapter<SearchPla
     {
         for(Playlist playlist: playlistList)
         {
-                checkStates.put(playlist.getId(), true);
+            checkStates.put(playlist.getId(), true);
         }
     }
 }

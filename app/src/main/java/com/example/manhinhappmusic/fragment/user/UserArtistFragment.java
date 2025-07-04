@@ -11,6 +11,7 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -20,13 +21,16 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.example.manhinhappmusic.R;
+import com.example.manhinhappmusic.adapter.ArtistSongAdapter;
 import com.example.manhinhappmusic.databinding.FragmentUserArtistBinding;
 import com.example.manhinhappmusic.dto.SongResponse;
 import com.example.manhinhappmusic.fragment.BaseFragment;
 import com.example.manhinhappmusic.model.User;
 import com.example.manhinhappmusic.decoration.VerticalLinearSpacingItemDecoration;
 import com.example.manhinhappmusic.adapter.SearchResultAdapter;
+import com.example.manhinhappmusic.network.ApiService;
 import com.example.manhinhappmusic.repository.SongRepository;
 import com.example.manhinhappmusic.model.ListItem;
 import com.example.manhinhappmusic.model.ListItemType;
@@ -54,12 +58,16 @@ public class UserArtistFragment extends BaseFragment {
     private ImageButton backButton;
     private User artist;
 
-    private SearchResultAdapter songsAdapter;
+    private ArtistSongAdapter songsAdapter;
 
 
     private static final String ARG_ID = "artistId";
+    private static final String ARG_NAME = "artistName";
+    private static final String ARG_URL = "artistImageUrl";
 
     private String id;
+    private String name;
+    private String imageUrl;
 
     public UserArtistFragment() {
         // Required empty public constructor
@@ -68,7 +76,7 @@ public class UserArtistFragment extends BaseFragment {
     public static UserArtistFragment newInstance(String id) {
         UserArtistFragment fragment = new UserArtistFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_ID, id);
+
         fragment.setArguments(args);
         return fragment;
     }
@@ -78,6 +86,9 @@ public class UserArtistFragment extends BaseFragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             id = getArguments().getString(ARG_ID);
+            name = getArguments().getString(ARG_NAME);
+            imageUrl = getArguments().getString(ARG_URL);
+
         }
     }
 
@@ -91,16 +102,19 @@ public class UserArtistFragment extends BaseFragment {
     @Override
     public void onResume() {
         super.onResume();
-        SongRepository.getInstance().getRecentlySongs().observe(getViewLifecycleOwner(), new Observer<List<Song>>() {
+
+        collapsingToolbarLayout.setTitle(name);
+        Glide.with(getContext())
+                .load(ApiService.BASE_URL + imageUrl)
+                .into(artistImage);
+        SongRepository.getInstance().getSongByArtistId(id).observe(getViewLifecycleOwner(), new Observer<List<Song>>() {
             @Override
             public void onChanged(List<Song> songs) {
-                List<SongResponse> songResponses = new ArrayList<>();
-                for(Song song : songs)
-                {
-                    songResponses.add(new SongResponse(song.getId(), song.getArtistId(), song.getAudioUrl(), song.getTitle(), song.getDescription(), song.getCoverImageUrl(), new ArrayList<>(), 0L, 0d));
-                }
-                songsAdapter.setListItemList(new ArrayList<>(songResponses));
+                songsAdapter.setSongList(songs);
                 songsAdapter.notifyDataSetChanged();
+
+                callback.setIsProcessing(false);
+
             }
         });
     }
@@ -122,25 +136,20 @@ public class UserArtistFragment extends BaseFragment {
             }
         });
 
-        artist = ArtistRepository.getInstance().getItemById(id).getValue();
-
-        artistImage.setImageResource(artist.getAvatarResID());
-        collapsingToolbarLayout.setTitle(artist.getFullName());
 
 
 
 
-        songsAdapter = new SearchResultAdapter(new ArrayList<>(), new SparseBooleanArray(),new SearchResultAdapter.OnItemClickListener() {
+
+
+
+        songsAdapter = new ArtistSongAdapter(new ArrayList<>(), new ArtistSongAdapter.OnItemClickListener() {
             @Override
-            public void onItemClick(int position, ListItem item) {
-                if(item.getItemType() == ListItemType.SONG)
-                {
-                    Song song = (Song) item;
-                    MediaPlayerManager mediaPlayerManager = MediaPlayerManager.getInstance(null);
-                    mediaPlayerManager.setPlaylist(new ArrayList<>(Arrays.asList(song)));
-                    mediaPlayerManager.setCurrentSong(0);
-                    callback.onRequestLoadMiniPlayer();
-                }
+            public void onItemClick(int position, Song song) {
+                MediaPlayerManager mediaPlayerManager = MediaPlayerManager.getInstance(null);
+                mediaPlayerManager.setPlaylist(new ArrayList<>(Arrays.asList(song)));
+                mediaPlayerManager.setCurrentSong(0);
+                callback.onRequestLoadMiniPlayer();
             }
         });
         LinearLayoutManager songLayoutManager = new LinearLayoutManager(this.getContext());

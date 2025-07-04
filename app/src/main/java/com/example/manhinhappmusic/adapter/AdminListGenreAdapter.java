@@ -19,7 +19,7 @@ import com.example.manhinhappmusic.model.Genre;
 
 import java.util.List;
 
-public class ListGenreAdapter extends RecyclerView.Adapter<ListGenreAdapter.ViewHolder> {
+public class AdminListGenreAdapter extends RecyclerView.Adapter<AdminListGenreAdapter.ViewHolder> {
 
     private List<Genre> genreList;
     private OnItemRemoveListener removeListener;
@@ -40,7 +40,7 @@ public class ListGenreAdapter extends RecyclerView.Adapter<ListGenreAdapter.View
     }
 
 
-    public ListGenreAdapter(List<Genre> genreList, OnItemRemoveListener removeListener) {
+    public AdminListGenreAdapter(List<Genre> genreList, OnItemRemoveListener removeListener) {
         this.genreList = genreList;
         this.removeListener = removeListener;
     }
@@ -66,8 +66,9 @@ public class ListGenreAdapter extends RecyclerView.Adapter<ListGenreAdapter.View
         Genre genre = genreList.get(position);
         holder.genreName.setText(genre.getName());
 
-        String imageUrl = genre.getUrlCoverImage();
-        if (imageUrl == null || imageUrl.isEmpty()) {
+        String imageUrl = genre.getThumbnailUrl();
+
+        if (imageUrl == null || imageUrl.trim().isEmpty()) {
             holder.genreImage.setImageResource(R.drawable.exampleavatar);
         } else {
             Glide.with(holder.itemView.getContext())
@@ -78,7 +79,7 @@ public class ListGenreAdapter extends RecyclerView.Adapter<ListGenreAdapter.View
                     .into(holder.genreImage);
         }
 
-        // Sự kiện xóa
+        // Xử lý sự kiện xóa
         holder.removeButton.setOnClickListener(v -> {
             FragmentActivity activity = (FragmentActivity) v.getContext();
             ConfirmDeletingGenreFragment dialog = ConfirmDeletingGenreFragment.newInstance(genre, holder.getAdapterPosition());
@@ -92,19 +93,21 @@ public class ListGenreAdapter extends RecyclerView.Adapter<ListGenreAdapter.View
             dialog.show(activity.getSupportFragmentManager(), "ConfirmDeleteGenreDialog");
         });
 
+        // Click item (cả layout)
         holder.itemView.setOnClickListener(v -> {
             if (genreClickListener != null) {
                 genreClickListener.onGenreClick(genre);
             }
         });
 
+        // Click vào hình ảnh riêng
         holder.genreImage.setOnClickListener(v -> {
             if (clickListener != null) {
                 clickListener.onItemClick(genre);
             }
         });
-
     }
+
 
     @Override
     public int getItemCount() {

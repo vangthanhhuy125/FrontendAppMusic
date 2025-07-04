@@ -90,12 +90,6 @@ public class MoreOptionsSongFragment extends BottomSheetDialogFragment {
         artistNameText = view.findViewById(R.id.artist_name_text);
         addButton = view.findViewById(R.id.add_to_other_playlist_button);
         removeButton = view.findViewById(R.id.remove_from_this_playlist_button);
-
-
-//            Glide.with(getContext())
-//                .load(ApiService.BASE_URL + song.getCoverImageUrl())
-//                .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(15))))
-//                .into(songCoverImage);
         songTitleText.setText(song.getTitle());
         artistNameText.setText(song.getArtistId());
 
@@ -111,7 +105,7 @@ public class MoreOptionsSongFragment extends BottomSheetDialogFragment {
             @Override
             public void onClick(View v) {
                 PlaylistRepository.getInstance().removeSongs(PlaylistRepository.getInstance().getCurrentPlaylist().getId()
-                , new ArrayList<>(Arrays.asList(songId))).observe(getViewLifecycleOwner(), new Observer<Playlist>() {
+                        , new ArrayList<>(Arrays.asList(songId))).observe(getViewLifecycleOwner(), new Observer<Playlist>() {
                     @Override
                     public void onChanged(Playlist playlist) {
                         getParentFragmentManager().setFragmentResult("remove_song_from_this_playlist", null);

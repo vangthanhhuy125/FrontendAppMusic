@@ -1,6 +1,7 @@
 package com.example.manhinhappmusic.fragment.auth;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -115,6 +116,9 @@ public class RegisterFragment extends BaseFragment {
         String password = passwordEditText.getText().toString().trim();
         String fullname = fullnameEditText.getText().toString().trim();
 
+        SharedPreferences preferences = requireContext().getSharedPreferences("AppPreferences", Context.MODE_PRIVATE);
+        preferences.edit().putString("otp_email", email).apply();
+
         if (email.isEmpty() || password.isEmpty() || fullname.isEmpty()) {
             Toast.makeText(getContext(), "Vui lòng nhập đầy đủ thông tin", Toast.LENGTH_SHORT).show();
             return;
@@ -141,7 +145,4 @@ public class RegisterFragment extends BaseFragment {
             }
         });
     }
-
-
-
 }

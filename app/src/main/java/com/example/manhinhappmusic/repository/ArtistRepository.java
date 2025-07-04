@@ -8,7 +8,11 @@ import com.example.manhinhappmusic.model.User;
 
 import java.util.List;
 
-public class ArtistRepository implements AppRepository<User> {
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+public class ArtistRepository extends AppRepository {
 
     private static ArtistRepository instance;
 
@@ -25,15 +29,29 @@ public class ArtistRepository implements AppRepository<User> {
 
     }
 
-    @Override
+
     public LiveData<User> getItemById(String id) {
         MutableLiveData<User> artist = new MutableLiveData<>();
         artist.setValue(TestData.getArtistById(id));
         return artist;
     }
 
-    @Override
-    public LiveData<List<User>> getAll() {
-        return null;
+    public LiveData<List<User>> getTrendingArtist() {
+        MutableLiveData<List<User>> artists = new MutableLiveData<>();
+        apiClient.getApiService().getTrendingArtist().enqueue(new Callback<List<User>>() {
+            @Override
+            public void onResponse(Call<List<User>> call, Response<List<User>> response) {
+                if(response.isSuccessful() && response.body() != null)
+                {
+                    artists.setValue(response.body());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<User>> call, Throwable throwable) {
+                callback.onError(throwable);
+            }
+        });
+        return artists;
     }
 }

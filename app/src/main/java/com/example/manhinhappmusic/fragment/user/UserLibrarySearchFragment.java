@@ -41,6 +41,7 @@ public class UserLibrarySearchFragment extends BaseFragment {
     private RecyclerView searchResultsView;
     private ImageButton backButton;
     private List<Playlist> sourcePlaylistList;
+    PlaylistAdapter adapter;
 
     private static final String ARG_ID = "id";
 
@@ -75,6 +76,21 @@ public class UserLibrarySearchFragment extends BaseFragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        PlaylistRepository.getInstance().getAll().observe(getViewLifecycleOwner(), new Observer<List<Playlist>>() {
+            @Override
+            public void onChanged(List<Playlist> playlists) {
+                sourcePlaylistList = playlists;
+                adapter.setPlaylistList(playlists);
+                adapter.notifyDataSetChanged();
+                callback.setIsProcessing(false);
+
+            }
+        });
+    }
+
+    @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         searchText = view.findViewById(R.id.search_text);
@@ -82,21 +98,14 @@ public class UserLibrarySearchFragment extends BaseFragment {
         backButton = view.findViewById(R.id.back_button);
 
         sourcePlaylistList = new ArrayList<>();
-        PlaylistAdapter adapter = new PlaylistAdapter(sourcePlaylistList, new PlaylistAdapter.OnItemClickListener() {
+        adapter = new PlaylistAdapter(sourcePlaylistList, new PlaylistAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
                 callback.onRequestChangeFragment(FragmentTag.USER_PLAYLIST, sourcePlaylistList.get(position).getId());
             }
         });
 
-         PlaylistRepository.getInstance().getAll().observe(getViewLifecycleOwner(), new Observer<List<Playlist>>() {
-            @Override
-            public void onChanged(List<Playlist> playlists) {
-                sourcePlaylistList = playlists;
-                adapter.setPlaylistList(playlists);
-                adapter.notifyDataSetChanged();
-            }
-        });
+
 
 
 
@@ -139,17 +148,14 @@ public class UserLibrarySearchFragment extends BaseFragment {
         if(!keyWord.isBlank())
         {
             return playlists.stream()
-                            .filter(playlist -> Pattern
-                                    .compile("\\b" + keyWord + ".*", Pattern.CASE_INSENSITIVE)
-                                    .matcher(playlist.getName())
-                                    .find())
-                            .collect(Collectors.toList());
+                    .filter(playlist -> Pattern
+                            .compile("\\b" + keyWord + ".*", Pattern.CASE_INSENSITIVE)
+                            .matcher(playlist.getName())
+                            .find())
+                    .collect(Collectors.toList());
 
         }
         return playlists;
 
     }
-
-
-
 }

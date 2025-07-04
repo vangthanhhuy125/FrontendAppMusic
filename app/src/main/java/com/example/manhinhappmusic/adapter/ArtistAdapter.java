@@ -16,6 +16,7 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.manhinhappmusic.R;
 import com.example.manhinhappmusic.model.User;
+import com.example.manhinhappmusic.network.ApiService;
 
 import java.util.List;
 
@@ -24,7 +25,7 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ViewHolder
     List<User> artistList;
 
     public interface OnItemClickListener{
-        void onItemClick(int position);
+        void onItemClick(int position, User user);
     }
 
     private OnItemClickListener onItemClickListener;
@@ -45,13 +46,13 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ViewHolder
         User artist = artistList.get(position);
         holder.getArtistName().setText(artistList.get(position).getFullName());
         Glide.with(holder.itemView.getContext())
-                .load(artist.getAvatarResID())
+                .load(ApiService.BASE_URL + artist.getAvatarUrl())
                 .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(80))))
                 .into(holder.getArtistImage());
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onItemClickListener.onItemClick(holder.getAdapterPosition());
+                onItemClickListener.onItemClick(holder.getAdapterPosition(), artist);
             }
         });
     }
@@ -80,5 +81,7 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ViewHolder
         }
     }
 
-
+    public void setArtistList(List<User> artistList) {
+        this.artistList = artistList;
+    }
 }

@@ -38,10 +38,14 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Playlist playlist = playlistList.get(position);
-       if(playlist.getThumbnailUrl() != null && !playlist.getThumbnailUrl().isEmpty())
-           Glide.with(holder.itemView)
-                   .load(ApiService.BASE_URL + playlist.getThumbnailUrl())
-                   .into(holder.getImageViewSong());
+        if(playlist.getThumbnailUrl() != null && !playlist.getThumbnailUrl().isEmpty())
+            Glide.with(holder.itemView)
+                    .load(ApiService.BASE_URL + playlist.getThumbnailUrl())
+                    .into(holder.getImageViewSong());
+        else
+            Glide.with(holder.itemView)
+                    .load(R.drawable.music_default_cover)
+                    .into(holder.getImageViewSong());
         holder.getTextViewNumOfSong().setText(String.valueOf(playlist.getSongs().size()) + " songs");
         holder.getTextViewSongTitle().setText(playlist.getName());
 

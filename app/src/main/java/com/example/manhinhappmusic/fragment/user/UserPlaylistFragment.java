@@ -39,9 +39,11 @@ import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.example.manhinhappmusic.databinding.FragmentUserPlaylistBinding;
+import com.example.manhinhappmusic.dto.SongResponse;
 import com.example.manhinhappmusic.fragment.BaseFragment;
 import com.example.manhinhappmusic.helper.CoverImageScrollHelper;
 import com.example.manhinhappmusic.network.ApiService;
+import com.example.manhinhappmusic.repository.GlobalVars;
 import com.example.manhinhappmusic.repository.SongRepository;
 import com.example.manhinhappmusic.view.ClearableEditText;
 import com.example.manhinhappmusic.repository.PlaylistRepository;
@@ -58,12 +60,8 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link UserPlaylistFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class UserPlaylistFragment extends BaseFragment {
+    private static final String ARG_USER_ID = "userId";
 
     private static final String ARG_ID = "ID";
     private static final String ARG_IS_THIS_PLAYING = "IS_THIS_PLAYING";
@@ -80,9 +78,8 @@ public class UserPlaylistFragment extends BaseFragment {
     private Button editButton;
     private ImageButton addToLibraryButton;
     private ImageButton moreOptionsButton;
-    private AppBarLayout appBarLayout;
     private NestedScrollView nestedScrollView;
-//    private ImageButton shuffleButton;
+    //    private ImageButton shuffleButton;
     private ImageButton playButton;
     private RecyclerView songsView;
     private LinearLayout inforLinearContainer;
@@ -130,45 +127,49 @@ public class UserPlaylistFragment extends BaseFragment {
     @Override
     public void onResume() {
         super.onResume();
+
         playlistsTitle.setText(playlist.getName());
         playlistsCount.setText(String.valueOf(playlist.getSongs().size()) + " songs");
-        if(playlist.getThumbnailUrl() != null && !playlist.getThumbnailUrl().isEmpty())
+        if(playlist.getThumbnailUrl() != null && !playlist.getThumbnailUrl().isBlank())
             Glide.with(this.getContext())
                     .asBitmap()
                     .load(ApiService.BASE_URL + playlist.getThumbnailUrl())
-                .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(20))))
-                .into(new CustomTarget<Bitmap>() {
-                    @Override
-                    public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
-                        playlistsCoverImage.setImageBitmap(resource);
-                        Palette.from(resource).generate(palette -> {
-                            int vibrant = palette.getVibrantColor(Color.GRAY);
-                            GradientDrawable gradientDrawable = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,
-                                    new int[]{vibrant,
-                                            Color.parseColor("#121212"),
-                                            Color.parseColor("#121212"),
-                                            Color.parseColor("#121212"),
-                                            });
-                            binding.mainLayout.setBackground( gradientDrawable);
-                        });
-                    }
+                    .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(20))))
+                    .into(new CustomTarget<Bitmap>() {
+                        @Override
+                        public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                            playlistsCoverImage.setImageBitmap(resource);
+                            Palette.from(resource).generate(palette -> {
+                                int vibrant = palette.getVibrantColor(Color.GRAY);
+                                GradientDrawable gradientDrawable = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,
+                                        new int[]{vibrant,
+                                                Color.parseColor("#121212"),
+                                                Color.parseColor("#121212"),
+                                                Color.parseColor("#121212"),
+                                        });
+                                binding.mainLayout.setBackground( gradientDrawable);
+                            });
+                        }
 
-                    @Override
-                    public void onLoadCleared(@Nullable Drawable placeholder) {
+                        @Override
+                        public void onLoadCleared(@Nullable Drawable placeholder) {
 
-                    }
-                });
+                        }
+                    });
         else
             Glide.with(this.getContext())
                     .load(R.drawable.music_default_cover)
                     .apply(new RequestOptions().transform(new MultiTransformation<>(new CenterCrop(), new RoundedCorners(20))))
                     .into(playlistsCoverImage);
         PlaylistRepository.getInstance().getAllSongs(playlist.getId()).observe(getViewLifecycleOwner(), new Observer<List<Song>>() {
+
             @Override
             public void onChanged(List<Song> songs) {
                 playlist.setSongsList(songs);
                 songAdapter.setSongList(songs);
                 songAdapter.notifyDataSetChanged();
+                callback.setIsProcessing(false);
+
             }
         });
     }
@@ -195,7 +196,8 @@ public class UserPlaylistFragment extends BaseFragment {
         songsView = binding.songsView;
 
 
-       new CoverImageScrollHelper(playlistsCoverImage, nestedScrollView, 300f, 0.5f, 0.5f);
+        addToLibraryButton.setVisibility(View.GONE);
+        new CoverImageScrollHelper(playlistsCoverImage, nestedScrollView, 300f, 0.5f, 0.5f);
 
         searchEditText.setHint("Search in playlist");
         searchEditText.addTextChangedListener(new TextWatcher() {
@@ -372,8 +374,10 @@ public class UserPlaylistFragment extends BaseFragment {
 
         getParentFragmentManager().setFragmentResultListener("add_song_to_other_playlist", getViewLifecycleOwner(),(requestKey, result) -> {
 
-            callback.onRequestChangeFrontFragment(FragmentTag.USER_SEARCH_ADD_SONG, songAdapter.getSongList().get(modifiedPosition).getId());
-        });
+            Bundle bundle = new Bundle();
+            Song song = songAdapter.getSongList().get(modifiedPosition);
+            bundle.putString("songId", song.getId());
+            navController.navigate(R.id.addSongToPlaylistFragment,bundle );        });
 
         getParentFragmentManager().setFragmentResultListener("remove_song_from_this_playlist", getViewLifecycleOwner(),(requestKey, result) -> {
             if(modifiedPosition != -1)
@@ -386,10 +390,10 @@ public class UserPlaylistFragment extends BaseFragment {
         });
 
         getParentFragmentManager().setFragmentResultListener("add_song_to_this_playlist", getViewLifecycleOwner(),(requestKey, result) -> {
-
             Bundle bundle = new Bundle();
             bundle.putString("playlistId", playlist.getId());
             navController.navigate(R.id.userPlaylistAddSongFragment,bundle );
+
         });
         getParentFragmentManager().setFragmentResultListener("edit_playlist", getViewLifecycleOwner(),(requestKey, result) -> {
 
@@ -453,8 +457,8 @@ public class UserPlaylistFragment extends BaseFragment {
 
             return items.stream()
                     .filter(song -> Pattern.compile("\\b" + keyWord + ".*", Pattern.CASE_INSENSITIVE)
-                                    .matcher(song.getTitle())
-                                    .find())
+                            .matcher(song.getTitle())
+                            .find())
                     .collect(Collectors.toList());
 
         }

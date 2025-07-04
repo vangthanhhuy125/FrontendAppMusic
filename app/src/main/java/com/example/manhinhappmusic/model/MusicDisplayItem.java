@@ -7,7 +7,7 @@ public class MusicDisplayItem {
     private String id;
     private String title;
     private HomeDisplayType homeDisplayType;
-//    private HomeDisplayFragment.HomeDisplayLayout homeDisplayLayout;
+    //    private HomeDisplayFragment.HomeDisplayLayout homeDisplayLayout;
     private List<ListItem> items;
 
 //    public HomeDisplayItem(String id, String title, List<ListItem> items, HomeDisplayFragment.HomeDisplayLayout homeDisplayLayout)

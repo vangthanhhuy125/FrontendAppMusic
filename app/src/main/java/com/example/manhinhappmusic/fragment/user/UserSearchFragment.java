@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -18,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
 import com.example.manhinhappmusic.R;
 import com.example.manhinhappmusic.TestData;
 import com.example.manhinhappmusic.databinding.FragmentUserSearchBinding;
@@ -25,11 +27,16 @@ import com.example.manhinhappmusic.decoration.AppItemDecoration;
 import com.example.manhinhappmusic.fragment.BaseFragment;
 import com.example.manhinhappmusic.model.User;
 import com.example.manhinhappmusic.adapter.ArtistAdapter;
-import com.example.manhinhappmusic.adapter.BrowseAdapter;
+import com.example.manhinhappmusic.adapter.GenreAdapter;
 import com.example.manhinhappmusic.decoration.GridSpacingItemDecoration;
 import com.example.manhinhappmusic.decoration.HorizontalLinearSpacingItemDecoration;
 import com.example.manhinhappmusic.model.Genre;
+import com.example.manhinhappmusic.network.ApiService;
+import com.example.manhinhappmusic.repository.ArtistRepository;
+import com.example.manhinhappmusic.repository.GenreRepository;
+import com.example.manhinhappmusic.repository.GlobalVars;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -61,15 +68,14 @@ public class UserSearchFragment extends BaseFragment {
      * @return A new instance of fragment UserSearchFragment.
      */
     // TODO: Rename and change types and number of parameters
+    private static final String ARG_USER_AVATAR_URL = "userAvatarUrl";
 
     private NavController navController;
     private FragmentUserSearchBinding binding;
     private ImageView userAvatar;
     private AppCompatButton searchButton;
     private RecyclerView browseView;
-    private BrowseAdapter browseAdapter;
-    private List<Genre> genreList;
-
+    private GenreAdapter genreAdapter;
     private RecyclerView artistView;
     private ArtistAdapter artistAdapter;
     private List<User> artistList;
@@ -93,6 +99,34 @@ public class UserSearchFragment extends BaseFragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        String userAvatarUrl = GlobalVars.getVars().get(ARG_USER_AVATAR_URL);
+        if(userAvatarUrl != null)
+            Glide.with(getContext())
+                    .load(ApiService.BASE_URL + userAvatarUrl)
+                    .circleCrop()
+                    .into(userAvatar);
+
+        ArtistRepository.getInstance().getTrendingArtist().observe(getViewLifecycleOwner(), new Observer<List<User>>() {
+            @Override
+            public void onChanged(List<User> users) {
+                artistAdapter.setArtistList(users);
+                artistAdapter.notifyDataSetChanged();
+            }
+        });
+        GenreRepository.getInstance().getAllGenres().observe(getViewLifecycleOwner(), new Observer<List<Genre>>() {
+            @Override
+            public void onChanged(List<Genre> genres) {
+                genreAdapter.setGenreList(genres);
+                callback.setIsProcessing(false);
+            }
+        });
+
+
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         binding = FragmentUserSearchBinding.inflate(inflater, container, false);
@@ -108,30 +142,35 @@ public class UserSearchFragment extends BaseFragment {
 
         searchButton = binding.searchButton;
         searchButton.setOnClickListener(this::onSearchButtonClick);
+        Glide.with(getContext())
+                .load(R.drawable.person_default_cover)
+                .circleCrop()
+                .into(userAvatar);
 
-        genreList = TestData.genreList;
-
-        browseAdapter = new BrowseAdapter(genreList, new BrowseAdapter.OnItemClickListener() {
+        genreAdapter = new GenreAdapter(new ArrayList<>(), new GenreAdapter.OnItemClickListener() {
             @Override
-            public void onItemClick(int position) {
+            public void onItemClick(int position, Genre item) {
                 Bundle bundle = new Bundle();
-                bundle.putString("genreId", genreList.get(position).getId());
+                bundle.putString("genreId", item.getId());
+                bundle.putString("genreName", item.getName());
                 navController.navigate(R.id.userGenreFragment, bundle);
             }
         });
         browseView = view.findViewById(R.id.browse_view);
-        browseView.setAdapter(browseAdapter);
+        browseView.setAdapter(genreAdapter);
         GridLayoutManager browseLayoutManager = new GridLayoutManager(this.getContext(), 2);
         browseView.setLayoutManager(browseLayoutManager);
         browseView.addItemDecoration(new GridSpacingItemDecoration(2, AppItemDecoration.convertDpToPx(10, getResources()), true));
 
-        artistList = TestData.artistList;
 
-        artistAdapter = new ArtistAdapter(artistList, new ArtistAdapter.OnItemClickListener() {
+        artistAdapter = new ArtistAdapter(new ArrayList<>(), new ArtistAdapter.OnItemClickListener() {
             @Override
-            public void onItemClick(int position) {
+            public void onItemClick(int position, User artist) {
                 Bundle bundle = new Bundle();
-                bundle.putString("artistId", artistList.get(position).getId());
+                bundle.putString("artistId", artist.getId());
+                bundle.putString("artistName", artist.getFullName());
+                bundle.putString("artistImageUrl", artist.getAvatarUrl());
+
                 navController.navigate(R.id.userArtistFragment, bundle);
             }
         });
@@ -148,7 +187,7 @@ public class UserSearchFragment extends BaseFragment {
     }
 
     private void onSearchButtonClick(View view){
-       navController.navigate(R.id.seacrhExFragment);
+        navController.navigate(R.id.seacrhExFragment);
     }
 
     @Override

@@ -98,4 +98,9 @@ public class LoginActivity extends AppCompatActivity implements BaseFragment.Fra
     public void onRequestLoadMiniPlayer() {
 
     }
+
+    @Override
+    public void setIsProcessing(boolean isProcessing) {
+
+    }
 }

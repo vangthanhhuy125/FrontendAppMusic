@@ -23,8 +23,10 @@ import android.widget.CheckBox;
 import android.widget.ImageButton;
 
 import com.example.manhinhappmusic.databinding.FragmentSeacrhExBinding;
+import com.example.manhinhappmusic.dto.PlaylistResponse;
 import com.example.manhinhappmusic.dto.SongResponse;
 import com.example.manhinhappmusic.fragment.BaseFragment;
+import com.example.manhinhappmusic.repository.LibraryRepository;
 import com.example.manhinhappmusic.repository.SearchRepository;
 import com.example.manhinhappmusic.repository.SongRepository;
 import com.example.manhinhappmusic.view.ClearableEditText;
@@ -45,6 +47,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import okhttp3.ResponseBody;
 
 public class SearchExFragment extends BaseFragment {
 
@@ -72,19 +76,15 @@ public class SearchExFragment extends BaseFragment {
     @Override
     public void onResume() {
         super.onResume();
-        PlaylistRepository.getInstance().getAll().observe(getViewLifecycleOwner(), new Observer<List<Playlist>>() {
-            @Override
-            public void onChanged(List<Playlist> playlists) {
-                userPlaylists = playlists;
-            }
-        });
+        callback.setIsProcessing(false);
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-       binding = FragmentSeacrhExBinding.inflate(inflater, container, false);
-       return binding.getRoot();
+        binding = FragmentSeacrhExBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
@@ -99,24 +99,21 @@ public class SearchExFragment extends BaseFragment {
 
 
         SearchResultAdapter searchResultAdapter = new SearchResultAdapter(new ArrayList<>(), new SparseBooleanArray(),
-        new SearchResultAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(int position, ListItem item) {
+                (position, item) -> {
 
-                if(item.getItemType() == ListItemType.SONG)
-                {
-                    MediaPlayerManager mediaPlayerManager = MediaPlayerManager.getInstance(null);
-                    mediaPlayerManager.setPlaylist(new ArrayList<>(Arrays.asList((Song) item)));
-                    mediaPlayerManager.setCurrentSong(0);
-                    callback.onRequestLoadMiniPlayer();
-                    mediaPlayerManager.play();
-                }
-                else if(item.getItemType() == ListItemType.PLAYLIST)
-                {
-                    callback.onRequestChangeFragment(FragmentTag.USER_PLAYLIST, ((Playlist)item).getId());
-                }
-            }
-        });
+                    if(item.getItemType() == ListItemType.SONG)
+                    {
+                        MediaPlayerManager mediaPlayerManager = MediaPlayerManager.getInstance(null);
+                        mediaPlayerManager.setPlaylist(new ArrayList<>(Arrays.asList(((SongResponse) item).toSong())));
+                        mediaPlayerManager.setCurrentSong(0);
+                        callback.onRequestLoadMiniPlayer();
+                        mediaPlayerManager.play();
+                    }
+                    else if(item.getItemType() == ListItemType.PLAYLIST)
+                    {
+                        callback.onRequestChangeFragment(FragmentTag.USER_PLAYLIST, ((Playlist)item).getId());
+                    }
+                });
         searchResultAdapter.setOnItemCheckBoxClickListener(new SearchResultAdapter.OnItemCheckBoxClickListener() {
             @Override
             public void onItemCheckBoxClick(int position, ListItem item, CheckBox checkBox) {
@@ -125,16 +122,22 @@ public class SearchExFragment extends BaseFragment {
                     checkBox.setChecked(true);
                     searchResultAdapter.getCheckStates().put(position, true);
                     modifiedPosition = position;
-                    SongRepository.getInstance().setCurrentSongResponse((SongResponse) item);
-                    navController.navigate(R.id.userSearchAddSongFragment);
+                    Bundle bundle = new Bundle();
+                    bundle.putString("songId", ((SongResponse) item).getId());
+                    navController.navigate(R.id.addSongToPlaylistFragment, bundle);
                 }
                 else if(item.getItemType() == ListItemType.PLAYLIST)
                 {
-                    Snackbar snackbar =  Snackbar.make(view,"Removed playlist from library", Snackbar.LENGTH_SHORT);
-                    snackbar.setBackgroundTint(Color.WHITE);
-                    snackbar.setTextColor(Color.BLACK);
-                    snackbar.show();
-                    TestData.userPlaylistList.remove((Playlist) item);
+                    LibraryRepository.getInstance().removePlaylistFromLibrary(((PlaylistResponse)item).getId()).observe(getViewLifecycleOwner(), new Observer<ResponseBody>() {
+                        @Override
+                        public void onChanged(ResponseBody responseBody) {
+                            Snackbar snackbar =  Snackbar.make(view,"Removed playlist from library", Snackbar.LENGTH_SHORT);
+                            snackbar.setBackgroundTint(Color.WHITE);
+                            snackbar.setTextColor(Color.BLACK);
+                            snackbar.show();
+                        }
+                    });
+
                 }
 
             }
@@ -145,37 +148,53 @@ public class SearchExFragment extends BaseFragment {
             public void onItemCheckBoxClick(int position, ListItem item, CheckBox checkBox) {
                 if(item.getItemType() == ListItemType.SONG)
                 {
-                    PlaylistRepository.getInstance().addSongs("684594f8ee9e612d30043517", new ArrayList<>(Arrays.asList(((Song)item).getId()))).observe(getViewLifecycleOwner(), new Observer<Playlist>() {
-                        @Override
-                        public void onChanged(Playlist playlist) {
-                            Snackbar snackbar = Snackbar.make(view,"", Snackbar.LENGTH_LONG);
-                            View snackBarCustomLayout = LayoutInflater
-                                    .from(view.getContext())
-                                    .inflate(R.layout.snackbar_add_song_to_favorites, null);
-                            snackBarCustomLayout.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    modifiedPosition = position;
-                                    callback.onRequestChangeFrontFragment(FragmentTag.USER_SEARCH_ADD_SONG, ((Song)item).getId());
-                                    snackbar.dismiss();
-                                }
-                            });
-
-                            ViewGroup snackBarLayout = (ViewGroup) snackbar.getView();
-                            snackBarLayout.removeAllViews();
-                            snackBarLayout.addView(snackBarCustomLayout);
-                            snackbar.show();
-                        }
-                    });
+//                    callback.setIsProcessing(true);
+//                    PlaylistRepository.getInstance().addSongs(null, new ArrayList<>(Arrays.asList(((SongResponse)item).getId()))).observe(getViewLifecycleOwner(), new Observer<ResponseBody>() {
+//                        @Override
+//                        public void onChanged(ResponseBody result) {
+//                            callback.setIsProcessing(false);
+//                            Snackbar snackbar = Snackbar.make(view,"", Snackbar.LENGTH_LONG);
+//                            View snackBarCustomLayout = LayoutInflater
+//                                    .from(view.getContext())
+//                                    .inflate(R.layout.snackbar_add_song_to_favorites, null);
+//                            snackBarCustomLayout.setOnClickListener(new View.OnClickListener() {
+//                                @Override
+//                                public void onClick(View v) {
+//                                    modifiedPosition = position;
+//                                    Bundle bundle = new Bundle();
+//                                    bundle.putString("songId", ((SongResponse) item).getId());
+//                                    navController.navigate(R.id.addSongToPlaylistFragment, bundle);
+//                                    snackbar.dismiss();
+//                                }
+//                            });
+//
+//                            ViewGroup snackBarLayout = (ViewGroup) snackbar.getView();
+//                            snackBarLayout.removeAllViews();
+//                            snackBarLayout.addView(snackBarCustomLayout);
+//                            snackbar.show();
+//                        }
+//                    }
+//                );
+                    checkBox.setChecked(false);
+                    searchResultAdapter.getCheckStates().put(position, false);
+                    modifiedPosition = position;
+                    Bundle bundle = new Bundle();
+                    bundle.putString("songId", ((SongResponse) item).getId());
+                    navController.navigate(R.id.addSongToPlaylistFragment, bundle);
 
                 }
                 else if(item.getItemType() == ListItemType.PLAYLIST)
                 {
-                    Snackbar snackbar =  Snackbar.make(view,"Add playlist to library", Snackbar.LENGTH_SHORT);
-                    snackbar.setBackgroundTint(Color.WHITE);
-                    snackbar.setTextColor(Color.BLACK);
-                    snackbar.show();
-                    TestData.userPlaylistList.add((Playlist) item);
+                    LibraryRepository.getInstance().addPlaylistToLibrary(((PlaylistResponse)item).getId()).observe(getViewLifecycleOwner(), new Observer<ResponseBody>() {
+                        @Override
+                        public void onChanged(ResponseBody responseBody) {
+                            Snackbar snackbar =  Snackbar.make(view,"Add playlist to library", Snackbar.LENGTH_SHORT);
+                            snackbar.setBackgroundTint(Color.WHITE);
+                            snackbar.setTextColor(Color.BLACK);
+                            snackbar.show();
+                        }
+                    });
+
                 }
 
 
@@ -200,12 +219,15 @@ public class SearchExFragment extends BaseFragment {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if(!s.toString().isBlank())
                 {
+                    callback.setIsProcessing(true);
 
                     SearchRepository.getInstance().search(s.toString()).observe(getViewLifecycleOwner(), new Observer<List<ListItem>>() {
                         @Override
                         public void onChanged(List<ListItem> listItems) {
-                            searchResultAdapter.setListItemList(listItems);
+                            searchResultAdapter.setNewData(listItems, new SparseBooleanArray());
                             searchResultAdapter.notifyDataSetChanged();
+                            callback.setIsProcessing(false);
+
                         }
                     });
                 }
@@ -238,6 +260,12 @@ public class SearchExFragment extends BaseFragment {
             snackbar.show();
         });
         getParentFragmentManager().setFragmentResultListener("change", getViewLifecycleOwner(), (requestKey, result) ->{
+            if(modifiedPosition != -1)
+            {
+                searchResultAdapter.getCheckStates().put(modifiedPosition, true);
+                searchResultAdapter.notifyItemChanged(modifiedPosition);
+
+            }
             Snackbar snackbar =  Snackbar.make(view,"Saved changes", Snackbar.LENGTH_SHORT);
             snackbar.setBackgroundTint(Color.WHITE);
             snackbar.setTextColor(Color.BLACK);
@@ -249,28 +277,6 @@ public class SearchExFragment extends BaseFragment {
 
     private void onBackButtonClick(View view){
         navController.popBackStack();
-    }
-
-    private List<ListItem> search(String keyWord, List<ListItem> items)
-    {
-        if(!keyWord.isBlank())
-        {
-            return items.stream()
-                    .filter(listItem -> {
-                        for(String itemKeyWord: listItem.getSearchKeyWord())
-                        {
-                            if(Pattern.compile("\\b" + keyWord + ".*", Pattern.CASE_INSENSITIVE)
-                                    .matcher(itemKeyWord)
-                                    .find())
-                            {
-                                return true;
-                            }
-                        }
-                        return false;
-                       })
-                    .collect(Collectors.toList());
-        }
-        return new ArrayList<>();
     }
 
     private SparseBooleanArray checkItemInLibrary(List<ListItem> items)

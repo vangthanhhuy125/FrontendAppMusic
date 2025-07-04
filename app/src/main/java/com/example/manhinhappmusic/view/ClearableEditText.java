@@ -78,4 +78,10 @@ public class ClearableEditText extends FrameLayout {
     {
         this.textChangedListener = textChangedListener;
     }
+
+    public void setText(String text)
+    {
+        editText.setText(text);
+        btnClear.setVisibility(text != null && !text.isEmpty() ? VISIBLE : GONE);
+    }
 }

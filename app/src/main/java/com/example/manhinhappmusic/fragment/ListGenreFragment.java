@@ -5,6 +5,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -13,74 +14,46 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 
 import com.example.manhinhappmusic.R;
+import com.example.manhinhappmusic.adapter.AdminListGenreAdapter;
 import com.example.manhinhappmusic.adapter.ListGenreAdapter;
 import com.example.manhinhappmusic.model.Genre;
+import com.example.manhinhappmusic.viewmodel.GenreViewModel;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link ListGenreFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class ListGenreFragment extends Fragment implements ListGenreAdapter.OnItemRemoveListener {
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    public ListGenreFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment ListGenreFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-
+public class ListGenreFragment extends BaseFragment implements ListGenreAdapter.OnItemRemoveListener {
 
     private List<Genre> genreList;
     private List<Genre> filteredList;
     private EditText searchBox;
+    private ImageView imgSort;
+    private Button btnNewGenre;
     private RecyclerView genreRecyclerView;
     private ListGenreAdapter adapter;
+    private GenreViewModel genreViewModel;
+    private boolean isSortAscending = true;
+
+    public ListGenreFragment() { }
 
     public static ListGenreFragment newInstance(String param1, String param2) {
         ListGenreFragment fragment = new ListGenreFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putString("param1", param1);
+        args.putString("param2", param2);
         fragment.setArguments(args);
         return fragment;
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_list_genre, container, false);
     }
 
@@ -90,6 +63,8 @@ public class ListGenreFragment extends Fragment implements ListGenreAdapter.OnIt
 
         genreRecyclerView = view.findViewById(R.id.genreRecyclerView);
         searchBox = view.findViewById(R.id.searchBox);
+        imgSort = view.findViewById(R.id.imgSort);
+        btnNewGenre = view.findViewById(R.id.btnNewGenre);
 
         genreList = new ArrayList<>();
         genreList.add(new Genre("1", "Pop", "Popular music", null));
@@ -99,40 +74,129 @@ public class ListGenreFragment extends Fragment implements ListGenreAdapter.OnIt
 
         filteredList = new ArrayList<>(genreList);
 
-        ListGenreAdapter adapter = new ListGenreAdapter(filteredList, this);
+        adapter = new ListGenreAdapter(filteredList, this);
+
+        adapter.setOnGenreClickListener(genre -> {
+            if (callback != null) {
+                callback.onRequestChangeFragment(FragmentTag.CONFIRM_DELETING_GENRE, genre);
+            }
+        });
+
+        genreRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         genreRecyclerView.setAdapter(adapter);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
-        genreRecyclerView.setLayoutManager(linearLayoutManager);
+        genreRecyclerView.setVisibility(View.VISIBLE);
+
+        searchBox.setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus) {
+                filteredList.clear();
+                filteredList.addAll(genreList);
+                adapter.notifyDataSetChanged();
+                genreRecyclerView.setVisibility(View.VISIBLE);
+            }
+        });
 
         searchBox.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
                 filterGenres(s.toString());
+                genreRecyclerView.setVisibility(View.VISIBLE);
             }
 
-            @Override
-            public void afterTextChanged(Editable s) {}
+            @Override public void afterTextChanged(Editable s) { }
         });
+
+        imgSort.setOnClickListener(v -> {
+            sortGenres();
+        });
+
+        btnNewGenre.setOnClickListener(v -> {
+            if (callback != null) {
+                callback.onRequestChangeFragment(FragmentTag.ADD_GENRE);
+            }
+        });
+
+        genreViewModel = new ViewModelProvider(requireActivity()).get(GenreViewModel.class);
+
+        genreViewModel.getGenreList().observe(getViewLifecycleOwner(), genres -> {
+            if (genres != null && !genres.isEmpty()) {
+                genreList.clear();
+                genreList.addAll(genres);
+                filteredList.clear();
+                filteredList.addAll(genres);
+                adapter.notifyDataSetChanged();
+            }
+        });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Bundle args = getArguments();
+        if (args != null && args.containsKey("genre_result")) {
+            Genre updatedGenre = args.getParcelable("genre_result");
+            updateOrAddGenre(updatedGenre);
+            args.remove("genre_result");
+        }
+    }
+
+    private void updateOrAddGenre(Genre genre) {
+        int index = -1;
+        for (int i = 0; i < genreList.size(); i++) {
+            if (genreList.get(i).getId().equals(genre.getId())) {
+                index = i;
+                break;
+            }
+        }
+        if (index != -1) {
+            genreList.set(index, genre);
+            adapter.notifyItemChanged(index);
+        } else {
+            genreList.add(genre);
+            adapter.notifyItemInserted(genreList.size() - 1);
+        }
     }
 
     private void filterGenres(String keyword) {
         filteredList.clear();
-        for (Genre genre : genreList) {
-            if (genre.getName().toLowerCase().contains(keyword.toLowerCase())) {
-                filteredList.add(genre);
+        if (keyword.isEmpty()) {
+            filteredList.addAll(genreList);
+        } else {
+            for (Genre genre : genreList) {
+                if (genre.getName().toLowerCase().contains(keyword.toLowerCase())) {
+                    filteredList.add(genre);
+                }
             }
         }
         adapter.notifyDataSetChanged();
     }
 
     @Override
-    public void onRemove(int position, Genre genre) {
-        if (filteredList != null && position >= 0 && position < filteredList.size()) {
+    public void onRemove(int position) {
+        if (position >= 0 && position < filteredList.size()) {
+            Genre genreToRemove = filteredList.get(position);
+
+            Iterator<Genre> iterator = genreList.iterator();
+            while (iterator.hasNext()) {
+                if (iterator.next().getId().equals(genreToRemove.getId())) {
+                    iterator.remove();
+                    break;
+                }
+            }
+
             filteredList.remove(position);
             adapter.notifyItemRemoved(position);
         }
+    }
+
+    private void sortGenres() {
+        if (isSortAscending) {
+            filteredList.sort((g1, g2) -> g2.getName().compareToIgnoreCase(g1.getName())); // Z → A
+        } else {
+            filteredList.sort((g1, g2) -> g1.getName().compareToIgnoreCase(g2.getName())); // A → Z
+        }
+
+        isSortAscending = !isSortAscending;
+        adapter.notifyDataSetChanged();
     }
 }

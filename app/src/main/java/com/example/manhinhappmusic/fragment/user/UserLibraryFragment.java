@@ -17,15 +17,20 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.manhinhappmusic.R;
 import com.example.manhinhappmusic.databinding.FragmentUserLibraryBinding;
 import com.example.manhinhappmusic.decoration.VerticalLinearSpacingItemDecoration;
 import com.example.manhinhappmusic.adapter.PlaylistAdapter;
 import com.example.manhinhappmusic.fragment.BaseFragment;
 import com.example.manhinhappmusic.model.Playlist;
+import com.example.manhinhappmusic.network.ApiService;
+import com.example.manhinhappmusic.repository.GlobalVars;
 import com.example.manhinhappmusic.repository.PlaylistRepository;
+import com.example.manhinhappmusic.repository.UserRepository;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.imageview.ShapeableImageView;
 
@@ -38,10 +43,10 @@ public class UserLibraryFragment extends BaseFragment {
     public UserLibraryFragment() {
         // Required empty public constructor
     }
-
+    private static final String ARG_USER_AVATAR_URL = "userAvatarUrl";
     private FragmentUserLibraryBinding binding;
     private NavController navController;
-    private ShapeableImageView userAvatar;
+    private ImageView userAvatar;
     private ImageButton addButton;
     private ImageButton searchButton;
     private MaterialButton sortButton;
@@ -58,7 +63,6 @@ public class UserLibraryFragment extends BaseFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//
     }
 
     @Override
@@ -72,16 +76,38 @@ public class UserLibraryFragment extends BaseFragment {
     @Override
     public void onResume() {
         super.onResume();
-        Log.d("frag", "resume");
+        String userAvatarUrl = GlobalVars.getVars().get(ARG_USER_AVATAR_URL);
+        if(userAvatarUrl != null)
+            Glide.with(getContext())
+                    .load(ApiService.BASE_URL + userAvatarUrl)
+                    .circleCrop()
+                    .into(userAvatar);
+
         PlaylistRepository.getInstance().getAll().observe(getViewLifecycleOwner(), new Observer<List<Playlist>>() {
             @Override
             public void onChanged(List<Playlist> playlists) {
-                playlistAdapter.setPlaylistList(playlists);
-                playlistAdapter.notifyDataSetChanged();
+                try {
+
+                    Playlist fav = playlists.stream().filter(p -> p.getPlaylistType() != null && p.getPlaylistType().equals("favorites")).findFirst().get();
+                    Playlist your_songs  = playlists.stream().filter(p -> p.getPlaylistType() != null && p.getPlaylistType().equals("your_songs")).findFirst().get();
+                    playlists.remove(fav);
+                    playlists.remove(your_songs);
+                    playlists.add(0,your_songs);
+                    playlists.add(0, fav);
+                }
+                catch (Exception ex)
+                {
+
+                }
+                finally {
+                    playlistAdapter.setPlaylistList(playlists);
+                    playlistAdapter.notifyDataSetChanged();
+                    callback.setIsProcessing(false);
+                }
             }
         });
-    }
 
+    }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -90,7 +116,12 @@ public class UserLibraryFragment extends BaseFragment {
         userAvatar = binding.userAvatarImage;
         addButton = binding.addPlaylistButton;
         searchButton = binding.searchPlaylistButton;
-        sortButton = binding.sortButton;
+//        sortButton = binding.sortButton;
+
+        Glide.with(getContext())
+                .load(R.drawable.person_default_cover)
+                .circleCrop()
+                .into(userAvatar);
 
         userAvatar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -123,22 +154,12 @@ public class UserLibraryFragment extends BaseFragment {
             }
         });
 
-
-
         playlistsView = view.findViewById(R.id.playlists_view);
         playlistsView.setAdapter(playlistAdapter);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this.getContext());
         playlistsView.setLayoutManager(layoutManager);
         playlistsView.addItemDecoration(new VerticalLinearSpacingItemDecoration((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, getResources().getDisplayMetrics())));
-
-        sortButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
         getParentFragmentManager().setFragmentResultListener("request_add_playlist", getViewLifecycleOwner(), (requestKey, result) ->{
-            //playlistList.add(new Playlist("dfd", result.getString("playlist_name"), "Fdfd", new ArrayList<>(),"",0,"",new ArrayList<>()));
             String playlistName = result.getString("playlist_name", "null");
 
             PlaylistRepository.getInstance().getAll().observe(getViewLifecycleOwner(), new Observer<List<Playlist>>() {
@@ -151,21 +172,6 @@ public class UserLibraryFragment extends BaseFragment {
             });
 
         });
-
-//        getParentFragmentManager().setFragmentResultListener("update_library_when_playlist_got_deleted", getViewLifecycleOwner(), (requestKey, result) ->{
-//            if(currentPlaylistPosition != -1)
-//            {
-//                playlistAdapter.getPlaylistList().remove(currentPlaylistPosition);
-//                playlistAdapter.notifyItemRemoved(currentPlaylistPosition);
-//
-//            }
-//        });
-//
-//        getParentFragmentManager().setFragmentResultListener("update_library_when_playlist_got_modified", getViewLifecycleOwner(), (requestKey, result) ->{
-//            if(currentPlaylistPosition != -1)
-//                playlistAdapter.notifyItemChanged(currentPlaylistPosition);
-//        });
-
     }
 
     @Override

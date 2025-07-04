@@ -3,11 +3,17 @@ package com.example.manhinhappmusic.repository;
 import androidx.lifecycle.LiveData;
 
 import com.example.manhinhappmusic.network.ApiClient;
+import com.example.manhinhappmusic.network.NetworkMessage;
 
 import java.util.List;
 
-public interface AppRepository<T> {
+public abstract class AppRepository {
+
+    public static void initialize(NetworkMessage networkMessage)
+    {
+        callback = networkMessage;
+    }
     ApiClient apiClient = ApiClient.getInstance();
-    LiveData<T> getItemById(String id);
-    LiveData<List<T>> getAll();
+
+    protected static NetworkMessage callback;
 }

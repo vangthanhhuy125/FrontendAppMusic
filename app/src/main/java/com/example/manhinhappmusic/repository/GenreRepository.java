@@ -8,7 +8,11 @@ import com.example.manhinhappmusic.model.Genre;
 
 import java.util.List;
 
-public class GenreRepository implements AppRepository<Genre> {
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+public class GenreRepository extends AppRepository{
 
     private static GenreRepository instance;
 
@@ -25,16 +29,26 @@ public class GenreRepository implements AppRepository<Genre> {
 
     }
 
-    @Override
-    public LiveData<Genre> getItemById(String id) {
-        MutableLiveData<Genre> genre = new MutableLiveData<>();
 
-        genre.setValue(TestData.getGenreById(id));
-        return genre;
-    }
 
-    @Override
-    public LiveData<List<Genre>> getAll() {
-        return null;
+
+    public LiveData<List<Genre>> getAllGenres() {
+
+        MutableLiveData<List<Genre>> genres = new MutableLiveData<>();
+        apiClient.getApiService().getAllGenres().enqueue(new Callback<List<Genre>>() {
+            @Override
+            public void onResponse(Call<List<Genre>> call, Response<List<Genre>> response) {
+                if(response.isSuccessful() && response.body() != null)
+                {
+                    genres.setValue(response.body());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Genre>> call, Throwable throwable) {
+                callback.onError(throwable);
+            }
+        });
+        return genres;
     }
 }
