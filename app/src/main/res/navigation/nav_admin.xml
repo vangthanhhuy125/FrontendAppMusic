@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_admin"
+    app:startDestination="@id/adminHomeFragment">
+    <fragment
+        android:id="@+id/adminHomeFragment"
+        android:name="com.example.manhinhappmusic.fragment.admin.AdminHomeFragment"
+        android:label="fragment_admin_home"
+        tools:layout="@layout/fragment_admin_home"/>
+
+    <fragment
+        android:id="@+id/adminUserFragment"
+        android:name="com.example.manhinhappmusic.fragment.admin.ListUserFragment"
+        android:label="fragment_admin_list_user"
+        tools:layout="@layout/fragment_list_user"/>
+
+
+    <fragment
+        android:id="@+id/adminEditProfileFragment"
+        android:name="com.example.manhinhappmusic.fragment.admin.EditProfileAdminFragment"
+        android:label="fragment_admin_profile"
+        tools:layout="@layout/fragment_edit_profile_admin"/>
+
+    <fragment
+        android:id="@+id/adminProfileFragment"
+        android:name="com.example.manhinhappmusic.fragment.admin.AdminProfileFragment"
+        android:label="fragment_admin_profile"
+        tools:layout="@layout/fragment_admin_profile"/>
+
+    <fragment
+        android:id="@+id/adminFeedbackFragment"
+        android:name="com.example.manhinhappmusic.fragment.admin.AdminFeedbackFragment"
+        android:label="fragment_admin_feedback"
+        tools:layout="@layout/fragment_admin_feedback"/>
+
+    <fragment
+        android:id="@+id/listGenreFragment"
+        android:name="com.example.manhinhappmusic.fragment.admin.ListGenreFragment"
+        android:label="fragment_admin_genre"
+        tools:layout="@layout/fragment_list_genre"/>
+    <fragment
+        android:id="@+id/adminAddGenreFragment"
+        android:name="com.example.manhinhappmusic.fragment.admin.AddGenreFragment"
+        android:label="fragment_admin_add_genre"
+        tools:layout="@layout/fragment_add_genre"/>
+
+    <fragment
+        android:id="@+id/adminEditGenreFragment"
+        android:name="com.example.manhinhappmusic.fragment.admin.EditGenreFragment"
+        android:label="fragment_admin_edit_genre"
+        tools:layout="@layout/fragment_edit_genre"/>
+</navigation>

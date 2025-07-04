@@ -1,0 +1,16 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- Peace Symbol Circle -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M12,2a10,10 0 1,0 10,10A10,10 0 0,0 12,2zM11,4v7.5l-5.33,5.33a8,8 0 0,1 5.33,-12.83zM13,4a8,8 0 0,1 5.33,12.83L13,11.5V4zM11,13.92v4.08a8,8 0 0,1 -3.1,-1.27L11,13.92zM13,13.92l3.1,2.81a8,8 0 0,1 -3.1,1.27v-4.08z" />
+
+    <!-- Music Note -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M16,4v6.5a2.5,2.5 0 1,0 1,2v-7.5l3,-1v-1l-4,1z" />
+</vector>

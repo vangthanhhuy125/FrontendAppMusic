@@ -1,0 +1,94 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:padding="12dp"
+    android:layout_margin="8dp"
+    card_view:cardCornerRadius="12dp"
+    card_view:cardElevation="4dp"
+    android:background="@android:color/black">
+
+    <!-- Dòng user -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <ImageView
+            android:id="@+id/avatar"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/exampleavatar"
+            android:layout_marginEnd="10dp"
+            android:scaleType="centerCrop"
+            android:background="@drawable/circle_background" />
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/userName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tên người dùng"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="2 ngày trước"
+                android:textColor="#AAAAAA"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <!-- Số sao -->
+        <RatingBar
+            android:id="@+id/ratingBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:numStars="5"
+            android:stepSize="1"
+            android:isIndicator="true"
+            android:layout_marginStart="8dp"
+            style="@style/Widget.AppCompat.RatingBar.Small"/>
+    </LinearLayout>
+
+    <!-- Nội dung feedback -->
+    <TextView
+        android:id="@+id/content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/white"
+        android:text="Ứng dụng rất tốt, dễ sử dụng"
+        android:layout_marginTop="8dp"
+        android:textSize="15sp" />
+
+    <!-- Phản hồi từ admin -->
+    <TextView
+        android:id="@+id/adminReply"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#80FF00"
+        android:text="Phản hồi của admin"
+        android:textStyle="italic"
+        android:layout_marginTop="8dp"
+        android:textSize="14sp"
+        android:visibility="gone" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/sendReply"
+        android:text="Reply"
+        android:layout_gravity="end"
+        android:textColor="@android:color/white"
+        android:background="@android:color/black"/>
+</LinearLayout>

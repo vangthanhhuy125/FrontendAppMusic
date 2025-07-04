@@ -41,7 +41,7 @@ import retrofit2.http.Query;
 
 public interface ApiService {
 
-    String BASE_URL = "http://192.168.1.27:8081";
+    String BASE_URL = "http://<YOUR-URL>:8081";
 
     @GET("/api/common/playlist/{playlistId}")
     Call<Playlist> getPlaylistById(@Path("playlistId") String id);
